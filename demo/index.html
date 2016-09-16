@@ -1,0 +1,235 @@
+<html>
+
+<title>Linked charts with D3</title>
+<link rel="stylesheet" type="text/css" href="src/style.css">
+
+<style type="text/css">
+span.comment  {color:#060; font-weight:normal}
+span.oper     {color:#006; font-weight:normal}
+span.var      {color:#600; font-weight:normal}
+span.func     {color:#606; font-weight:normal}
+span.num      {color:#300; font-weight:bold}
+span.string   {color:#066; font-weight:normal}
+span.reg      {color:#666; font-weight:normal}
+</style>
+
+<body>
+<div>
+	This page was created to demonstrate the library that I am developing as 
+	my thesis project.<br>
+	Heatmap shows the change of avarage inhibition of several PDAC cell lines after
+	combining the drug in question with Everolimus (the original data are not
+	yet published and therefore demonstrated values have been randomly generated).<br>
+	By clicking on any cell of the heatmap one can see corresponding curvefits,
+	where solid line shows fitted drug response curve for drug + Everolimus 
+	combination and dashed line stands for drug + DMSO combination. <br>
+	Under each plot code used to generate it is demonstrated.
+</div>
+
+<table>
+	<tr>
+		<td><div id = "heatmap"></div></td>
+		<td>
+			<p id = "headline"></p>
+			<div id = "curveFit"></div>
+		</td>
+	</tr>
+	<tr>
+		<td>
+<pre lang="javascript"><code>
+<span class="oper">var</span> <span class="var">chart</span> <span class="oper">=</span> <span class="var">d3</span>.<span class="func">heatmapChart</span>()
+	<span class="comment">//set ids for each row of the heatmap</span>
+		.<span class="func">rowIds</span>(<span class="var">Object</span>.<span class="func">keys</span>(<span class="var">inputData</span>.<span class="var">Everolimus</span>.<span class="var">inh</span>))
+	<span class="comment">//set ids for each column of the heatmap</span>
+	.<span class="func">colIds</span>(<span class="oper">function</span>() {
+		<span class="oper">return</span> <span class="var">Object</span>.<span class="func">keys</span>(<span class="var">inputData</span>.<span class="var">Everolimus</span>.<span class="var">inh</span>[<span class="var">this</span>.<span class="func">get_rowIds</span>()[<span class="num">0</span>]]);
+	})
+	<span class="comment">//set number of rows</span>
+	.<span class="func">nrows</span>(<span class="oper">function</span>() {<span class="oper">return</span> <span class="var">this</span>.<span class="func">get_rowIds</span>().<span class="var">length</span>;})
+	<span class="comment">//set number of columns</span>
+	.<span class="func">ncols</span>(<span class="oper">function</span>() {<span class="oper">return</span> <span class="var">this</span>.<span class="func">get_colIds</span>().<span class="var">length</span>;})
+	<span class="comment">//for a pair of ids get data value in a corresponding cell</span>
+	.<span class="func">value</span>(<span class="oper">function</span>(<span class="var">row_id</span>, <span class="var">col_id</span>){
+		<span class="oper">return</span> <span class="var">inputData</span>.<span class="var">Everolimus</span>.<span class="var">inh</span>[<span class="var">row_id</span>][<span class="var">col_id</span>];
+	})
+	<span class="comment">//set size of the chart and margins</span>
+	.<span class="func">width</span>(<span class="num">1000</span>)
+	.<span class="func">height</span>(<span class="num">700</span>)
+	.<span class="func">margin</span>({<span class="var">top</span><span class="oper">:</span> <span class="num">100</span>, <span class="var">bottom</span><span class="oper">:</span> <span class="num">50</span>, <span class="var">left</span><span class="oper">:</span> <span class="num">150</span>, <span class="var">right</span><span class="oper">:</span> <span class="num">20</span>})
+	<span class="comment">//define onClick actions</span>
+	.<span class="func">cellClick</span>(<span class="oper">function</span>(<span class="var">d</span>){
+		<span class="var">curveFit_id</span> <span class="oper">=</span> <span class="var">d</span>[<span class="num">1</span>] <span class="oper">+</span> &quot;<span class="string">_</span>&quot; <span class="oper">+</span> <span class="var">d</span>[<span class="num">0</span>];
+		<span class="var">curveFit</span>.<span class="func">update</span>();
+		<span class="func">changeTitle</span>();
+	})
+	<span class="comment">//set location of the chart</span>
+	.<span class="func">place</span>(&quot;<span class="string">#heatmap</span>&quot;);
+
+</code></pre>
+		</td>
+		<td>
+		<!-- Code for curve fits -->
+<pre lang="javascript"><code>
+<span class="comment">//create curveFit</span>
+<span class="oper">var</span> <span class="var">curveFit</span> <span class="oper">=</span> <span class="var">d3</span>.<span class="func">scatterChart</span>()
+	<span class="comment">//set number of points</span>
+	.<span class="func">numPoints</span>(<span class="num">10</span>)
+	<span class="comment">//set x coordinate for each point</span>
+	.<span class="func">x</span>(<span class="var">get_x</span>)
+	<span class="comment">//set y coordinate for each point</span>
+	.<span class="func">y</span>(<span class="var">get_y</span>)
+	<span class="comment">//define style of the points</span>
+	.<span class="func">style</span>(<span class="oper">function</span>(<span class="var">i</span>) {
+		<span class="oper">if</span>(<span class="var">i</span> <span class="oper">&lt;</span> <span class="num">5</span>)
+			<span class="oper">return</span> &quot;<span class="string">fill: blue;</span>&quot;
+		<span class="oper">else</span>
+			<span class="oper">return</span> &quot;<span class="string">fill: LightBlue;</span>&quot;;
+	})
+	<span class="comment">//set axes labels</span>
+	.<span class="func">x_label</span>(&quot;<span class="string">Concentration (log10)</span>&quot;)
+	.<span class="func">y_label</span>(&quot;<span class="string">Inhibition</span>&quot;)
+	<span class="comment">//set location of the chart</span>
+	.<span class="func">place</span>(&quot;<span class="string">#curveFit</span>&quot;)
+	<span class="comment">//add fitted curves to the scatter plot</span>
+	.<span class="func">add_lines</span>()
+	<span class="comment">//set number of lines</span>
+	.<span class="func">nlines</span>(<span class="num">2</span>)
+	<span class="comment">//define a funtion for each line</span>
+	.<span class="func">lineFun</span>(<span class="var">curveFunction</span>)
+	<span class="comment">//set style of each line</span>
+	.<span class="func">lineStyle</span>(<span class="oper">function</span>(<span class="var">i</span>){
+		<span class="oper">if</span>(<span class="var">i</span> <span class="oper">=</span><span class="oper">=</span> <span class="num">0</span>)
+			<span class="oper">return</span> &quot;<span class="string">stroke: blue</span>&quot;
+		<span class="oper">else</span>
+			<span class="oper">return</span> &quot;<span class="string">stroke: LightBlue; stroke-dasharray: 5,5</span>&quot;;
+		})
+	.<span class="func">update</span>();
+
+</code></pre>
+
+		</td>
+	</tr>
+</table>
+
+
+<script src = "https://d3js.org/d3.v4.min.js"></script>
+<script src = "https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src = "https://d3js.org/d3-color.v1.min.js"></script>
+<script src = "src/demoData.js"></script>
+<script src = "src/d3-linked-charts.js"></script>
+
+<script>
+
+//Calculate x coordinate for curve fitting plot
+get_x = function(i){
+	if(i < 5)
+		return Math.log10(inputData.Everolimus.curveFit[curveFit_id].minConc * 
+						Math.pow(10, i))
+	else 
+		return Math.log10(inputData.DMSO.curveFit[curveFit_id].minConc * 
+						Math.pow(10, i - 5));
+}
+//Calculate y coordinate for curve fit plot`
+get_y = function(i){
+	if(i < 5)
+		return inputData.Everolimus.curveFit[curveFit_id]["D" + (i + 1)]
+	else
+		return inputData.DMSO.curveFit[curveFit_id]["D" + (i - 4)];
+}
+//sigmoid function for curve fitting
+curveFunction = function(id, x) {
+		if(id == 0){
+			var max = inputData.Everolimus.curveFit[curveFit_id].max,
+				min = inputData.Everolimus.curveFit[curveFit_id].min,
+				IC50 = inputData.Everolimus.curveFit[curveFit_id].IC50,
+				slope = inputData.Everolimus.curveFit[curveFit_id].Slope;
+		} else {
+			var max = inputData.DMSO.curveFit[curveFit_id].max,
+				min = inputData.DMSO.curveFit[curveFit_id].min,
+				IC50 = inputData.DMSO.curveFit[curveFit_id].IC50,
+				slope = inputData.DMSO.curveFit[curveFit_id].Slope;
+		}
+		
+		return min + (max - min)/(1 + Math.pow(10, -(x - Math.log10(IC50)) * slope))
+}
+
+//update title of the curve fitting plot
+changeTitle = function() {
+		var screen = document.getElementById("screen")
+			.options[document.getElementById("screen").selectedIndex].value,
+		drug = document.getElementById("drug")
+			.options[document.getElementById("drug").selectedIndex].value;
+		d3.select("#headline")
+			.text(screen + " " + drug + " " + curveFit_id);
+};
+
+//Variable that stores an id of the currently displayed curve fit
+var curveFit_id = Object.keys(inputData.Everolimus.curveFit)[0];
+
+//create a heatmap
+var chart = d3.heatmapChart()
+	//set ids for each row of the heatmap
+		.rowIds(Object.keys(inputData.Everolimus.inh))
+	//set ids for each column of the heatmap
+	.colIds(function() {
+		return Object.keys(inputData.Everolimus.inh[this.get_rowIds()[0]]);
+	})
+	//set number of rows
+	.nrows(function() {return this.get_rowIds().length;})
+	//set number of columns
+	.ncols(function() {return this.get_colIds().length;})
+	//for a pair of ids get data value in a corresponding cell
+	.value(function(row_id, col_id){
+		return inputData.Everolimus.inh[row_id][col_id];
+	})
+	//set size of the chart and margins
+	.width(1000)
+	.height(700)
+	.margin({top: 100, bottom: 50, left: 150, right: 20})
+	//define onClick actions
+	.cellClick(function(d){
+		curveFit_id = d[1] + "_" + d[0];
+		curveFit.update();
+		changeTitle();
+	})
+	//set location of the chart
+	.place("#heatmap");
+	
+//create curveFit
+var curveFit = d3.scatterChart()
+	//set number of points
+	.numPoints(10)
+	//set x coordinate for each point
+	.x(get_x)
+	//set y coordinate for each point
+	.y(get_y)
+	//define style of the points
+	.style(function(i) {
+		if(i < 5)
+			return "fill: blue;"
+		else
+			return "fill: LightBlue;";
+	})
+	//set axes labels
+	.x_label("Concentration (log10)")
+	.y_label("Inhibition")
+	//set location of the chart
+	.place("#curveFit")
+	//add fitted curves to the scatter plot
+	.add_lines()
+	//set number of lines
+	.nlines(2)
+	//define a funtion for each line
+	.lineFun(curveFunction)
+	//set style of each line
+	.lineStyle(function(i){
+		if(i == 0)
+			return "stroke: blue"
+		else
+			return "stroke: LightBlue; stroke-dasharray: 5,5";
+		})
+	.update();
+
+</script>
+
+</body></html>
