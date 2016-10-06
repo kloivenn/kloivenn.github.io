@@ -175,6 +175,7 @@
 	  var obj = svgChartBase()
 	    .add_property( "x" )
 	    .add_property( "y" )
+			.add_property( "y_range", [])
 	    .add_property( "style", "" )
 	    .add_property( "numPoints" )
 	    .add_property( "dataIds" );
@@ -254,7 +255,7 @@
 	      .range( [ 0, obj.get_width() ] )
 	      .nice();
 	    obj.scale_y = d3.scaleLinear()
-	      .domain( d3.extent( obj.get_dataIds(), function(k) { return obj.get_y(k) } ) )
+	      .domain( obj.get_y_range().length > 0 ? obj.get_y_range() : d3.extent( obj.get_dataIds(), function(k) { return obj.get_y(k) } ) )
 	      .range( [ obj.get_height(), 0 ] )
 	      .nice();
 
@@ -318,8 +319,9 @@
 			.add_property("colour", function(val) {return obj.colourScale(val);})
 			.add_property("heatmapRow", function(rowId) {return obj.get_rowIds().indexOf(rowId);})
 			.add_property("heatmapCol", function(colId) {return obj.get_colIds().indexOf(colId);})
-			.add_property("palette", d3.interpolateOrRd)
-			.add_property("colourRange", function() {return obj.dataRange()})
+			.add_property("palette", function(t) {return d3.interpolateRdBu(1 - t);})
+			.add_property("colourCentered", true)
+			.add_property("colourRange")
 			.add_property("legendSteps", 21)
 			.add_property("labelMouseOver")
 			.add_property("labelMouseOut")
@@ -328,6 +330,19 @@
 			.add_property("labelClick")
 			.add_property("cellClick", function() {});
 			
+		obj.colourRange(function() {
+			var dr = obj.dataRange();
+			if(!obj.get_colourCentered()){
+				return dr
+			} else {
+				if(dr[0] * dr[1] == 0) return dr;
+				if(dr[0] * dr[1] > 0){
+					if(dr[0] > 0) return [0, dr[1]];
+					if(dr[0] < 0) return [dr[0], 0];
+				}
+				return [- d3.max([-dr[0], dr[1]]), d3.max([-dr[0], dr[1]])];
+			}
+		})
 		//returns maximum and minimum values of the data
 		obj.dataRange = function(){
 			var i = 0, range, newRange;

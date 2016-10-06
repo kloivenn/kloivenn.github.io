@@ -15,17 +15,19 @@ span.reg      {color:#666; font-weight:normal}
 
 <body>
 <div>
-	This page was created to demonstrate the library that I am developing as 
+	This page was created to demonstrate the library that I am developing as
 	my thesis project.<br>
-	Heatmap shows the change of avarage inhibition of several PDAC cell lines after
-	combining the drug in question with Everolimus (the original data are not
-	yet published and therefore here is drug labels and cell lines have been 
-	randomly scrambled).<br>
-	By clicking on any cell of the heatmap one can see corresponding curvefits,
-	where solid line shows fitted drug response curve for drug + Everolimus 
-	combination and dashed line stands for drug + DMSO combination. <br>
-	Under each plot the code	used to generate it is demonstrated. This code is
-	supposed to be written by a user of the library.
+	For several cancer cell lines, the response to a library of drugs was 
+	measured. The heatmap shows the difference in average growth inhibition, 
+	comparing the use of the drug alone, or in combination with everolimus. 
+	(The original data are not yet published, and therefore drug names 
+	(rows) and cell lines (columns) have been randomly scrambled).<br>
+	By clicking on any cell of the heatmap, one can see corresponding dose-response
+	curves, where the solid line shows the fitted drug response curve for the 
+	combination and the dashed line stands for the alone.<br>
+	Under each plot, the code used to generate it is shown, to illustrate how little 
+	code a user of my library has to write to implement complex visualization. The 
+	code of the actual library under development is on github.
 </div>
 
 <table>
@@ -72,7 +74,6 @@ span.reg      {color:#666; font-weight:normal}
 		<td>
 		<!-- Code for curve fits -->
 <pre lang="javascript"><code>
-<span class="comment">//create curveFit</span>
 <span class="oper">var</span> <span class="var">curveFit</span> <span class="oper">=</span> <span class="var">d3</span>.<span class="func">scatterChart</span>()
 	<span class="comment">//set number of points</span>
 	.<span class="func">numPoints</span>(<span class="num">10</span>)
@@ -90,6 +91,8 @@ span.reg      {color:#666; font-weight:normal}
 	<span class="comment">//set axes labels</span>
 	.<span class="func">x_label</span>(&quot;<span class="string">Concentration (log10)</span>&quot;)
 	.<span class="func">y_label</span>(&quot;<span class="string">Inhibition</span>&quot;)
+	<span class="comment">//fix the scale of Y axis</span>
+	.<span class="func">y_range</span>([<span class="oper">-</span><span class="num">25</span>, <span class="num">110</span>])
 	<span class="comment">//set location of the chart</span>
 	.<span class="func">place</span>(&quot;<span class="string">#curveFit</span>&quot;)
 	<span class="comment">//add fitted curves to the scatter plot</span>
@@ -106,8 +109,8 @@ span.reg      {color:#666; font-weight:normal}
 			<span class="oper">return</span> &quot;<span class="string">stroke: LightBlue; stroke-dasharray: 5,5</span>&quot;;
 		})
 	.<span class="func">update</span>();
-
 </code></pre>
+
 
 		</td>
 	</tr>
@@ -157,12 +160,8 @@ curveFunction = function(id, x) {
 
 //update title of the curve fitting plot
 changeTitle = function() {
-		var screen = document.getElementById("screen")
-			.options[document.getElementById("screen").selectedIndex].value,
-		drug = document.getElementById("drug")
-			.options[document.getElementById("drug").selectedIndex].value;
 		d3.select("#headline")
-			.text(screen + " " + drug + " " + curveFit_id);
+			.text(curveFit_id);
 };
 
 //Variable that stores an id of the currently displayed curve fit
@@ -184,6 +183,7 @@ var chart = d3.heatmapChart()
 	.value(function(row_id, col_id){
 		return inputData.Everolimus.inh[row_id][col_id];
 	})
+	
 	//set size of the chart and margins
 	.width(1000)
 	.height(700)
@@ -215,6 +215,8 @@ var curveFit = d3.scatterChart()
 	//set axes labels
 	.x_label("Concentration (log10)")
 	.y_label("Inhibition")
+	//fix the scale of Y axis
+	.y_range([-25, 110])
 	//set location of the chart
 	.place("#curveFit")
 	//add fitted curves to the scatter plot
