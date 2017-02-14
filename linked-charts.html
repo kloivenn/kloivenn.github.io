@@ -70,7 +70,7 @@ var heatmap = d3.heatmapChart()
   .colourRange( [ -1, 1 ] )
   .palette( d3.interpolateRdBu )
   .value( function( row, col ) {  
-     return pearsonCorr( geneExprs[row], drugScores[col] ) 
+     return d3.pearsonCorr( geneExprs[row], drugScores[col] ) 
    } )
   .rowLabels( function(row) { 
      return geneNames[row] 
