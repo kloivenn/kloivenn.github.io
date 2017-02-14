@@ -79,8 +79,8 @@ var heatmap = d3.heatmapChart()
      return drugNames[col] 
    } )
   .on_click( function( rowId, colId ) {
-     selGene = colId;
-     selDrug = rowId;
+     selGene = rowId;
+     selDrug = colId;
      scatterplot.update();
   })
   .place( "#heatmap")
