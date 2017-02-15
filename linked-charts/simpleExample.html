@@ -4,7 +4,7 @@
 
 <title>Linked charts</title>
 
-<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src = "https://d3js.org/d3.v4.min.js"></script>
 <script src = "https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
 </head>
@@ -18,7 +18,8 @@
 <p>To demonstrate how easy it is to create interactive data exploration apps with <i>linked-charts</i>,
 we show here a very simple example, complete with the code needed to create it.</p>
 
-<p>This example visualizes an excerpt of data from a project within <a href="">FIMM</a>'s <a href="">Individualized
+<p>This example visualizes an excerpt of data from a project within <a href="https://www.fimm.fi/">FIMM</a>'s 
+<a href="https://www.fimm.fi/en/research/grand-challenge-programmes/individualized-systems-medicine-cancer">Individualized
 Systems Medicine</a> programme. From a cohort of (here) 52 patients with acute myeloid leukaemia (AML), samples 
 of tumour cells were acquired by means of bone marrow aspiration. Each sample was assayed by various means,
 including RNA-Seq to measure gene expressions and an assay which tested the sensitivity of each sample
@@ -87,6 +88,19 @@ var heatmap = d3.heatmapChart()
 
 </script>
 
+<p style = 'background: #daeaff; padding: 10px; width: 50%;'>Note that on both charts zooming is possible (double-click to show the entire chart). 
+To order rows or columns of the heatmap according to the values in some column or row one can click on the corresponding label on the heatmap. 
+This default behaviour can be changed by user.</p>
+
+<div id = "navPanel"></div>
+<script src = "src/navigation.js"></script>
+<script>
+  showNavigationPanel(d3.select("#navPanel"), 0);
+</script>
+
+<br>
+<br>
+<br>
 <h2>The code for the example</h2>
 
 <p>A user of our framework can create apps with very little code. The following is the complete code needed to create the app above, with comments. </p>
@@ -134,9 +148,9 @@ var heatmap = d3.heatmapChart()
 <x-expl id="rowcolnames"></x-expl>    <span style='color:#808030; '>.</span>colLabels<span style='color:#808030; '>(</span> <span style='color:#800000; font-weight:bold; '>function</span><span style='color:#808030; '>(</span>col<span style='color:#808030; '>)</span> <span style='color:#800080; '>{</span> 
 <x-expl id="rowcolnames"></x-expl>       <span style='color:#800000; font-weight:bold; '>return</span> drugNames<span style='color:#808030; '>[</span>col<span style='color:#808030; '>]</span> 
 <x-expl id="rowcolnames"></x-expl>     <span style='color:#800080; '>}</span> <span style='color:#808030; '>)</span>
-<x-expl id="click"></x-expl>    <span style='color:#808030; '>.</span>cellClick<span style='color:#808030; '>(</span> <span style='color:#800000; font-weight:bold; '>function</span><span style='color:#808030; '>(</span> d <span style='color:#808030; '>)</span> <span style='color:#800080; '>{</span>
-<x-expl id="click"></x-expl>       selGene <span style='color:#808030; '>=</span> d<span style='color:#808030; '>[</span><span style='color:#008c00; '>0</span><span style='color:#808030; '>]</span><span style='color:#800080; '>;</span>
-<x-expl id="click"></x-expl>       selDrug <span style='color:#808030; '>=</span> d<span style='color:#808030; '>[</span><span style='color:#008c00; '>1</span><span style='color:#808030; '>]</span><span style='color:#800080; '>;</span>
+<x-expl id="click"></x-expl>    <span style='color:#808030; '>.</span>on_click<span style='color:#808030; '>(</span> <span style='color:#800000; font-weight:bold; '>function</span><span style='color:#808030; '>(</span> rowId <span style='color:#808030; '>,</span> colId <span style='color:#808030; '>)</span> <span style='color:#800080; '>{</span>
+<x-expl id="click"></x-expl>       selGene <span style='color:#808030; '>=</span> rowId<span style='color:#800080; '>;</span>
+<x-expl id="click"></x-expl>       selDrug <span style='color:#808030; '>=</span> colId<span style='color:#800080; '>;</span>
 <x-expl id="click"></x-expl>       scatterplot<span style='color:#808030; '>.</span>update<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
 <x-expl id="click"></x-expl>    <span style='color:#800080; '>}</span><span style='color:#808030; '>)</span>
 <x-expl id="place"></x-expl>    <span style='color:#808030; '>.</span>place<span style='color:#808030; '>(</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>#heatmap</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span>
@@ -260,7 +274,7 @@ by two vectors of labels, which are accessed here.</p>
 </div>
 
 <div class="expl" id="click">
-<p>The property <tt>cellClick</tt> is set here to a call back function that is called whenever the user
+<p>The property <tt>on_click</tt> is set here to a call back function that is called whenever the user
 clicks on a cell.</p>
 <p>The function takes the row and column index of the clicked heat map cell from the provided arguments
 and saves them in the two global variables <tt>selGene</tt> and <tt>selDrug</tt> that we have defined at the top and which are read by
@@ -301,10 +315,10 @@ is an area under a dose-response curve, and a click on a point in the scatter pl
 curve. This would merely require one more code block of the style shown.</p>
 
 <p>We intend to provide functions for several important chart types, always allowing linking of charts via the
-call-back mechanism. We will provide documentation, tutorials and case studies in the form of examples such as the one given here.
+call-back mechanism. We will provide documentation, tutorials and case studies in the form of examples such as the one given here.</p>
 
-Currently (Nov 2016), we are also working on better functionality for the chart types shown here, e.g. adding zooming and brushing, 
-and, for the heat maps, interactive clustering. </p>
+<p>Currently (Feb 2017), we are also working on better functionality for the chart types shown here, e.g. adding dendograms for heatmaps,
+using different shape of points for scatterplots, etc. </p>
 
 </body>
 
