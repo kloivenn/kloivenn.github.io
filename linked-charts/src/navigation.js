@@ -2,8 +2,8 @@ var exampleList = [{
 		link: "simpleExample.html",
 		name: "A very simple Example"
 	}, {
-		link: "",
-		name: "Test"
+		link: "corrAndCurvefit.html",
+		name: "Adding layers"
 	}]
 
 function showNavigationPanel(element, ind){
@@ -38,7 +38,9 @@ function showNavigationPanel(element, ind){
 							else
 								return function() {}
 					}())
-					.on("click", function() {window.open(exampleList[i].link, '_self', false)})
+					.on("click", (function(i) {
+						 return function() {window.open(exampleList[i].link, '_self', false)};
+					})(i))
 					.style("font-family", "Consolas, courier")
 					.text("- " + exampleList[i].name);
 		} else {

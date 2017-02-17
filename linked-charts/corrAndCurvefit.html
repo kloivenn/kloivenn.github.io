@@ -1,0 +1,343 @@
+<html>
+
+<head>
+
+<title>Linked charts - Adding layers</title>
+
+<script src = "https://d3js.org/d3.v4.min.js"></script>
+<script src = "https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<link rel="stylesheet" href="src/prism.css">
+<script src = "src/prism.js"></script>
+
+</head>
+
+<body>
+
+<h1>Linked charts</h1>
+
+<h2>Adding layers</h2>
+
+<p>In this and futher examples we provide more insight in the possibilities of the linked-charts 
+library and show how to use it.</p>
+<p>Some types of charts (for example, chart with axes) support layer system, where each layer can have 
+its own set of properties that are defined independently from other layers' properties. This is a simple 
+example of creating a chart with two layers.</p>
+<p>The data used here are generated in a drug-screening experiment. 50 drugs at 5 different concentrations 
+were tested against 21 pancreatic cancer cell lines. The heatmap shows drug-drug correlation. Like in the 
+previous example, a click on a cell of  the heatmap reveals the underlying statistics by demonstrating on 
+a scatter plot (right upper corner) the values of avarage inhibition for all tested cell lines and the two
+selected drugs. By clicking on a data point one can select a cell line, and thus change the third plot 
+(right bottom corner) that demonstrate individual inhibition percent values for the two selected drugs and 
+the selected cell line.</p>
+
+<link rel = "stylesheet" type = "text/css" href = "src/style.css">
+<script src = "src/d3-linked-charts.js"></script>
+<script src = "src/clusterfck.js"></script>
+<script src = "src/inputdata.js"></script>
+
+<table><tr>
+  <td id="heatmap" valign="top"></td>
+  <td id="scatterplot" valign="top"></td>
+</tr></table>
+
+<script>
+
+inputData = d3.separateBy(inputData, ["screen", "Drug", "CellLine"]);
+var drugs = Object.keys(inputData.RTG),
+  cellLines = Object.keys(inputData.RTG[drugs[0]]);
+
+var selDrugs = [drugs[0], drugs[1]],
+  selCellLine = cellLines[0];
+
+var heatmap = d3.heatmapChart()
+  .rowIds( drugs )
+  .colIds( drugs )
+  .colourRange( [ -1, 1 ] )
+  .palette( d3.interpolateRdBu )
+  .value( function( rowId, colId ) {  
+    var rowValues = cellLines.map(function(e) {
+        return inputData.RTG[rowId][e].avInh;
+      }),
+      colValues = cellLines.map(function(e) {
+        return inputData.RTG[colId][e].avInh;
+      });
+    return d3.pearsonCorr( rowValues, colValues ); 
+   })
+  .on_click( function( rowId, colId ) {
+     selDrugs = [rowId, colId]
+     scatterplot.update();
+     curveFit.update();
+  })
+  .place( "#heatmap");
+
+heatmap.cluster("Row")
+  .cluster("Col");
+
+var scatterplot = d3.scatterChart()
+  .width( 300 )
+  .height( 300 )
+  .dataIds( cellLines )
+  .x( function( k ) { return inputData.RTG[selDrugs[0]][k].avInh } )
+  .y( function( k ) { return inputData.RTG[selDrugs[1]][k].avInh } )
+  .on_click( function( k ) {
+    selCellLine = k;
+    curveFit.update();
+  })
+  .place( "#scatterplot" );
+
+var curveFit = d3.scatterChart("drug1")
+  .width( 300 )
+  .height( 200 )
+  .npoints( 5 )
+  .x( function( k ) {return k;} )
+  .y( function( k ) {
+    return inputData.RTG[selDrugs[0]][selCellLine]["D" + (k + 1)];
+  })
+  .colour( "blue" );
+d3.scatterChart("drug2", curveFit)
+  .npoints( 5 )
+  .x( function( k ) {return k} )
+  .y( function( k ) {
+    return inputData.RTG[selDrugs[1]][selCellLine]["D" + (k + 1)];
+  })
+  .colour("red")
+  .place( "#scatterplot" );
+
+</script>
+
+<p style = 'background: #daeaff; padding: 10px; width: 50%;'>Note that on both charts zooming is possible (double-click to show the entire chart). 
+To order rows or columns of the heatmap according to the values in some column or row one can click on the corresponding label on the heatmap. 
+This default behaviour can be changed by user.</p>
+
+<div id = "navPanel"></div>
+<script src = "src/navigation.js"></script>
+<script>
+  showNavigationPanel(d3.select("#navPanel"), 1);
+</script>
+
+<br>
+<br>
+<br>
+<h2>The code for the example</h2>
+
+<p>A user of our framework can create apps with very little code. The following code is not complete, since some lines that were
+explained in the previous example are omitted for the sake of simplicity. <span style = "color: #b44; font-weight: bold;"
+onclick="window.open('Layers_code.html', 'newwindow', 'width=800, height=800');">Here</span> one can find the complete code for this example.</p>
+
+<table><tr><td valign="top">
+<pre>
+<x-expl id="inputdata"></x-expl><code class = "language-html">&lt;script></code>
+<x-expl id="inputdata"></x-expl><code class = "language-javascript">  inputData = [{"CellLine":"Pa16C","Drug":"Galunisertib","minConc":1, ...}, ... ];</code>
+<x-expl id="inputdata"></x-expl><code class = "language-html">&lt;/script></code>
+
+<x-expl id="mainscript"></x-expl><code class = "language-html">&lt;script></code>
+<x-expl id="separateBy"></x-expl><code class = "language-javascript">  inputData = d3.separateBy(inputData, ["screen", "Drug", "CellLine"]);</code>
+<x-expl id="list"></x-expl><code class = "language-javascript">  var drugs = Object.keys(inputData.RTG),</code>
+<x-expl id="list"></x-expl><code class = "language-javascript">    cellLines = Object.keys(inputData.RTG[drugs[0]]);</code>
+
+<x-expl id="vars"></x-expl><code class = "language-javascript">  var selDrugs = [drugs[0], drugs[1]],</code> 
+<x-expl id="vars"></x-expl><code class = "language-javascript">    selCellLine = cellLines[0];</code>
+
+<x-expl id="heatmap"></x-expl><code class = "language-javascript">  var heatmap = d3.heatmapChart()</code>
+<x-expl id="ids"></x-expl><code class = "language-javascript">    .rowIds( drugs )</code>
+<x-expl id="ids"></x-expl><code class = "language-javascript">    .colIds( drugs )</code>
+<x-expl id="hm_value"></x-expl><code class = "language-javascript">    .value( function( rowId, colId ) { </code> 
+<x-expl id="hm_value"></x-expl><code class = "language-javascript">      var rowValues = cellLines.map(function(e) {</code>
+<x-expl id="hm_value"></x-expl><code class = "language-javascript">          return inputData.RTG[rowId][e].avInh;</code>
+<x-expl id="hm_value"></x-expl><code class = "language-javascript">        }),</code>
+<x-expl id="hm_value"></x-expl><code class = "language-javascript">        colValues = cellLines.map(function(e) {</code>
+<x-expl id="hm_value"></x-expl><code class = "language-javascript">          return inputData.RTG[colId][e].avInh;</code>
+<x-expl id="hm_value"></x-expl><code class = "language-javascript">        });</code>
+<x-expl id="hm_value"></x-expl><code class = "language-javascript">      return d3.pearsonCorr( rowValues, colValues );</code> 
+<x-expl id="hm_value"></x-expl><code class = "language-javascript">     })</code>
+<x-expl id="skip"></x-expl><code>    ...</code>
+<x-expl id="place"></x-expl><code class = "language-javascript">    .place( "#heatmap");</code>
+
+<x-expl id="cluster"></x-expl><code class = "language-javascript">  heatmap.cluster("Row")</code>
+<x-expl id="cluster"></x-expl><code class = "language-javascript">    .cluster("Col");</code>
+
+<x-expl id="scatter1"></x-expl><code class = "language-javascript">  var scatterplot = d3.scatterChart()</code>
+<x-expl id="ids"></x-expl><code class = "language-javascript">    .dataIds( cellLines )</code>
+<x-expl id="skip"></x-expl><code>    ...</code>
+<x-expl id="place"></x-expl><code class = "language-javascript">    .place( "#scatterplot" );</code>
+
+<x-expl id="layer1"></x-expl><code class = "language-javascript">  var curveFit = d3.scatterChart("drug1")</code>
+<x-expl id="skip"></x-expl><code>    ...</code>
+<x-expl id="npoints"></x-expl><code class = "language-javascript">    .npoints( 5 )</code>
+<x-expl id="xy"></x-expl><code class = "language-javascript">    .x( function( k ) {return k;} )</code>
+<x-expl id="xy"></x-expl><code class = "language-javascript">    .y( function( k ) {</code>
+<x-expl id="xy"></x-expl><code class = "language-javascript">      return inputData.RTG[selDrugs[0]][selCellLine]["D" + (k + 1)];</code>
+<x-expl id="xy"></x-expl><code class = "language-javascript">    })</code>
+<x-expl id="colour"></x-expl><code class = "language-javascript">    .colour( "blue" );</code>
+<x-expl id="layer2"></x-expl><code class = "language-javascript">  d3.scatterChart("drug2", curveFit)</code>
+<x-expl id="npoints"></x-expl><code class = "language-javascript">    .npoints( 5 )</code>
+<x-expl id="xy"></x-expl><code class = "language-javascript">    .x( function( k ) {return k} )</code>
+<x-expl id="xy"></x-expl><code class = "language-javascript">    .y( function( k ) {</code>
+<x-expl id="xy"></x-expl><code class = "language-javascript">      return inputData.RTG[selDrugs[1]][selCellLine]["D" + (k + 1)];</code>
+<x-expl id="xy"></x-expl><code class = "language-javascript">    })</code>
+<x-expl id="colour"></x-expl><code class = "language-javascript">    .colour("red")</code>
+<x-expl id="place"></x-expl><code class = "language-javascript">    .place( "#scatterplot" );</code>
+<x-expl id="mainscript"></x-expl><code class = "language-html">&lt;/script></code>
+</pre>
+</td>
+<td valign="top" style="padding-left:20px">
+
+<style>
+div.expl {
+   display: none;
+   position: absolute;
+   background: #EBBCD8;
+   width: 40%;
+   padding: 10px;
+}
+</style>
+
+<p style="background:#f0fff0; padding:10px"><i>Click on all the yellow bubbles (<img height="10pt" src="src/bubble_yellow.svg">),
+going from top to bottom, to see explanations of the code.</i></p>
+<br>
+
+<div class="expl" id="inputdata">
+<p>Just like it has been done in the previous example, here, the data was exported from R
+using toJSON function. Yet, here we exported the entire data frame with experiment results
+without any attempts to optimize data for using it in JavaScript. Therefore, all data are
+contained in a single variable <tt>inputData</tt>. This variable is an array with each
+element corresponding to a row of the original data frame. All elements are objects with
+the following properties: <tt>cellLine</tt>, <tt>Drug</tt>, <tt>minConc</tt>, <tt>D1</tt>,
+<tt>D2</tt>, <tt>D3</tt>, <tt>D4</tt>, <tt>D5</tt>, <tt>IC50</tt>, <tt>Slope</tt>, <tt>max</tt>,
+<tt>min</tt>, <tt>avInh</tt>, <tt>screen</tt>.</p>
+</div>
+
+<div class="expl" id="mainscript">
+<p>This is the actual user script to use the <i>linked-charts</i> library.</p> 
+</div>
+
+<div class="expl" id="separateBy">
+<p>The <i>linked-charts</i> library often requires to access a specific row of the data table.
+For example, here we will often want to get a value of avarage inhibition for a specific drug 
+testet against a specific cell line measured using RealTime-Glo assay. To avoid excessive 
+filtering one can assign a unique ID to each sample, as it was done in the previous example.
+Another way to address this problem is demonstrated here</p> 
+<p>Function <tt>separateBy(<i>dataset, properties</i>)</tt> is a part of the <i>linked-charts</i> 
+library. It takes the data in a form of an array or object and converts it into hierarchical, tree-like
+form, consequently separating the data by the values of provided properties.</p>
+<p>The figure bellow illustrates the transformation of <tt>inputData</tt> made by this function.</p>
+<img src = "src/separateBy_sm.png">
+</div>
+
+<div class="expl" id="list">
+<p>It can be more convenient to keep lists of all tested drugs and cell lines in separate variables.</p>
+</div>
+
+<div class="expl" id="vars">
+<p>These global variables provide the link between plots on this page:</p>
+<p><tt>selDrugs</tt> stores names of the two drugs user selects by clicking on a heatmap cell, 
+<tt>selCellLine</tt> stores name of the cell line user selects by clicking on a point of the 
+correlation scatter plot.</p>
+</div>
+
+<div class="expl" id="heatmap">
+<p>Here, we instantiate the first chart, namely the heatmap on the left. The heatmap is one
+of the standard chart types provided by the <i>linked-charts</i> library.</div>
+
+<div class="expl" id="ids">
+<p>Instead of setting the number of points (rows and colums for the heatmap) one can use an 
+array of IDs of all displayed points (rows and columns). By default the IDs are also used as
+row and column labels, but this can be changed by user. If these properties are not set by the 
+user, each point (row and column) gets a consequent number as an ID.</p>
+</div>
+
+<div class="expl" id="hm_value">
+<p>As it was described in the previous example, the <tt>value</tt> property is used to get the value
+that the cell with the given position should show given the row and column IDs of the cell.
+Here, the function looks more complicated due to different form of the data. First, we need to store
+avarage inhibition values for each cell line in two separate variables and only after can we calculate
+Pearson correlation.</p>
+</div>
+
+<div class="expl" id="place">
+<p>The place functions insert the object just defined into the web page. The argument is a CSS selector,
+here selecting the tabl elements that were marked with <tt>id</tt> attributes as the places to
+take up the charts.</p>
+<p>Each plot is placed into a separate <tt>div</tt> element, so one can place several charts into one 
+element. Here, both scatterplots are placed into a single table cell.</p>
+</div>
+
+<div class="expl" id="skip">
+<p>Some lines of code, whose functionality had been already described in previous examples, were omitted 
+for the sake of simplicity. <span style = "color: #44b; font-weight: bold;"
+ onclick="window.open('Layers_code.html', 'newwindow', 'width=800, height=800');">
+Here</span>, you can find the complete working code.</p>
+</div>
+
+<div class="expl" id="cluster">
+<p>To cluster rows or columns of a heatmap one can use <tt>cluster</tt> function. By default, the Eucledian
+metric is used, but other metric can be provided via <tt>clusterRowMetric</tt> and <tt>clusterColMetric</tt>
+functions. For clustering we use <a href = "https://harthur.github.io/clusterfck/">clusterfck</a> library.</p>
+</div>
+
+<div class="expl" id="scatter1">
+<p>Here, we initialize a "scatterChart" object. This is one of the standard chart types provided
+by our "linked-charts" library.</p>
+<p>In the following lines, we set the objects properties</p>
+</div>
+
+<div class="expl" id="layer1">
+<p>Here, we initialize a plot with two layers (both are scatter plots). Layers are created by the
+same function we used to make a single-layer scatter plot. <tt>scatterChart</tt> function has two
+optional arguments. First sets the ID of a new layer. If not defined, the ID for a layer will be 
+automatically set to <tt>layerN</tt>, where N is a number of the layer starting from 0. The second
+argument is a chart to which the new layer should be added. If not defined a new chart is initialized.</p>
+<p>So here we are creating a new chart that contains one layer, which is a scatter plot and has ID <tt>drug1</tt></p>
+</div>
+
+<div class="expl" id="layer2">
+<p>Here, we add <tt>drug2</tt> layer to the chart <tt>curveFit</tt>. The new layer is automatically set active,
+which means that the properties we define in the next few lines are being set for this new layer. To chage
+properties of the first layer one need either set it active (<tt>chart.setActiveLayer(<i>id</i>)</tt>), or
+use <tt>get_layer(<i>id</i>)</tt> function.</p>
+<p>As it will be shown in the next example, the same chart can also be generated with only one layer, but
+having different types of plots on one chart (e.g. scatter plot and lines) always requires layers.</p>
+</div>
+
+<div class="expl" id="npoints">
+<p>If <tt>dataIds</tt> property is not set, <tt>scatterChart</tt> tries to define the number of points, which can
+be not possible in some cases. If this is the case, then one should define the number of points manualy by setting
+the <tt>npoints</tt> property.</p>
+<p>Here, each drug was tested at five different concentrations, so the number of points is fixed for all cases.</p>
+</div>
+
+<div class="expl" id="xy">
+<p>Here, we define the functions that are called for each data point to get its x and y coordinate. As an argument
+these functions get an ID of the data points.</p> 
+</div>
+
+<div class="expl" id="colour">
+<p>Here, we define colour for all points of the layer.</p> 
+</div>
+
+</td></tr>
+</table>
+
+<script>
+d3.selectAll( "x-expl" )
+   .append( "img" )
+      .attr( "height", "10pt" )
+      .attr( "class", "bubble_icon" )
+      .attr( "src", "src/bubble_yellow.svg" )
+      .style( "padding-right", "15px")
+      .on( "click", function() {
+      	  d3.selectAll( "div.expl" )
+      	     .style( "display", "none" );
+          d3.selectAll( "img.bubble_icon" )
+             .attr( "src", "src/bubble_yellow.svg")
+      	  var tagId = d3.select(this.parentNode).attr("id");
+      	  d3.select( "div.expl#" + tagId )
+      	     .style( "display", "block" )
+          d3.selectAll( "x-expl#" + tagId ).select("img.bubble_icon")
+             .attr( "src", "src/bubble_red.svg")
+       })
+</script>
+
+</body>
+
+</html>

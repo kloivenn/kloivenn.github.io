@@ -2,10 +2,12 @@
 
 <head>
 
-<title>Linked charts</title>
+<title>Linked charts - A very simple example</title>
 
 <script src = "https://d3js.org/d3.v4.min.js"></script>
 <script src = "https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<link rel="stylesheet" href="src/prism.css">
+<script src = "src/prism.js"></script>
 
 </head>
 
@@ -46,7 +48,7 @@ data element is a prototypical use case of <i>linked-charts</i>.
 <link rel="stylesheet" type="text/css" href="src/style.css">
 <script src="src/d3-linked-charts.js"></script>
 
-<script src="src/inputdata.js"></script>
+<script src="src/inputdata_simple.js"></script>
 
 <table><tr>
   <td id="heatmap" valign="top"></td>
@@ -106,56 +108,55 @@ This default behaviour can be changed by user.</p>
 <p>A user of our framework can create apps with very little code. The following is the complete code needed to create the app above, with comments. </p>
 
 <table><tr><td valign="top">
-<pre style='color:#000000;background:#f7f7ff;'>
-<x-expl id="loadlib"></x-expl><span style='color:#a65700; '>&lt;</span><span style='color:#800000; font-weight:bold; '>script</span><span style='color:#274796; '> </span><span style='color:#074726; '>src</span><span style='color:#808030; '>=</span><span style='color:#0000e6; '>"d3-linked-charts.js"</span><span style='color:#a65700; '>></span><span style='color:#a65700; '>&lt;/</span><span style='color:#800000; font-weight:bold; '>script</span><span style='color:#a65700; '>></span>
+<pre>
+<x-expl id="loadlib"></x-expl><code class = "language-html">&lt;script src="d3-linked-charts.js"></script></code>
 
-<x-expl id="inputdata"></x-expl><span style='color:#a65700; '>&lt;</span><span style='color:#800000; font-weight:bold; '>script</span><span style='color:#a65700; '>></span>
-<x-expl id="labelVectors"></x-expl>  geneNames <span style='color:#808030; '>=</span> <span style='color:#808030; '>[</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>CD248</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>CA6</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> <span style='color:#808030; '>.</span><span style='color:#808030; '>.</span><span style='color:#808030; '>.</span> <span style='color:#808030; '>,</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>PDGFB</span><span style='color:#800000; '>"</span> <span style='color:#808030; '>]</span>
-<x-expl id="matrices"></x-expl>  geneExprs <span style='color:#808030; '>=</span> <span style='color:#808030; '>[</span> <span style='color:#808030; '>[</span> <span style='color:#008000; '>4.3119</span><span style='color:#808030; '>,</span> <span style='color:#008000; '>3.1594</span><span style='color:#808030; '>,</span> <span style='color:#808030; '>.</span><span style='color:#808030; '>.</span><span style='color:#808030; '>.</span> <span style='color:#808030; '>,</span> <span style='color:#008000; '>3.516</span><span style='color:#808030; '>]</span> <span style='color:#808030; '>,</span> <span style='color:#808030; '>[</span> <span style='color:#808030; '>.</span><span style='color:#808030; '>.</span><span style='color:#808030; '>.</span> <span style='color:#808030; '>]</span><span style='color:#808030; '>,</span> <span style='color:#808030; '>.</span><span style='color:#808030; '>.</span><span style='color:#808030; '>.</span> <span style='color:#808030; '>]</span>
-<x-expl id="labelVectors"></x-expl>  drugNames <span style='color:#808030; '>=</span> <span style='color:#808030; '>[</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>Irinotecan</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>Topotecan</span><span style='color:#800000; '>"</span><span style='color:#808030; '>,</span> <span style='color:#808030; '>.</span><span style='color:#808030; '>.</span><span style='color:#808030; '>.</span><span style='color:#808030; '>,</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>Valrubicin</span><span style='color:#800000; '>"</span> <span style='color:#808030; '>]</span>
-<x-expl id="matrices"></x-expl>  drugScores = [ [ <span style='color:#008c00; '>3.2</span>, <span style='color:#008c00; '>0.1</span>, <span style='color:#008c00; '>0</span>, <span style='color:#008c00; '>4.6</span>, ... ], [ ... ], ... ]
-<x-expl id="inputdata"></x-expl><span style='color:#a65700; '>&lt;/</span><span style='color:#800000; font-weight:bold; '>script</span><span style='color:#a65700; '>></span>
+<x-expl id="inputdata"></x-expl><code class = "language-html">&lt;script></code>
+<x-expl id="labelVectors"></x-expl><code class = "language-javascript">  geneNames = [ "CD248", "CA6", ... , "PDGFB" ]</code>
+<x-expl id="matrices"></x-expl><code class = "language-javascript">  geneExprs = [ [ 4.3119, 3.1594, ... , 3.516] , [ ... ], ... ]</code>
+<x-expl id="labelVectors"></x-expl><code class = "language-javascript">  drugNames = [ "Irinotecan", "Topotecan", ..., "Valrubicin" ]</code>
+<x-expl id="matrices"></x-expl><code class = "language-javascript">  drugScores = [ [ 3.2, 0.1, 0, 4.6, ... ], [ ... ], ... ]</code>
+<x-expl id="inputdata"></x-expl><code class = "language-html">&lt;/script></code>
 
-<x-expl id="table"></x-expl><span style='color:#a65700; '>&lt;</span><span style='color:#800000; font-weight:bold; '>table</span><span style='color:#a65700; '>></span><span style='color:#a65700; '>&lt;</span><span style='color:#800000; font-weight:bold; '>tr</span><span style='color:#a65700; '>></span>
-<x-expl id="table"></x-expl>  <span style='color:#a65700; '>&lt;</span><span style='color:#800000; font-weight:bold; '>td</span><span style='color:#274796; '> </span><span style='color:#074726; '>id</span><span style='color:#808030; '>=</span><span style='color:#0000e6; '>"heatmap"</span><span style='color:#274796; '> </span><span style='color:#074726; '>valign</span><span style='color:#808030; '>=</span><span style='color:#0000e6; '>"top"</span><span style='color:#a65700; '>></span><span style='color:#a65700; '>&lt;/</span><span style='color:#800000; font-weight:bold; '>td</span><span style='color:#a65700; '>></span>
-<x-expl id="table"></x-expl>  <span style='color:#a65700; '>&lt;</span><span style='color:#800000; font-weight:bold; '>td</span><span style='color:#274796; '> </span><span style='color:#074726; '>id</span><span style='color:#808030; '>=</span><span style='color:#0000e6; '>"scatterplot"</span><span style='color:#274796; '> </span><span style='color:#074726; '>valign</span><span style='color:#808030; '>=</span><span style='color:#0000e6; '>"top"</span><span style='color:#a65700; '>></span><span style='color:#a65700; '>&lt;/</span><span style='color:#800000; font-weight:bold; '>td</span><span style='color:#a65700; '>></span>
-<x-expl id="table"></x-expl><span style='color:#a65700; '>&lt;/</span><span style='color:#800000; font-weight:bold; '>tr</span><span style='color:#a65700; '>></span><span style='color:#a65700; '>&lt;/</span><span style='color:#800000; font-weight:bold; '>table</span><span style='color:#a65700; '>></span>
+<x-expl id="table"></x-expl><code class = "language-html">&lt;table>&lt;tr></code>
+<x-expl id="table"></x-expl><code class = "language-html">  &lt;td id="heatmap" valign="top">&lt;/td></code>
+<x-expl id="table"></x-expl><code class = "language-html">  &lt;td id="scatterplot" valign="top">&lt;/td></code>
+<x-expl id="table"></x-expl><code class = "language-html">&lt;/tr>&lt;/table></code>
 
+<x-expl id="mainscript"></x-expl><code class = "language-html">&lt;script></code>
 
-<x-expl id="mainscript"></x-expl><span style='color:#a65700; '>&lt;</span><span style='color:#800000; font-weight:bold; '>script</span><span style='color:#a65700; '>></span>
+<x-expl id="vars"></x-expl><code class = "language-javascript">  var selGene = 1;</code>
+<x-expl id="vars"></x-expl><code class = "language-javascript">  var selDrug = 1;</code>
 
-<x-expl id="vars"></x-expl>  <span style='color:#800000; font-weight:bold; '>var</span> selGene <span style='color:#808030; '>=</span> <span style='color:#008c00; '>1</span><span style='color:#800080; '>;</span>                                              
-<x-expl id="vars"></x-expl>  <span style='color:#800000; font-weight:bold; '>var</span> selDrug <span style='color:#808030; '>=</span> <span style='color:#008c00; '>1</span><span style='color:#800080; '>;</span>
+<x-expl id="scatter1"></x-expl><code class = "language-javascript">  var scatterplot = d3.scatterChart()</code>
+<x-expl id="xy"></x-expl><code class = "language-javascript">    .x( function( k ) { return geneExprs[selGene][k] } )</code>
+<x-expl id="xy"></x-expl><code class = "language-javascript">    .y( function( k ) { return drugScores[selDrug][k] } )</code>
+<x-expl id="place"></x-expl><code class = "language-javascript">    .place("#scatterplot");</code>
 
-<x-expl id="scatter1"></x-expl>  <span style='color:#800000; font-weight:bold; '>var</span> scatterplot <span style='color:#808030; '>=</span> d3<span style='color:#808030; '>.</span>scatterChart<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
-<x-expl id="xy"></x-expl>    <span style='color:#808030; '>.</span>x<span style='color:#808030; '>(</span> <span style='color:#800000; font-weight:bold; '>function</span><span style='color:#808030; '>(</span> k <span style='color:#808030; '>)</span> <span style='color:#800080; '>{</span> <span style='color:#800000; font-weight:bold; '>return</span> geneExprs<span style='color:#808030; '>[</span>selGene<span style='color:#808030; '>]</span><span style='color:#808030; '>[</span>k<span style='color:#808030; '>]</span> <span style='color:#800080; '>}</span> <span style='color:#808030; '>)</span>
-<x-expl id="xy"></x-expl>    <span style='color:#808030; '>.</span>y<span style='color:#808030; '>(</span> <span style='color:#800000; font-weight:bold; '>function</span><span style='color:#808030; '>(</span> k <span style='color:#808030; '>)</span> <span style='color:#800080; '>{</span> <span style='color:#800000; font-weight:bold; '>return</span> drugScores<span style='color:#808030; '>[</span>selDrug<span style='color:#808030; '>]</span><span style='color:#808030; '>[</span>k<span style='color:#808030; '>]</span> <span style='color:#800080; '>}</span> <span style='color:#808030; '>)</span>
-<x-expl id="place"></x-expl>    <span style='color:#808030; '>.</span>place<span style='color:#808030; '>(</span><span style='color:#800000; '>"</span><span style='color:#0000e6; '>#scatterplot</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
+<x-expl id="heatmap1"></x-expl><code class = "language-javascript">  var heatmap = d3.heatmapChart()</code>
+<x-expl id="hm_prop"></x-expl><code class = "language-javascript">    .nrows( geneNames.length )</code>
+<x-expl id="hm_prop"></x-expl><code class = "language-javascript">    .ncols( drugNames.length )</code>
+<x-expl id="hm_prop"></x-expl><code class = "language-javascript">    .height( 650 )</code>
+<x-expl id="hm_prop"></x-expl><code class = "language-javascript">    .width( 400 )</code>
+<x-expl id="hm_col"></x-expl><code class = "language-javascript">    .colourRange( [ -1, 1 ] )</code>
+<x-expl id="hm_col"></x-expl><code class = "language-javascript">    .palette( d3.interpolateRdBu )</code>
+<x-expl id="hm_value"></x-expl><code class = "language-javascript">    .value( function( row, col ) {</code>  
+<x-expl id="hm_value"></x-expl><code class = "language-javascript">       return pearsonCorr( geneExprs[row], drugScores[col] )</code>
+<x-expl id="hm_value"></x-expl><code class = "language-javascript">     } )</code>
+<x-expl id="rowcolnames"></x-expl><code class = "language-javascript">    .rowLabels( function(row) {</code>
+<x-expl id="rowcolnames"></x-expl><code class = "language-javascript">       return geneNames[row]</code>
+<x-expl id="rowcolnames"></x-expl><code class = "language-javascript">     } )</code>
+<x-expl id="rowcolnames"></x-expl><code class = "language-javascript">    .colLabels( function(col) { </code>
+<x-expl id="rowcolnames"></x-expl><code class = "language-javascript">       return drugNames[col] </code>
+<x-expl id="rowcolnames"></x-expl><code class = "language-javascript">     } )</code>
+<x-expl id="click"></x-expl><code class = "language-javascript">    .on_click( function( rowId , colId ) {</code>
+<x-expl id="click"></x-expl><code class = "language-javascript">       selGene = rowId;</code>
+<x-expl id="click"></x-expl><code class = "language-javascript">       selDrug = colId;</code>
+<x-expl id="click"></x-expl><code class = "language-javascript">       scatterplot.update();</code>
+<x-expl id="click"></x-expl><code class = "language-javascript">    })</code>
+<x-expl id="place"></x-expl><code class = "language-javascript">    .place( "#heatmap")</code>
 
-<x-expl id="heatmap1"></x-expl>  <span style='color:#800000; font-weight:bold; '>var</span> heatmap <span style='color:#808030; '>=</span> d3<span style='color:#808030; '>.</span>heatmapChart<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span>
-<x-expl id="hm_prop"></x-expl>    <span style='color:#808030; '>.</span>nrows<span style='color:#808030; '>(</span> geneNames<span style='color:#808030; '>.</span><span style='color:#800000; font-weight:bold; '>length</span> <span style='color:#808030; '>)</span>
-<x-expl id="hm_prop"></x-expl>    <span style='color:#808030; '>.</span>ncols<span style='color:#808030; '>(</span> drugNames<span style='color:#808030; '>.</span><span style='color:#800000; font-weight:bold; '>length</span> <span style='color:#808030; '>)</span>
-<x-expl id="hm_prop"></x-expl>    <span style='color:#808030; '>.</span>height<span style='color:#808030; '>(</span> <span style='color:#008c00; '>650</span> <span style='color:#808030; '>)</span>
-<x-expl id="hm_prop"></x-expl>    <span style='color:#808030; '>.</span>width<span style='color:#808030; '>(</span> <span style='color:#008c00; '>400</span> <span style='color:#808030; '>)</span>
-<x-expl id="hm_col"></x-expl>    <span style='color:#808030; '>.</span>colourRange<span style='color:#808030; '>(</span> <span style='color:#808030; '>[</span> <span style='color:#808030; '>-</span><span style='color:#008c00; '>1</span><span style='color:#808030; '>,</span> <span style='color:#008c00; '>1</span> <span style='color:#808030; '>]</span> <span style='color:#808030; '>)</span>
-<x-expl id="hm_col"></x-expl>    <span style='color:#808030; '>.</span>palette<span style='color:#808030; '>(</span> d3<span style='color:#808030; '>.</span>interpolateRdBu <span style='color:#808030; '>)</span>
-<x-expl id="hm_value"></x-expl>    <span style='color:#808030; '>.</span>value<span style='color:#808030; '>(</span> <span style='color:#800000; font-weight:bold; '>function</span><span style='color:#808030; '>(</span> row<span style='color:#808030; '>,</span> col <span style='color:#808030; '>)</span> <span style='color:#800080; '>{</span>  
-<x-expl id="hm_value"></x-expl>       <span style='color:#800000; font-weight:bold; '>return</span> pearsonCorr<span style='color:#808030; '>(</span> geneExprs<span style='color:#808030; '>[</span>row<span style='color:#808030; '>]</span><span style='color:#808030; '>,</span> drugScores<span style='color:#808030; '>[</span>col<span style='color:#808030; '>]</span> <span style='color:#808030; '>)</span>
-<x-expl id="hm_value"></x-expl>     <span style='color:#800080; '>}</span> <span style='color:#808030; '>)</span>
-<x-expl id="rowcolnames"></x-expl>    <span style='color:#808030; '>.</span>rowLabels<span style='color:#808030; '>(</span> <span style='color:#800000; font-weight:bold; '>function</span><span style='color:#808030; '>(</span>row<span style='color:#808030; '>)</span> <span style='color:#800080; '>{</span> 
-<x-expl id="rowcolnames"></x-expl>       <span style='color:#800000; font-weight:bold; '>return</span> geneNames<span style='color:#808030; '>[</span>row<span style='color:#808030; '>]</span> 
-<x-expl id="rowcolnames"></x-expl>     <span style='color:#800080; '>}</span> <span style='color:#808030; '>)</span>
-<x-expl id="rowcolnames"></x-expl>    <span style='color:#808030; '>.</span>colLabels<span style='color:#808030; '>(</span> <span style='color:#800000; font-weight:bold; '>function</span><span style='color:#808030; '>(</span>col<span style='color:#808030; '>)</span> <span style='color:#800080; '>{</span> 
-<x-expl id="rowcolnames"></x-expl>       <span style='color:#800000; font-weight:bold; '>return</span> drugNames<span style='color:#808030; '>[</span>col<span style='color:#808030; '>]</span> 
-<x-expl id="rowcolnames"></x-expl>     <span style='color:#800080; '>}</span> <span style='color:#808030; '>)</span>
-<x-expl id="click"></x-expl>    <span style='color:#808030; '>.</span>on_click<span style='color:#808030; '>(</span> <span style='color:#800000; font-weight:bold; '>function</span><span style='color:#808030; '>(</span> rowId <span style='color:#808030; '>,</span> colId <span style='color:#808030; '>)</span> <span style='color:#800080; '>{</span>
-<x-expl id="click"></x-expl>       selGene <span style='color:#808030; '>=</span> rowId<span style='color:#800080; '>;</span>
-<x-expl id="click"></x-expl>       selDrug <span style='color:#808030; '>=</span> colId<span style='color:#800080; '>;</span>
-<x-expl id="click"></x-expl>       scatterplot<span style='color:#808030; '>.</span>update<span style='color:#808030; '>(</span><span style='color:#808030; '>)</span><span style='color:#800080; '>;</span>
-<x-expl id="click"></x-expl>    <span style='color:#800080; '>}</span><span style='color:#808030; '>)</span>
-<x-expl id="place"></x-expl>    <span style='color:#808030; '>.</span>place<span style='color:#808030; '>(</span> <span style='color:#800000; '>"</span><span style='color:#0000e6; '>#heatmap</span><span style='color:#800000; '>"</span><span style='color:#808030; '>)</span>
-
-<x-expl id="mainscript"></x-expl><span style='color:#a65700; '>&lt;/</span><span style='color:#800000; font-weight:bold; '>script</span><span style='color:#a65700; '>></span>
+<x-expl id="mainscript"></x-expl><code class = "language-html">&lt;/script></code>
 </pre>
 </td>
 <td valign="top" style="padding-left:20px">

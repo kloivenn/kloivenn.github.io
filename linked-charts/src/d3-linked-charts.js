@@ -426,6 +426,7 @@
 		return layer;
 	}
 
+	//basic chart object
 	function chartBase() {
 		var chart = base()
 			.add_property("width", 500)
@@ -656,7 +657,7 @@
 									domain = chart.get_layer(k)["get_layerDomain" + axis]()
 								else {
 									domain[0] = d3.min([domain[0], chart.get_layer(k)["get_layerDomain" + axis]()[0]]);
-									domain[1] = d3.min([domain[1], chart.get_layer(k)["get_layerDomain" + axis]()[1]]);
+									domain[1] = d3.max([domain[1], chart.get_layer(k)["get_layerDomain" + axis]()[1]]);
 								}
 					} else { //if scale is categorical, find unique values from each layer
 						for(var k in chart.layers)
@@ -1652,7 +1653,9 @@
 				return oldOrder.indexOf(a) - oldOrder.indexOf(b);
 			});
 			
-			chart.updateLabelPosition();		
+			chart.updateLabelPosition();
+
+			return chart;		
 		}
 
 		chart.updateTexts = function(){
