@@ -2,8 +2,14 @@ var exampleList = [{
 		link: "simpleExample.html",
 		name: "A very simple Example"
 	}, {
-		link: "corrAndCurvefit.html",
+		link: "layers.html",
 		name: "Adding layers"
+	}, {
+		link: "linesAndColour.html",
+		name: "Lines and colour"
+	}, {
+		link: "labelsAndLegend.html",
+		name: "Labels and legend"
 	}]
 
 function showNavigationPanel(element, ind){

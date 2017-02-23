@@ -394,7 +394,8 @@
 		layer.put_static_content = function() {
 	    layer.g = layer.chart.svg.append("g")
 	      .attr("class", "chart_g")
-	      .attr("id", layer.id);
+	      .attr("id", layer.id)
+	      .attr("clip-path", "url(#viewBox)");
 	    //layer.chart.svg.select(".clickPanel").raise();
 		};
 		
@@ -466,6 +467,10 @@
 			chart.container = element.append("div");
 			chart.container.node().ondragstart = function() { return false; };
 			chart.svg = chart.container.append("svg");
+			chart.viewBox = chart.svg.append("defs")
+				.append("clipPath")
+					.attr("id", "viewBox")
+					.append("rect");
 			chart.container.append("div")
 				.attr("class", "inform hidden")
 				.append("p")
@@ -502,6 +507,11 @@
 		
 		//update parts
 		chart.updateSize = function(){
+			chart.viewBox
+				.attr("x", -5) //Let's leave some margin for a view box so that not to cut
+				.attr("y", -5) //points that are exactly on the edge
+				.attr("width", chart.get_plotWidth() + 10) 
+				.attr("height", chart.get_plotHeight() + 10);
 			if(typeof chart.transition !== "undefined"){
 				chart.svg.transition(chart.transition)
 					.attr("width", chart.get_width())
@@ -711,11 +721,13 @@
 		}
 
 		chart.zoom = function(lu, rb){
-	    chart.domainX([chart.axes.scale_x.invert(lu[0]), 
-	                        chart.axes.scale_x.invert(rb[0])]);
-	    chart.domainY([chart.axes.scale_y.invert(rb[1]),
-	                        chart.axes.scale_y.invert(lu[1])]);
-	    chart.updateAxes();
+	    if(getEuclideanDistance(lu, rb) > 10){
+		    chart.domainX([chart.axes.scale_x.invert(lu[0]), 
+	  	                      chart.axes.scale_x.invert(rb[0])]);
+	    	chart.domainY([chart.axes.scale_y.invert(rb[1]),
+	    	                    chart.axes.scale_y.invert(lu[1])]);
+	   	 chart.updateAxes();
+	    }
 	  }
 	  chart.resetDomain = function(){
 	    chart.domainX("reset");
@@ -1139,7 +1151,8 @@
 				.attr("class", "col label_panel");
 					//delete canvas if any
 			chart.g = chart.svg.append("g")
-				.attr("class", "chart_g");
+				.attr("class", "chart_g")
+				.attr("clip-path", "url(#viewBox)");
 			chart.text = chart.g.append("g")
 				.attr("class", "text_g");
 			chart.axes.x_label = chart.svg.append("text")
