@@ -50,39 +50,73 @@
 	     scatterplot.update();
 	     curveFit.update();
 	  })
-	  .place( "#heatmap");
+	  .place( "#heatmap" );
 
-	heatmap.cluster("Row")
-	  .cluster("Col");
+	heatmap.cluster( "Row" )
+	  .cluster( "Col" );
+
+var get_curve = function( drug, cellLine, x ){
+  var max = inputData.RTG[drug][cellLine].max,
+    min = inputData.RTG[drug][cellLine].min,
+    IC50 = inputData.RTG[drug][cellLine].IC50,
+    slope = inputData.RTG[drug][cellLine].Slope,
+    minConc = inputData.RTG[drug][cellLine].minConc;
+      
+  return min + (max - min)/
+    (1 + Math.pow(10, -(x - Math.log10(IC50/minConc)) * slope));
+}
 
 	var scatterplot = d3.scatterChart()
 	  .width( 300 )
 	  .height( 300 )
 	  .dataIds( cellLines )
+	  .aspectRatio( 1 )
 	  .x( function( k ) { return inputData.RTG[selDrugs[0]][k].avInh } )
 	  .y( function( k ) { return inputData.RTG[selDrugs[1]][k].avInh } )
+	  .palette( ["green", "yellow","red"] )
+	  .colourValue( function ( k ) {
+	    var res = 0;
+	    for( var x = 0; x < 5; x++ )
+	      for( var l = 0; l < 2; l++ )
+	        res += Math.pow( get_curve( selDrugs[l], k, x ) - 
+	                    inputData.RTG[selDrugs[l]][k]["D" + (x + 1)], 2 ); 
+	    res = Math.sqrt( res );
+	    return res;
+	  })
+	  .colourRange([0, 30]) 
 	  .on_click( function( k ) {
 	    selCellLine = k;
 	    curveFit.update();
+	  });
+	d3.lineChart("line", scatterplot)
+	  .npoints(1)
+	  .lineFun( function( k, x ){
+	    return x;
 	  })
 	  .place( "#scatterplot" );
 
-	var curveFit = d3.scatterChart("drug1")
+	var curveFit = d3.scatterChart( "points" )
 	  .width( 300 )
 	  .height( 200 )
-	  .npoints( 5 )
-	  .x( function( k ) {return k;} )
+	  .npoints( 10 )
+	  .x( function( k ) {
+	    return k % 5;
+	  } )
 	  .y( function( k ) {
-	    return inputData.RTG[selDrugs[0]][selCellLine]["D" + (k + 1)];
+	    var ind = Math.floor( k / 5 );
+	    return inputData.RTG[selDrugs[ind]][selCellLine]["D" + (k % 5 + 1)];
 	  })
-	  .colour( "blue" );
-	d3.scatterChart("drug2", curveFit)
-	  .npoints( 5 )
-	  .x( function( k ) {return k} )
-	  .y( function( k ) {
-	    return inputData.RTG[selDrugs[1]][selCellLine]["D" + (k + 1)];
+	  .colour( function( k ) {
+	    return k > 4 ? "red" : "blue";
+	  } );
+	d3.lineChart("lines", curveFit)
+	  .npoints(2)
+	  .lineFun( function( k, x ) {
+	    return get_curve( selDrugs[k], selCellLine, x );
 	  })
-	  .colour("red")
+	  .colour(function( k ){
+	    return k == 0 ? "blue" : "red";
+	  })
 	  .place( "#scatterplot" );
 &lt;/script>
 	</code>
