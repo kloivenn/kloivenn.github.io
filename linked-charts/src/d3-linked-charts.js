@@ -17,7 +17,7 @@ function base() {
     obj[ propname ] = function( vf, propname, overrideFunc ) {
 
       if( vf === undefined )
-        throw "No value passed in setter for property '" + propname + "'.";
+        return obj[ getter ]();      
 
       if( vf == "_override_"){
         if(typeof overrideFunc === "function")
@@ -366,6 +366,114 @@ function pearsonCorr( v1, v2 ) {
       var2 += ( v2[i] - mean2 ) * ( v2[i] - mean2 );
    } 
    return cov / Math.sqrt( var1 * var2 );
+} 
+
+function wrapText(text, width, height, minSize, maxSize, fontRatio){
+  var splitBy = function(text, symbol){
+    var spl = text.split(symbol);
+    if(spl[spl.length - 1] == "")
+      spl.pop();
+    if(spl.length == 1) return;
+    var mult = 0, bestSep, leftSide = 0,
+      rightSide = text.length;
+    for(var i = 0; i < spl.length; i++){
+      leftSide += (spl[i].length + 1);
+      rightSide -= (spl[i].length + 1);
+      if(mult < leftSide * rightSide){
+        mult = leftSide *  rightSide;
+        bestSep = i;
+      }
+    }
+    return [spl.slice(0, i).join(symbol) + symbol, 
+            spl.slice(i + 1, spl.length - 1).join(symbol)];
+  };
+
+  var splitByVowel = function(text){
+    var vowelInd = Array.apply(null, Array(text.length)).map(Number.prototype.valueOf,0),
+      vowels = ["a", "A", "o", "O", "e", "E", "u", "U", "i", "I"];
+    
+    for(var i = 0; i < text.length; i++)
+      if(vowels.indexOf(text[i]) != -1)
+        vowelInd[i] = 1;
+    for(var i = 0; i < vowelInd.length - 1; i++)
+      vowelInd[i] = (vowelInd[i] - vowelInd[i + 1]) * vowelInd[i];
+    vowelInd[vowelInd.length - 1] = 0;
+    vowelInd[vowelInd.length - 2] = 0;
+    if(vowelInd.indexOf(1) == -1)
+      return [text.substring(0, Math.ceil(text.length / 2)) + "-", 
+              text.substring(Math.ceil(text.length / 2))];
+    var mult = 0, bestSep;
+    for(var i = 0; i < text.length; i++)
+      if(vowelInd[i] == 1)
+        if(mult < (i + 2) * (text.length - i - 1)){
+          mult = (i + 2) * (text.length - i - 1);
+          bestSep = i;
+        }
+
+      return [text.substring(0, bestSep + 1) + "-", 
+              text.substring(bestSep + 1)];
+  };
+
+  if(typeof minSize === "undefined")
+    minSize = 8;
+  if(typeof maxSize === "undefined")
+    maxSize = 13;
+  if(typeof fontRatio === "undefined")
+    fontRatio = 0.6;
+  var fontSize = d3.min([height, maxSize]),
+    spans = [text], maxLength = text.length,
+    allowedLength, longestSpan = 0,
+    mult, br;
+
+  while(maxLength * fontSize * fontRatio > width && fontSize >= minSize){
+    if(maxLength == 1)
+      fontSize = width / fontRatio * 0.95;
+    else {
+      var charachters = [" ", ".", ",", "/", "\\", "-", "_", "+", "*", "&", "(", ")", "?", "!"],
+        spl, i = 0;
+      while(typeof spl === "undefined" && i < charachters.length){
+        spl = splitBy(spans[longestSpan], charachters[i]);
+        i++;
+      }
+      if(typeof spl === "undefined")
+        spl = splitByVowel(spans[longestSpan]);
+      spans.splice(longestSpan, 1, spl[0], spl[1]);
+
+      allowedLength = Math.floor(width / (fontSize * fontRatio));
+
+      for(var i = 0; i < spans.length - 1; i++)
+        if(spans[i].length + spans[i + 1].length <= allowedLength &&
+            spans[i].length + spans[i + 1].length < maxLength){
+          spans.splice(i, 2, spans[i] + spans[i + 1]);
+          fontSize = d3.min([height / (spans.length - 1), maxSize]);
+          allowedLength = Math.floor(width / (fontSize * fontRatio));
+        }
+
+      fontSize = d3.min([height / spans.length, maxSize]);
+      maxLength = spans[0].length;
+      longestSpan = 0;
+      for(var i = 1; i < spans.length; i++)
+        if(spans[i].length > maxLength){
+          maxLength = spans[i].length;
+          longestSpan = i;
+        }
+    }     
+  }
+
+
+  return {spans: spans, fontSize: fontSize};
+}
+
+function fillTextBlock(g, width, height, text, minSize, maxSize, fontRatio){
+  var fit = wrapText(text, width, height, minSize, maxSize, fontRatio),
+    spans = g.selectAll("text").data(d3.range(fit.spans.length));
+    spans.exit().remove();
+    spans.enter().append("text")
+      .merge(spans)
+        .attr("text-anchor", "left")
+        .attr("font-size", fit.fontSize)
+        .attr("y", function(d) {return (d + 1) * fit.fontSize;})
+        .text(function(d) {return fit.spans[d]});
 }
 
 function layerBase(id) {
@@ -383,9 +491,10 @@ function layerBase(id) {
     .add_property("colour", function(id) {
       return layer.colourScale(layer.get_colourValue(id));
     })
+    .add_property("addColourScaleToLegend", true)
     .add_property("palette")
     .add_property("colourRange")
-    .add_property("colourValue", "black")
+    .add_property("colourValue", undefined)
 		.add_property("dresser", function(){});
 
 	layer.id = id;
@@ -396,21 +505,29 @@ function layerBase(id) {
   layer.npoints( "_override_", "dataIds", function() {
     return d3.range( layer.get_npoints() );
   });
+  layer.colour( "_override_", "addColourScaleToLegend", false );
 
   layer.colourRange(function() {
     var ids = layer.get_dataIds();
-    var range = [];
-    for(var i = 0 ; i < ids.length; i++)
-      //colour range can contain only unique values
-      if(range.indexOf(layer.get_colourValue(ids[i])) == -1)
-        range.push(layer.get_colourValue(ids[i]));
+    if(layer.get_colourValue(ids[0]) !== undefined){
+      var range = [];
+      for(var i = 0 ; i < ids.length; i++)
+        //colour range can contain only unique values
+        if(range.indexOf(layer.get_colourValue(ids[i])) == -1)
+          range.push(layer.get_colourValue(ids[i]));
 
-    return range;
+      return range;
+    }
   });
+
+  layer.colourScale = function(){
+    return "black";
+  };
 
   layer.resetColourScale = function() {
     var range = layer.get_colourRange();
-
+    if(range === undefined)
+      return;
     //first of all, let's check if the colour scale supposed to be
     //categorical or continuous
     var allNum = true;
@@ -428,7 +545,7 @@ function layerBase(id) {
           layer.palette(["red", "yellow", "green", "blue"]);
       //if palette is an array of colors, make a linear colour scale using all
       //values of the palette as intermideate points
-      if(layer.get_palette().length){
+      if(layer.get_palette().splice){
         var palette = layer.get_palette();
         if(palette.length != range.length)
           range = [d3.min(range), d3.max(range)];
@@ -494,8 +611,20 @@ function layerBase(id) {
         };
       } 
     }
+
+    var scale = layer.colourScale;
+    scale.domain = layer.colourRange();
+    layer.addLegend(scale, "colour", layer.id);
   };
 
+  layer.legendBloccks = [];
+
+  layer.addLegend = function(scale, type, id){
+    layer.chart.legend.add(scale, type, id, layer);
+    layer.legendBloccks.push(id);
+
+    return layer; 
+  };
 
 	layer.update = function() {
     
@@ -544,6 +673,233 @@ function layerBase(id) {
 	return layer;
 }
 
+function legend(chart) {
+	var legend = base()
+		.add_property("width", function() {return chart.margin().right;})
+		.add_property("height", function() {return chart.plotHeight();})
+		.add_property("x", function() {return chart.plotWidth() + chart.margin().left;})
+		.add_property("y", function() {return chart.margin().top;})
+		.add_property("alignX")
+		.add_property("alignY");
+
+	legend.blocks = {};
+	legend.chart = chart;
+
+	legend.add = function(scale, type, id, layer){
+		legend.chart.set_margin({right: d3.max([75, legend.chart.margin().right])});
+		//scale can be an array or d3 scale. If scale is an array,
+		//we need to turn it into a scale
+		var block = {};
+		if(typeof scale !== "function"){
+			var scCont = false,
+				rCont = false;
+			if(scale.length == 1)
+				throw "Error in 'legend.add': range of the scale is not defined.";
+			if(scale[0].length == 2 && typeof scale[0][0] === "number" && 
+																typeof scale[0][1] === "number")
+				scCont = true;
+			if(type == "colour" && scale[0].length != scale[1].length)
+				rCont = true;
+			if(scale[1].length == 2 && typeof scale[0][0] === "number" && 
+																typeof scale[0][1] === "number")
+				rCont = true;
+			if(scCont && rCont){
+				block.scale = d3.scaleLinear()
+					.domain(scale[0])
+					.range(scale[1]);
+				scale.steps ? block.steps = scale.steps : block.steps = 9;
+			}
+			if(scCont && !rCont){
+				block.scale = d3.scaleQuantize()
+					.domain(scale[0])
+					.range(scale[1]);
+				block.steps = scale[1].length;
+			}
+			if(!scCont && rCont){
+				block.scale = d3.scalePoint()
+					.domain(scale[0])
+					.range(scale[1]);
+				block.steps = scale[0].length;
+			}
+			if(scCont && rCont){
+				if(scale[0].length > scale[1].length)
+					scale[0].splice(scale[1].length);
+				if(scale[1].length > scale[0].length)
+					scale[1].splice(scale[0].length);
+				block.scale = d3.scaleOrdinal()
+					.domain(scale[0])
+					.range(scale[1]);
+				block.steps = scale[0].length;				
+			}
+			block.domain = scale[0];
+		} else {
+			//scale is a function it is either a d3 scale or it has a domain property
+			if(typeof scale !== "function")
+				throw "Error in 'legend.add': the type of scale argument is not suported. " +
+					"Scale should be an array or a function."
+			var domain;
+			scale().domain ? domain = scale().domain() : domain = scale.domain;
+			if(typeof domain === "undefined")
+				throw "Error in 'legend.add': the domain of the scale is not defined.";
+			block.domain = domain;
+			block.scale = scale;
+			if(scale.steps)
+				block.steps = scale.steps;
+			else {
+				domain.length == 2 ? block.steps = 9 : block.steps = domain.length;
+			} 
+		}
+		if(typeof layer !== "undefined")
+			block.layer = layer;
+		if(["colour", "size", "style"].indexOf(type) == -1)
+			throw "Error in 'legend.add': " + type + " is not a suitable type of legend block. " +
+				"Please, use one of these: 'colour', 'size', 'style'";
+		block.type = type;
+
+		legend.blocks[id] = block;
+		legend.update();
+
+		return legend.chart;
+	};
+
+	legend.remove = function(id) {
+		if(typeof legend.blocks[id] === "undefined")
+			throw "Error in 'legend.remove': block with ID " + id +
+			" doesn't exist";
+		if(typeof legend.blocks[id].layer !== "undefined")
+			legend.blocks[id].layer.legendBlocks.splice(
+				legend.blocks[id].layer.legendBlocks.indexOf(id), 1
+			);
+		delete legend.blocks[id];
+		legend.g.select("#" + id).remove();
+		legend.update();
+
+		return legend.chart;
+	};
+
+	legend.rename = function(oldId, newId) {
+		legend.blocks[newId] = legendBlocks.blocks[oldId];
+		delete legend.blocks[oldId];
+		if(typeof legend.blocks[newId].layer !== "undefined")
+			legend.blocks[newId].layer.legendBlocks.splice(
+				legend.blocks[newId].layer.legendBlocks.indexOf(oldId), 1, newId
+			);
+		legend.g.select("#" + oldId)
+			.attr("id", newId);
+		legend.update();
+
+		return legend.chart;
+	};
+	legend.updateGrid = function() {
+		//assume that optimal side ratio of each block is 2:1
+		//define optimal layout for all the blocks
+		var n = Object.keys(legend.blocks).length,
+			minVacantArea = legend.width() * legend.height(),
+			bestLayout, j, blockHeight, blockWidth; 
+		for(var i = 1; i <= Math.floor(Math.sqrt(n)); i++){
+			j =  Math.ceil(n / i);
+			blockHeight = d3.min([legend.height() / i, legend.width() * 2 / j]);
+			blockWidth = d3.min([blockHeight / 2, legend.width() / j]);
+			if(minVacantArea > legend.height() * legend.width() - blockHeight * blockWidth * n){
+				minVacantArea = legend.height() * legend.width() - blockHeight * blockWidth * n;
+				bestLayout = [i, j];
+			}
+		}
+		blockWidth = legend.width() / bestLayout[1];
+		blockHeight = legend.height() / bestLayout[0];
+		var row = 0, col = 0;
+		for(var i in legend.blocks){
+			legend.blocks[i].width = blockWidth;
+			legend.blocks[i].height = d3.min([blockHeight, legend.blocks[i].steps * 20]);
+			legend.blocks[i].x = col * blockWidth;
+			legend.blocks[i].y = row * blockHeight;
+			col++;
+			if(col == bestLayout[1]){
+				col = 0;
+				row++;
+			}
+		} 
+	};
+	legend.updateBlock = function(id){
+		if(typeof legend.blocks[id] === "undefined")
+			throw "Error in 'legend.updateBlock': block with ID " + id +
+				" is not defined."
+		//redraw the block
+		var block_g = legend.g.select("#" + id);
+		if(block_g.empty())
+			block_g = legend.g.append("g")
+				.attr("id", id);
+		block_g.attr("transform", "translate(" + legend.blocks[id].x + ", " 
+																+ legend.blocks[id].y + ")");
+		
+		var title = block_g.select(".title");
+		if(title.empty())
+			title = block_g.append("g")
+				.attr("class", "title");
+		fillTextBlock(title, legend.blocks[id].height, legend.blocks[id].width * 0.2, id);
+		title.attr("transform", "rotate(-90)translate(-" + legend.blocks[id].height + ", 0)");
+
+		var sampleValues;
+		if(legend.blocks[id].domain.length == legend.blocks[id].steps)
+			sampleValues = legend.blocks[id].domain;
+		else
+			sampleValues = d3.range(legend.blocks[id].steps).map(function(e) {
+				return legend.blocks[id].domain[0] + e * (legend.blocks[id].domain[1] - legend.blocks[id].domain[0]) / 
+																			(legend.blocks[id].steps - 1)
+			});
+		var sampleData = [];
+		for(var i = 0; i < sampleValues.length; i++)
+			sampleData.push([sampleValues[i]]);
+		
+		var samples = block_g.selectAll(".sample").data(sampleData);
+		samples.exit().remove();
+		samples.enter().append("g")
+			.attr("class", "sample")
+			.merge(samples)
+				.attr("transform", function(d, i) {
+					return "translate(" + legend.blocks[id].width*0.2 + ", " + 
+									(i * legend.blocks[id].height / legend.blocks[id].steps) + ")";
+				});
+
+		if(legend.blocks[id].type == "colour"){
+			var rect = block_g.selectAll(".sample").selectAll("rect").data(function(d){
+				return d;
+			});
+			rect.enter().append("rect")
+				.merge(rect)
+					.attr("width", d3.min([legend.blocks[id].width * 0.2 ,20]))
+					.attr("height", legend.blocks[id].height / legend.blocks[id].steps)
+					.attr("fill", function(d) {return legend.blocks[id].scale(d)});
+			
+			var sampleText = block_g.selectAll(".sample").selectAll("g").data(function(d){
+				return (typeof d[0] === "number") ? [d[0].toString()] : d;
+			});
+			sampleText.enter().append("g")
+				.merge(sampleText)
+					.attr("transform", "translate(" + (legend.blocks[id].width * 0.25) + ", 0)");
+			block_g.selectAll(".sample").selectAll("g").each(function(d) {
+				fillTextBlock(d3.select(this), legend.blocks[id].width * 0.55, 
+												legend.blocks[id].height / legend.blocks[id].steps, d
+											);
+			});	
+		}
+		if(legend.blocks[id].type == "size"){
+
+		}
+	};
+	legend.update = function() {
+		legend.g
+			.attr("transform", "translate(" + legend.x() + ", " + legend.y() + ")");
+		legend.updateGrid();
+		for(var k in legend.blocks)
+			legend.updateBlock(k);
+
+		return legend.chart;
+	};
+
+	return legend;
+}
+
 function chartBase() {
 	var chart = base()
 		.add_property("width", 500)
@@ -578,6 +934,20 @@ function chartBase() {
   			return chart.get_height() - 
   				(chart.get_margin().top + chart.get_margin().bottom);
   });
+
+  chart.set_margin = function(margin){
+  	if(typeof margin.top === "undefined")
+  		margin.top = chart.margin().top;
+  	if(typeof margin.bottom === "undefined")
+  		margin.bottom = chart.margin().bottom;
+  	if(typeof margin.left === "undefined")
+  		margin.left = chart.margin().left;
+  	if(typeof margin.right === "undefined")
+  		margin.right === chart.margin().right;
+  	
+  	chart.margin(margin);
+  	return chart;
+  };
 
   chart.put_static_content = function( element ) {
 		chart.container = element.append("div");
@@ -655,8 +1025,11 @@ function chartBase() {
 
 function layerChartBase(){
 	var chart = chartBase()
-		.add_property("activeLayer", undefined);
+		.add_property("activeLayer", undefined)
+		.add_property("showLegend", true);
 	
+	chart.legend = legend(chart);
+
 	//Basic layer functionality
 	chart.layers = {};
 	var findLayerProperty = function(propname){
@@ -714,6 +1087,7 @@ function layerChartBase(){
 	chart.put_static_content = function(element){
 		inherited_put_static_content(element);
 		add_click_listener(chart);
+		chart.legend.g = chart.svg.append("g");
 		for(var k in chart.layers)
 			chart.get_layer(k).put_static_content();		
 	};
@@ -725,6 +1099,8 @@ function layerChartBase(){
 			chart.get_layer(k).updatePointStyle();
 		}
 		inherited_update();
+		if(chart.showLegend() && Object.keys(chart.legend.blocks).length > 0)
+			chart.legend.update();
 		return chart;
 	};
 
@@ -1211,7 +1587,7 @@ function heatmapChart(id, chart){
 		.add_property("rowTitle", "")
 		.add_property("showValue", false)
 		.add_property("colTitle", "")
-		.add_property("showLabel", true);
+		.add_property("showLegend", true);
 
 	chart.margin({top: 100, left: 100, right: 10, bottom: 40});
 
@@ -1567,7 +1943,8 @@ function heatmapChart(id, chart){
 	//create colorScale
 		var range = chart.get_colourRange();
 		chart.colourScale = d3.scaleSequential(chart.get_palette).domain(range);
-		chart.updateLegend();		
+		if(chart.get_showLegend())
+			chart.updateLegend();		
 	};	
 
 	//some default onmouseover and onmouseout behaviour for cells and labels
@@ -1838,7 +2215,7 @@ function heatmapChart(id, chart){
 	chart.updateLegendSize = function(){
 		//calculate the size of element of legend
 		var height = d3.min([chart.get_margin().bottom * 0.5, 20]),
-			width = d3.min([chart.get_width()/23, 20]),
+			width = d3.min([chart.get_width()/23, 30]),
 			fontSize = d3.min([chart.get_margin().bottom * 0.3, width / 2, 15]),
 			blocks = chart.svg.select(".legend_panel").selectAll(".legend_block")
 			.attr("transform", function(d) {
@@ -2180,6 +2557,7 @@ exports.separateBy = separateBy;
 exports.getEuclideanDistance = getEuclideanDistance;
 exports.add_click_listener = add_click_listener;
 exports.pearsonCorr = pearsonCorr;
+exports.fillTextBlock = fillTextBlock;
 exports.sigmoidColorSlider = sigmoidColorSlider;
 exports.simpleTable = simpleTable;
 
