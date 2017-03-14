@@ -376,7 +376,7 @@ function wrapText(text, width, height, minSize, maxSize, fontRatio){
     if(spl.length == 1) return;
     var mult = 0, bestSep, leftSide = 0,
       rightSide = text.length;
-    for(var i = 0; i < spl.length; i++){
+    for(var i = 0; i < spl.length - 1; i++){
       leftSide += (spl[i].length + 1);
       rightSide -= (spl[i].length + 1);
       if(mult < leftSide * rightSide){
@@ -384,8 +384,8 @@ function wrapText(text, width, height, minSize, maxSize, fontRatio){
         bestSep = i;
       }
     }
-    return [spl.slice(0, i).join(symbol) + symbol, 
-            spl.slice(i + 1, spl.length - 1).join(symbol)];
+    return [spl.slice(0, bestSep + 1).join(symbol) + symbol, 
+            spl.slice(bestSep + 1, spl.length - bestSep).join(symbol)];
   };
 
   var splitByVowel = function(text){
@@ -429,37 +429,42 @@ function wrapText(text, width, height, minSize, maxSize, fontRatio){
     if(maxLength == 1)
       fontSize = width / fontRatio * 0.95;
     else {
-      var charachters = [" ", ".", ",", "/", "\\", "-", "_", "+", "*", "&", "(", ")", "?", "!"],
-        spl, i = 0;
-      while(typeof spl === "undefined" && i < charachters.length){
-        spl = splitBy(spans[longestSpan], charachters[i]);
-        i++;
+      if(height / (spans.length + 1) < width / (maxLength * fontRatio) * 0.95)
+        fontSize = width / (maxLength * fontRatio) * 0.95;
+      else {
+        var charachters = [" ", ".", ",", "/", "\\", "-", "_", "+", "*", "&", "(", ")", "?", "!"],
+          spl, i = 0;
+        while(typeof spl === "undefined" && i < charachters.length){
+          spl = splitBy(spans[longestSpan], charachters[i]);
+          i++;
+        }
+        if(typeof spl === "undefined")
+          spl = splitByVowel(spans[longestSpan]);
+        spans.splice(longestSpan, 1, spl[0], spl[1]);
+
+        allowedLength = Math.floor(width / (fontSize * fontRatio));
+
+        for(var i = 0; i < spans.length - 1; i++)
+          if(spans[i].length + spans[i + 1].length <= allowedLength &&
+              spans[i].length + spans[i + 1].length < maxLength){
+            spans.splice(i, 2, spans[i] + spans[i + 1]);
+            fontSize = d3.min([height / (spans.length - 1), maxSize]);
+            allowedLength = Math.floor(width / (fontSize * fontRatio));
+          }
+
+        fontSize = d3.min([height / spans.length, maxSize]);
+        maxLength = spans[0].length;
+        longestSpan = 0;
+        for(var i = 1; i < spans.length; i++)
+          if(spans[i].length > maxLength){
+            maxLength = spans[i].length;
+            longestSpan = i;
+          }
       }
-      if(typeof spl === "undefined")
-        spl = splitByVowel(spans[longestSpan]);
-      spans.splice(longestSpan, 1, spl[0], spl[1]);
-
-      allowedLength = Math.floor(width / (fontSize * fontRatio));
-
-      for(var i = 0; i < spans.length - 1; i++)
-        if(spans[i].length + spans[i + 1].length <= allowedLength &&
-            spans[i].length + spans[i + 1].length < maxLength){
-          spans.splice(i, 2, spans[i] + spans[i + 1]);
-          fontSize = d3.min([height / (spans.length - 1), maxSize]);
-          allowedLength = Math.floor(width / (fontSize * fontRatio));
-        }
-
-      fontSize = d3.min([height / spans.length, maxSize]);
-      maxLength = spans[0].length;
-      longestSpan = 0;
-      for(var i = 1; i < spans.length; i++)
-        if(spans[i].length > maxLength){
-          maxLength = spans[i].length;
-          longestSpan = i;
-        }
     }     
   }
 
+ // fontSize = d3.min([height / spans.length, width / (maxLength * fontRatio)]);
 
   return {spans: spans, fontSize: fontSize};
 }
@@ -470,6 +475,7 @@ function fillTextBlock(g, width, height, text, minSize, maxSize, fontRatio){
     spans.exit().remove();
     spans.enter().append("text")
       .merge(spans)
+        .attr("class", "plainText")
         .attr("text-anchor", "left")
         .attr("font-size", fit.fontSize)
         .attr("y", function(d) {return (d + 1) * fit.fontSize;})
@@ -690,6 +696,33 @@ function legend(chart) {
 		//scale can be an array or d3 scale. If scale is an array,
 		//we need to turn it into a scale
 		var block = {};
+		if(typeof scale === "function")
+			block.scale = scale;
+		else
+			block.scale = function() {return scale;};
+		if(typeof layer !== "undefined")
+			block.layer = layer;
+		if(["colour", "size", "style"].indexOf(type) == -1)
+			throw "Error in 'legend.add': " + type + " is not a suitable type of legend block. " +
+				"Please, use one of these: 'colour', 'size', 'style'";
+		block.type = type;
+
+		legend.blocks[id] = block;
+		//legend.update();
+
+		return legend.chart;
+	};
+
+	legend.convertScale = function(id) {
+		var scale, newScale;
+		try{
+			scale = legend.blocks[id].scale();
+		} catch (exc) {
+			scale = legend.blocks[id].scale;
+		}
+		if(typeof scale !== "function" && typeof scale.splice === "undefined")
+			scale = legend.blocks[id].scale;
+		
 		if(typeof scale !== "function"){
 			var scCont = false,
 				rCont = false;
@@ -698,40 +731,40 @@ function legend(chart) {
 			if(scale[0].length == 2 && typeof scale[0][0] === "number" && 
 																typeof scale[0][1] === "number")
 				scCont = true;
-			if(type == "colour" && scale[0].length != scale[1].length)
+			if(legend.blocks[id].type == "colour" && scale[0].length != scale[1].length)
 				rCont = true;
 			if(scale[1].length == 2 && typeof scale[0][0] === "number" && 
 																typeof scale[0][1] === "number")
 				rCont = true;
 			if(scCont && rCont){
-				block.scale = d3.scaleLinear()
+				newScale = d3.scaleLinear()
 					.domain(scale[0])
 					.range(scale[1]);
-				scale.steps ? block.steps = scale.steps : block.steps = 9;
+				scale.steps ? newScale.steps = scale.steps : newScale.steps = 9;
 			}
 			if(scCont && !rCont){
-				block.scale = d3.scaleQuantize()
+				newScale = d3.scaleQuantize()
 					.domain(scale[0])
 					.range(scale[1]);
-				block.steps = scale[1].length;
+				newScale.steps = scale[1].length;
 			}
 			if(!scCont && rCont){
-				block.scale = d3.scalePoint()
+				newScale = d3.scalePoint()
 					.domain(scale[0])
 					.range(scale[1]);
-				block.steps = scale[0].length;
+				newScale.steps = scale[0].length;
 			}
-			if(scCont && rCont){
+			if(!scCont && !rCont){
 				if(scale[0].length > scale[1].length)
 					scale[0].splice(scale[1].length);
 				if(scale[1].length > scale[0].length)
 					scale[1].splice(scale[0].length);
-				block.scale = d3.scaleOrdinal()
+				newScale = d3.scaleOrdinal()
 					.domain(scale[0])
 					.range(scale[1]);
-				block.steps = scale[0].length;				
+				newScale.steps = scale[0].length;				
 			}
-			block.domain = scale[0];
+			legend.blocks[id].domain = scale[0];
 		} else {
 			//scale is a function it is either a d3 scale or it has a domain property
 			if(typeof scale !== "function")
@@ -741,25 +774,15 @@ function legend(chart) {
 			scale().domain ? domain = scale().domain() : domain = scale.domain;
 			if(typeof domain === "undefined")
 				throw "Error in 'legend.add': the domain of the scale is not defined.";
-			block.domain = domain;
-			block.scale = scale;
+			legend.blocks[id].domain = domain;
+			newScale = scale;
 			if(scale.steps)
-				block.steps = scale.steps;
+				newScale.steps = scale.steps;
 			else {
-				domain.length == 2 ? block.steps = 9 : block.steps = domain.length;
+				domain.length == 2 ? newScale.steps = 9 : newScale.steps = domain.length;
 			} 
 		}
-		if(typeof layer !== "undefined")
-			block.layer = layer;
-		if(["colour", "size", "style"].indexOf(type) == -1)
-			throw "Error in 'legend.add': " + type + " is not a suitable type of legend block. " +
-				"Please, use one of these: 'colour', 'size', 'style'";
-		block.type = type;
-
-		legend.blocks[id] = block;
-		legend.update();
-
-		return legend.chart;
+		return newScale;
 	};
 
 	legend.remove = function(id) {
@@ -810,7 +833,7 @@ function legend(chart) {
 		var row = 0, col = 0;
 		for(var i in legend.blocks){
 			legend.blocks[i].width = blockWidth;
-			legend.blocks[i].height = d3.min([blockHeight, legend.blocks[i].steps * 20]);
+			legend.blocks[i].height = blockHeight;
 			legend.blocks[i].x = col * blockWidth;
 			legend.blocks[i].y = row * blockHeight;
 			col++;
@@ -821,6 +844,8 @@ function legend(chart) {
 		} 
 	};
 	legend.updateBlock = function(id){
+		var scale = legend.convertScale(id);
+		legend.blocks[id].height = d3.min([legend.blocks[id].height, scale.steps * 20]);
 		if(typeof legend.blocks[id] === "undefined")
 			throw "Error in 'legend.updateBlock': block with ID " + id +
 				" is not defined."
@@ -840,12 +865,12 @@ function legend(chart) {
 		title.attr("transform", "rotate(-90)translate(-" + legend.blocks[id].height + ", 0)");
 
 		var sampleValues;
-		if(legend.blocks[id].domain.length == legend.blocks[id].steps)
+		if(legend.blocks[id].domain.length == scale.steps)
 			sampleValues = legend.blocks[id].domain;
 		else
-			sampleValues = d3.range(legend.blocks[id].steps).map(function(e) {
+			sampleValues = d3.range(scale.steps).map(function(e) {
 				return legend.blocks[id].domain[0] + e * (legend.blocks[id].domain[1] - legend.blocks[id].domain[0]) / 
-																			(legend.blocks[id].steps - 1)
+																			(scale.steps - 1)
 			});
 		var sampleData = [];
 		for(var i = 0; i < sampleValues.length; i++)
@@ -858,7 +883,7 @@ function legend(chart) {
 			.merge(samples)
 				.attr("transform", function(d, i) {
 					return "translate(" + legend.blocks[id].width*0.2 + ", " + 
-									(i * legend.blocks[id].height / legend.blocks[id].steps) + ")";
+									(i * legend.blocks[id].height / scale.steps) + ")";
 				});
 
 		if(legend.blocks[id].type == "colour"){
@@ -868,8 +893,8 @@ function legend(chart) {
 			rect.enter().append("rect")
 				.merge(rect)
 					.attr("width", d3.min([legend.blocks[id].width * 0.2 ,20]))
-					.attr("height", legend.blocks[id].height / legend.blocks[id].steps)
-					.attr("fill", function(d) {return legend.blocks[id].scale(d)});
+					.attr("height", legend.blocks[id].height / scale.steps)
+					.attr("fill", function(d) {return scale(d)});
 			
 			var sampleText = block_g.selectAll(".sample").selectAll("g").data(function(d){
 				return (typeof d[0] === "number") ? [d[0].toString()] : d;
@@ -879,7 +904,7 @@ function legend(chart) {
 					.attr("transform", "translate(" + (legend.blocks[id].width * 0.25) + ", 0)");
 			block_g.selectAll(".sample").selectAll("g").each(function(d) {
 				fillTextBlock(d3.select(this), legend.blocks[id].width * 0.55, 
-												legend.blocks[id].height / legend.blocks[id].steps, d
+												legend.blocks[id].height / scale.steps, d
 											);
 			});	
 		}
@@ -900,13 +925,15 @@ function legend(chart) {
 	return legend;
 }
 
+//basic chart object
 function chartBase() {
 	var chart = base()
 		.add_property("width", 500)
 		.add_property("height", 500)
 		.add_property("plotWidth", 440)
 		.add_property("plotHeight", 440)
-		.add_property("margin", { top: 10, right: 10, bottom: 50, left: 50 })
+		.add_property("margin", { top: 15, right: 10, bottom: 50, left: 50 })
+		.add_property("title", "")
 		.add_property("transitionDuration", 1000); //may be set to zero
 	
 	chart.transition = undefined;
@@ -961,6 +988,9 @@ function chartBase() {
 			.attr("class", "inform hidden")
 			.append("p")
 				.attr("class", "value");
+		chart.svg.append("text")
+			.attr("class", "title plainText")
+			.attr("text-anchor", "middle");
 	};
 
 	chart.defineTransition = function(){
@@ -1005,6 +1035,10 @@ function chartBase() {
 			chart.container.transition(chart.transition)
 				.style("width", chart.get_width() + "px")
 				.style("height", chart.get_height() + "px");
+			chart.svg.select(".title").transition(chart.transition)
+				.attr("font-size", d3.min([15, chart.margin().top * 0.8]))
+				.attr("x", chart.width()/2)
+				.attr("y", d3.min([17, chart.margin().top * 0.9]));
 		} else {
 			chart.svg
 				.attr("width", chart.get_width())
@@ -1012,12 +1046,18 @@ function chartBase() {
 			chart.container
 				.style("width", chart.get_width() + "px")
 				.style("height", chart.get_height() + "px");
+			chart.svg.select(".title")
+				.attr("font-size", d3.min([15, chart.margin().top * 0.8]))
+				.attr("x", chart.width()/2)
+				.attr("y", d3.min([17, chart.margin().top * 0.9]));
 		}
 		return chart;			
 	};
 
 	chart.update = function(){
 		chart.updateSize();
+		chart.svg.select(".title")
+			.text(chart.title());
 		return chart;
 	};
   return chart;
@@ -1401,8 +1441,8 @@ function scatterChart(id, chart) {
         .style("top", (d3.event.pageY - 10) + "px")
         .select(".value")
           .html("ID: <b>" + d + "</b>;<br>" + 
-            "x = " + layer.get_x(d) + ";<br>" + 
-            "y = " + layer.get_y(d));  
+            "x = " + layer.get_x(d).toFixed(2) + ";<br>" + 
+            "y = " + layer.get_y(d).toFixed(2));  
     layer.chart.container.select(".inform")
       .classed("hidden", false);
   });
@@ -1976,7 +2016,7 @@ function heatmapChart(id, chart){
 			.select(".value")
 				.html("Row: <b>" + d[0] + "</b>;<br>" + 
 						"Col: <b>" + d[1] + "</b>;<br>" + 
-						"value = " + chart.get_value(d[0], d[1]));  
+						"value = " + chart.get_value(d[0], d[1]).toFixed(2));  
 		chart.container.select(".inform")
 			.classed("hidden", false);
 		}
@@ -2243,13 +2283,20 @@ function heatmapChart(id, chart){
 		blocks.append("rect");
 		chart.svg.select(".legend_panel")
 			.selectAll(".legend_block").selectAll("text")
-				.text(function(d) {return (range[0] + step * d).toFixed(2);});
+				.text(function(d) {
+					if(d % 2 == 0)
+						return (range[0] + step * d).toFixed(2)
+					else
+						return "";
+				});
 		chart.svg.select(".legend_panel")
 			.selectAll(".legend_block").selectAll("rect")
 				.attr("fill", function(d) {return chart.colourScale(range[0] + step * d)});
 	};
 	
 	chart.update = function() {
+		chart.svg.select(".title")
+			.text(chart.title());
 		chart.resetColourScale();
 		chart.axes.x_label
 			.text(chart.get_colTitle());

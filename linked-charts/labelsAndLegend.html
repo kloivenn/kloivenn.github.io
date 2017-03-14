@@ -2,7 +2,7 @@
 
 <head>
 
-<title>Linked charts - Adding layers</title>
+<title>Linked charts - Labels and legend</title>
 
 <script src = "https://d3js.org/d3.v4.min.js"></script>
 <script src = "https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
@@ -15,11 +15,11 @@
 
 <h1>Linked charts</h1>
 
-<h2>Lines and colours</h2>
+<h2>Labels and legend</h2>
 
-<p>Here, we show how to draw line plots. Let's add a diogonal line to the upper scatter plot and fitted curves
-for both drugs to the bottom one. We also use colour to indicate the samples, where curvefitting wasn't succesfull.
-Red dots on the correlation scatterplots show cell lines with bad fitting for at least one of two selected drugs.</p>
+<p>In this example, we will further fine tune our plots, to make them more easy to read. We will add labels to axes, 
+titles to plots, rename axes ticks. One could have already noticed that setting <tt>colourValue</tt> property automatically 
+generates a legend. Here, we will show how to manipulate this legend and how to create legends manually.</p>
 
 <link rel = "stylesheet" type = "text/css" href = "src/style.css">
 <script src = "src/d3-linked-charts.js"></script>
@@ -43,6 +43,7 @@ var selDrugs = [drugs[0], drugs[1]],
 var heatmap = d3.heatmapChart()
   .rowIds( drugs )
   .colIds( drugs )
+  .title("Drug-drug correlation")
   .colourRange( [ -1, 1 ] )
   .palette( d3.interpolateRdBu )
   .value( function( rowId, colId ) {  
@@ -75,13 +76,17 @@ var get_curve = function( drug, cellLine, x ){
     (1 + Math.pow(10, -(x - Math.log10(IC50/minConc)) * slope));
 }
 
-var scatterplot = d3.scatterChart()
-  .width( 300 )
+var scatterplot = d3.scatterChart("Total curvefitting error")
+  .width( 375 )
   .height( 300 )
   .dataIds( cellLines )
-  .aspectRatio( 1 )
   .x( function( k ) { return inputData.RTG[selDrugs[0]][k].avInh } )
   .y( function( k ) { return inputData.RTG[selDrugs[1]][k].avInh } )
+  .labelX(function() {return selDrugs[0]})
+  .labelY(function() {return selDrugs[1]})
+  .title("Average inhibition")
+  .domainX([-10, 50])
+  .domainY([-10, 50])
   .palette( ["green", "yellow","red"] )
   .colourValue( function ( k ) {
     var res = 0;
@@ -105,9 +110,13 @@ d3.lineChart("line", scatterplot)
   .place( "#scatterplot" );
 
 var curveFit = d3.scatterChart( "points" )
-  .width( 300 )
+  .width( 375 )
   .height( 200 )
   .npoints( 10 )
+  .title(function() {return selCellLine;})
+  .labelX("Drug concentration")
+  .labelY("Inhibition")
+  .domainY([-25, 100])
   .x( function( k ) {
     return k % 5;
   } )
@@ -118,6 +127,8 @@ var curveFit = d3.scatterChart( "points" )
   .colour( function( k ) {
     return k > 4 ? "red" : "blue";
   } );
+curveFit.legend.add(function() {return [selDrugs, ["red", "blue"]];}, 
+                      "colour", "Drugs");  
 d3.lineChart("lines", curveFit)
   .npoints(2)
   .lineFun( function( k, x ) {
@@ -127,6 +138,8 @@ d3.lineChart("lines", curveFit)
     return k == 0 ? "blue" : "red";
   })
   .place( "#scatterplot" );
+
+
 </script>
 
 <p style = 'background: #daeaff; padding: 10px; width: 50%;'>Note that on both charts zooming is possible (double-click to show the entire chart). 
@@ -136,7 +149,7 @@ This default behaviour can be changed by user.</p>
 <div id = "navPanel"></div>
 <script src = "src/navigation.js"></script>
 <script>
-  showNavigationPanel(d3.select("#navPanel"), 2);
+  showNavigationPanel(d3.select("#navPanel"), 3);
 </script>
 
 <br>
