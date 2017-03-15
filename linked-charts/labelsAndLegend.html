@@ -45,7 +45,7 @@ var heatmap = d3.heatmapChart()
   .colIds( drugs )
   .title("Drug-drug correlation")
   .colourRange( [ -1, 1 ] )
-  .palette( d3.interpolateRdBu )
+  .palette( function( val ) { return d3.interpolateRdBu( 1 - val ); } )
   .value( function( rowId, colId ) {  
     var rowValues = cellLines.map(function(e) {
         return inputData.RTG[rowId][e].avInh;
@@ -88,7 +88,7 @@ var scatterplot = d3.scatterChart("Total curvefitting error")
   .domainX([-10, 50])
   .domainY([-10, 50])
   .palette( ["green", "yellow","red"] )
-  .colourValue( function ( k ) {
+  .colourValue( function( k ) {
     var res = 0;
     for( var x = 0; x < 5; x++ )
       for( var l = 0; l < 2; l++ )
@@ -97,8 +97,10 @@ var scatterplot = d3.scatterChart("Total curvefitting error")
     res = Math.sqrt( res );
     return res;
   })
-  .colourRange([0, 30]) 
+  .colourRange( [ 0, 30 ] ) 
   .on_click( function( k ) {
+    scatterplot.svg.selectAll(".clicked").classed("clicked", false);
+    d3.select(this).classed("clicked", true);
     selCellLine = k;
     curveFit.update();
   });
@@ -117,6 +119,19 @@ var curveFit = d3.scatterChart( "points" )
   .labelX("Drug concentration")
   .labelY("Inhibition")
   .domainY([-25, 100])
+  .ticksX(function() {
+    var ticks = [d3.range(5), 
+      d3.range(5).map(function(e) {
+        return inputData.RTG[selDrugs[0]][selCellLine].minConc * 
+                Math.pow(10, e)
+      }),
+      d3.range(5).map(function(e) {
+        return inputData.RTG[selDrugs[1]][selCellLine].minConc * 
+                Math.pow(10, e)
+      })];
+    ticks.colour = ["blue", "red"];
+    return ticks;
+  })
   .x( function( k ) {
     return k % 5;
   } )
@@ -127,7 +142,7 @@ var curveFit = d3.scatterChart( "points" )
   .colour( function( k ) {
     return k > 4 ? "red" : "blue";
   } );
-curveFit.legend.add(function() {return [selDrugs, ["red", "blue"]];}, 
+curveFit.legend.add(function() {return [selDrugs, ["blue", "red"]];}, 
                       "colour", "Drugs");  
 d3.lineChart("lines", curveFit)
   .npoints(2)
