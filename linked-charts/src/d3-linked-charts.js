@@ -618,9 +618,9 @@ function layerBase(id) {
       } 
     }
 
-    var scale = layer.colourScale;
-    scale.domain = layer.colourRange();
-    layer.addLegend(scale, "colour", layer.id);
+    layer.colourScale.domain = layer.get_colourRange;
+    if(layer.chart.showLegend())
+      layer.addLegend(layer.colourScale, "colour", layer.id);
   };
 
   layer.legendBloccks = [];
@@ -925,7 +925,6 @@ function legend(chart) {
 	return legend;
 }
 
-//basic chart object
 function chartBase() {
 	var chart = base()
 		.add_property("width", 500)
@@ -970,7 +969,7 @@ function chartBase() {
   	if(typeof margin.left === "undefined")
   		margin.left = chart.margin().left;
   	if(typeof margin.right === "undefined")
-  		margin.right === chart.margin().right;
+  		margin.right = chart.margin().right;
   	
   	chart.margin(margin);
   	return chart;
@@ -2642,6 +2641,12 @@ function sigmoidColorSlider() {
       .style( "stop-color", function(d) { 
         return obj.get_straightColorScale( 
           percent_scale( 100 * obj.the_sigmoid( percent_scale(d) ) ) ) } ) ;
+
+    obj.colourScale = function(val){
+      return obj.get_straightColorScale( 
+          percent_scale( 100 * obj.the_sigmoid( val ) ) );
+    };
+
 
     obj.mainMarker
       .attr( "x", obj.pos_scale( obj.get_midpoint() ) );

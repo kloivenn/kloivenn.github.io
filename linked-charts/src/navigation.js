@@ -10,6 +10,9 @@ var exampleList = [{
 	}, {
 		link: "labelsAndLegend.html",
 		name: "Labels and legend"
+	}, {
+		link: "colourSlider.html",
+		name: "Adding a colour slider"
 	}]
 
 function showNavigationPanel(element, ind){
