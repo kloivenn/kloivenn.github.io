@@ -160,7 +160,7 @@ function getEuclideanDistance(a, b) {
 function add_click_listener(chart){
 
   var wait_dblClick = null, down, wait_click = null,
-    tolerance = 5, click_coord,
+    tolerance = 5, click_coord, downThis,
     event = d3.dispatch('click', 'dblclick');
 
   //add a transparent rectangle to detect clicks
@@ -181,23 +181,15 @@ function add_click_listener(chart){
 
   var on_mousedown = function(){
     down = d3.mouse(document.body);
+    downThis = d3.mouse(this);
     wait_click = window.setTimeout(function() {wait_click = null;}, 1000);
-    if(self.onSelection != "doNothing"){
-      if(!d3.event.shiftKey || this.onSelection == "zoom") {
-        chart.svg.selectAll(".data_point").classed("selected",false);
-        chart.svg.selectAll(".label").classed("selected",false);
-      }
-      var p = d3.mouse(this);  //Mouse position on the heatmap
-      chart.svg.append("rect")
-        .attr("class", "selection")
-        .attr("rx", 0)
-        .attr("ry", 0)
-        .attr("x", p[0])
-        .attr("y", p[1])
-        .attr("width", 1)
-        .attr("height", 1);
-      //chart.svg.select(".clickPanel").raise();
-    }
+    var p = d3.mouse(this);  //Mouse position on the heatmap
+    chart.svg.append("rect")
+      .attr("class", "selection")
+      .attr("x", p[0])
+      .attr("y", p[1])
+      .attr("width", 1)
+      .attr("height", 1);
     chart.container.select(".inform")
       .classed("blocked", true);
   };
@@ -205,37 +197,12 @@ function add_click_listener(chart){
     var s = chart.svg.select(".selection");
         
     if(!s.empty()) {
-      var p = d3.mouse(this),
-      //The latest position and size of the selection rectangle
-      d = {
-        x: parseInt(s.attr("x"), 10),
-        y: parseInt(s.attr("y"), 10),
-        width: parseInt(s.attr("width"), 10),
-        height: parseInt(s.attr("height"), 10)
-      },
-      move = {
-        x: p[0] - d.x,
-        y: p[1] - d.y
-      };
-        
-      if(move.x < 1 || (move.x * 2 < d.width)) {
-        d.x = p[0];
-        d.width -= move.x;
-      } else {
-        d.width = move.x;       
-      }
-        
-      if(move.y < 1 || (move.y * 2 < d.height)) {
-        d.y = p[1];
-        d.height -= move.y;
-      } else {
-        d.height = move.y;       
-      }
-         
-      s.attr("x", d.x)
-        .attr("y", d.y)
-        .attr("width", d.width)
-        .attr("height", d.height);
+      var p = d3.mouse(this);
+
+      s.attr("x", d3.min([p[0], downThis[0]]))
+        .attr("y", d3.min([downThis[1], p[1]]))
+        .attr("width", Math.abs(downThis[0] - p[0]))
+        .attr("height", Math.abs(downThis[1] - p[1]));
         
       // deselect all temporary selected state objects
       d3.selectAll('.tmp-selection.selected')
@@ -243,8 +210,8 @@ function add_click_listener(chart){
 
       //here we need to go through all layers
       var selPoints = chart.findPoints(
-        [d.x - chart.get_margin().left, d.y - chart.get_margin().top], 
-        [d.x + d.width - chart.get_margin().left, d.y + d.height - chart.get_margin().top]
+        [+s.attr("x") - chart.get_margin().left, +s.attr("y") - chart.get_margin().top], 
+        [+s.attr("x") + +s.attr("width") - chart.get_margin().left, +s.attr("y") + +s.attr("height") - chart.get_margin().top]
       );
       if(typeof selPoints.empty === "function")
         selPoints = [selPoints];
@@ -308,16 +275,15 @@ function add_click_listener(chart){
     }
     // remove temporary selection marker class
     if(mark)
-      d3.selectAll(".selected")
-        .classed("marked", true);
-    d3.selectAll(".tmp-selection")
+      chart.mark(chart.svg.selectAll(".selected"));
+    chart.svg.selectAll(".tmp-selection")
       .classed("tmp-selection",false)
       .classed("selected", false);
-    mark ? chart.get_markedUpdated(chart.svg.selectAll(".marked")) : chart.zoom(lu, rb);      
+    if(!mark)
+      chart.zoom(lu, rb);      
   };
   var on_dblclick = function(mark){
-    mark ? chart.container.selectAll(".marked").classed("marked", false) : chart.resetDomain();
-    if(mark) chart.get_markedUpdated();     
+    mark ? chart.mark("__clear__") : chart.resetDomain();
   };
   var on_panelClick = function(p, mark){
     var clickedPoints = chart.findPoints(p, p);
@@ -332,8 +298,7 @@ function add_click_listener(chart){
         var click = clickedPoints[i].on("click");
         click.call(clickedPoints[i].node(), clickedPoints[i].datum()); 
       } else {
-        clickedPoints[i].classed("marked") ? clickedPoints[i].classed("marked", false) : clickedPoints[i].classed("marked", true);
-        chart.get_markedUpdated(chart.svg.selectAll(".marked"));
+        chart.mark(clickedPoints[i]);
       }
     }
   };
@@ -925,7 +890,6 @@ function legend(chart) {
 	return legend;
 }
 
-//basic chart object
 function chartBase() {
 	var chart = base()
 		.add_property("width", 500)
@@ -934,7 +898,11 @@ function chartBase() {
 		.add_property("plotHeight", 440)
 		.add_property("margin", { top: 15, right: 10, bottom: 50, left: 50 })
 		.add_property("title", "")
-		.add_property("transitionDuration", 1000); //may be set to zero
+		.add_property("titleX", function() {return chart.width() / 2;})
+		.add_property("titleY", function() {return d3.min([17, chart.margin().top * 0.9]);})
+		.add_property("titleSize", function() {return d3.min([15, chart.margin().top * 0.8]);})
+		.add_property("transitionDuration", 1000)
+		.add_property("markedUpdated", function() {}); //may be set to zero
 	
 	chart.transition = undefined;
   chart.width("_override_", "plotWidth", function(){
@@ -995,8 +963,38 @@ function chartBase() {
 
 	chart.defineTransition = function(){
 		chart.transition = 
-			d3.transition().duration(chart.get_transitionDuration());
-		chart.transition.on("end", chart.defineTransition);
+			d3.transition().duration(chart.transitionDuration());
+		chart.transition
+			.on("end", chart.defineTransition);
+	};
+
+	chart.mark = function(selection) {
+		if(selection == "__clear__"){
+			chart.svg.selectAll(".data_point.marked")
+				.classed("marked", false);
+			chart.svg.selectAll(".data_point")
+				.attr("opacity", 1);
+			return;
+		}
+
+		if(chart.svg.selectAll(".data_point.marked").empty())
+			chart.svg.selectAll(".data_point")
+				.attr("opacity", 0.5);
+		selection.classed("switch", true);
+		if(selection.size() < 2)
+			selection.filter(function() {return d3.select(this).classed("marked");})
+				.classed("switch", false)
+				.classed("marked", false)
+				.attr("opacity", 0.5);
+		selection.filter(function() {return d3.select(this).classed("switch");})
+			.classed("marked", true)
+			.classed("switch", false)
+			.attr("opacity", 1);
+		if(chart.svg.selectAll(".data_point.marked").empty())
+			chart.svg.selectAll(".data_point")
+				.attr("opacity", 1);
+
+		chart.markedUpdated();
 	};
 
 	chart.afterUpdate = function(){
@@ -1036,9 +1034,9 @@ function chartBase() {
 				.style("width", chart.get_width() + "px")
 				.style("height", chart.get_height() + "px");
 			chart.svg.select(".title").transition(chart.transition)
-				.attr("font-size", d3.min([15, chart.margin().top * 0.8]))
-				.attr("x", chart.width()/2)
-				.attr("y", d3.min([17, chart.margin().top * 0.9]));
+				.attr("font-size", chart.titleSize())
+				.attr("x", chart.titleX())
+				.attr("y", chart.titleY());
 		} else {
 			chart.svg
 				.attr("width", chart.get_width())
@@ -1047,9 +1045,9 @@ function chartBase() {
 				.style("width", chart.get_width() + "px")
 				.style("height", chart.get_height() + "px");
 			chart.svg.select(".title")
-				.attr("font-size", d3.min([15, chart.margin().top * 0.8]))
-				.attr("x", chart.width()/2)
-				.attr("y", d3.min([17, chart.margin().top * 0.9]));
+				.attr("font-size", chart.titleSize())
+				.attr("x", chart.titleX())
+				.attr("y", chart.titleY());
 		}
 		return chart;			
 	};
@@ -1176,8 +1174,7 @@ function axisChart() {
 		.add_property("labelX")
 		.add_property("labelY")
 		.add_property("ticksX", undefined)
-		.add_property("ticksY", undefined)
-		.add_property("markedUpdated", function() {});
+		.add_property("ticksY", undefined);
 
 	chart.axes = {};
 	
@@ -1258,6 +1255,8 @@ function axisChart() {
 	};
 
 	chart.zoom = function(lu, rb){
+		if(lu[0] == rb[0] || lu[1] == rb[1])
+			return;
     chart.domainX([chart.axes.scale_x.invert(lu[0]), 
                         chart.axes.scale_x.invert(rb[0])]);
     chart.domainY([chart.axes.scale_y.invert(rb[1]),
@@ -1723,11 +1722,15 @@ function heatmapChart(id, chart){
 		.add_property("clusterRowMetric", getEuclideanDistance)
 		.add_property("clusterColMetric", getEuclideanDistance)
 		.add_property("on_click", function() {})
-		.add_property("markedUpdated", function() {})
 		.add_property("rowTitle", "")
 		.add_property("showValue", false)
 		.add_property("colTitle", "")
-		.add_property("showLegend", true);
+		.add_property("showLegend", true)
+		.add_property("informText", function(rowId, colId) {
+			return "Row: <b>" + rowId + "</b>;<br>" + 
+						"Col: <b>" + colId + "</b>;<br>" + 
+						"value = " + chart.get_value(rowId, colId).toFixed(2)
+			});
 
 	chart.margin({top: 100, left: 100, right: 10, bottom: 40});
 
@@ -2072,6 +2075,7 @@ function heatmapChart(id, chart){
 	chart.resetDomain = function(){
 		chart.dispColIds(chart.get_colIds);
 		chart.dispRowIds(chart.get_rowIds);
+		chart.mark("__clear__");
 		chart.updateLabels()
 			.updateLabelPosition()
 			.updateCellColour()
@@ -2114,9 +2118,7 @@ function heatmapChart(id, chart){
 			.style("left", (d3.event.pageX + 10) + "px")
 			.style("top", (d3.event.pageY - 10) + "px")
 			.select(".value")
-				.html("Row: <b>" + d[0] + "</b>;<br>" + 
-						"Col: <b>" + d[1] + "</b>;<br>" + 
-						"value = " + chart.get_value(d[0], d[1]).toFixed(2));  
+				.html(function() {return chart.get_informText(d[0], d[1])});  
 		chart.container.select(".inform")
 			.classed("hidden", false);
 		}
@@ -2395,8 +2397,7 @@ function heatmapChart(id, chart){
 	};
 	
 	chart.update = function() {
-		chart.svg.select(".title")
-			.text(chart.title());
+		chart.updateTitle();
 		chart.resetColourScale();
 		chart.axes.x_label
 			.text(chart.get_colTitle());
