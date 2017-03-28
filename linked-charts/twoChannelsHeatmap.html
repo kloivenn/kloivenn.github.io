@@ -4,8 +4,6 @@
 
 <title>Linked charts - Heatmap with two channels</title>
 
-<script src = "https://d3js.org/d3.v4.min.js"></script>
-<script src = "https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 <link rel="stylesheet" href="src/prism.css">
 <script src = "src/prism.js"></script>
 
@@ -33,9 +31,8 @@ non-effective drugs will be shown as black cells and all others will be either r
 <p>Now, instead of one legend we will have two, and both will be interactive colour sliders.</p> 
 
 
-<link rel = "stylesheet" type = "text/css" href = "src/style.css">
-<script src = "src/d3-linked-charts.js"></script>
-<script src = "src/clusterfck.js"></script>
+<link rel = "stylesheet" type = "text/css" href = "lib/linked-charts.css">
+<script src = "lib/linked-charts.min.js"></script>
 <script src = "src/inputdata.js"></script>
 
 <table><tr>
@@ -45,11 +42,11 @@ non-effective drugs will be shown as black cells and all others will be either r
 
 <script>
 
-inputData = d3.separateBy(inputData, ["screen", "Drug", "CellLine"]);
+inputData = lc.separateBy(inputData, ["screen", "Drug", "CellLine"]);
 var drugs = Object.keys(inputData.RTG),
   cellLines = Object.keys(inputData.RTG[drugs[0]]);
 
-var heatmap = d3.heatmapChart()
+var heatmap = lc.heatmapChart()
   .rowIds( drugs )
   .colIds( cellLines )
   .title( "Drug effect on viability and cytotoxicity" )
@@ -73,7 +70,7 @@ var heatmap = d3.heatmapChart()
   })
   .place( "#heatmap" );
 
-var RTGSlider = d3.sigmoidColorSlider()
+var RTGSlider = lc.sigmoidColorSlider()
 	.set_margin( {left: 100} )
   .title( "RealTime-Glo" )
   .titleX( 45 )
@@ -88,7 +85,7 @@ var RTGSlider = d3.sigmoidColorSlider()
 		heatmap.updateCellColour();
 	})
   .place( "#heatmap" );
-var CTXSlider = d3.sigmoidColorSlider()
+var CTXSlider = lc.sigmoidColorSlider()
   .set_margin( {left: 100} )
   .title( "CellTox" )
   .titleX( 45 )
@@ -122,7 +119,7 @@ var get_curve = function( drug, cellLine, x ){
     (1 + Math.pow( 10, - ( x - Math.log10( IC50/minConc ) ) * slope));
 }
 
-var curveFit = d3.scatterChart( "points" )
+var curveFit = lc.scatterChart( "points" )
   .width( 375 )
   .height( 200 )
   .npoints( 10 )
@@ -155,7 +152,7 @@ var curveFit = d3.scatterChart( "points" )
   } );
 curveFit.legend.add(function() {return [selDrugs, ["blue", "red"]];}, 
                       "colour", "Drugs");  
-d3.lineChart( "lines", curveFit )
+lc.lineChart( "lines", curveFit )
   .npoints( 2 )
   .lineFun( function( k, x ) {
     return get_curve( selDrugs[k], selCellLine, x );

@@ -4,8 +4,6 @@
 
 <title>Linked charts - A very simple example</title>
 
-<script src = "https://d3js.org/d3.v4.min.js"></script>
-<script src = "https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 <link rel="stylesheet" href="src/prism.css">
 <script src = "src/prism.js"></script>
 
@@ -43,10 +41,8 @@ point representing one sample.</p>
 <p>This linking of a chart visualizing a summary statistic with a chart drilling down into the data of a specific
 data element is a prototypical use case of <i>linked-charts</i>.
 
-
-
-<link rel="stylesheet" type="text/css" href="src/style.css">
-<script src="src/d3-linked-charts.js"></script>
+<script src="lib/linked-charts.min.js"></script>
+<link rel="stylesheet" type="text/css" href="lib/linked-charts.css">
 
 <script src="src/inputdata_simple.js"></script>
 
@@ -60,12 +56,12 @@ data element is a prototypical use case of <i>linked-charts</i>.
 var selGene = 1;                                               
 var selDrug = 1;
 
-var scatterplot = d3.scatterChart()
+var scatterplot = lc.scatterChart()
   .x( function( k ) { return geneExprs[selGene][k] } )
   .y( function( k ) { return drugScores[selDrug][k] } )
   .place("#scatterplot");
 
-var heatmap = d3.heatmapChart()
+var heatmap = lc.heatmapChart()
   .nrows( geneNames.length )
   .ncols( drugNames.length )
   .height( 650 )
@@ -73,7 +69,7 @@ var heatmap = d3.heatmapChart()
   .colourRange( [ -1, 1 ] )
   .palette( d3.interpolateRdBu )
   .value( function( row, col ) {  
-     return d3.pearsonCorr( geneExprs[row], drugScores[col] ) 
+     return lc.pearsonCorr( geneExprs[row], drugScores[col] ) 
    } )
   .rowLabels( function(row) { 
      return geneNames[row] 
@@ -109,7 +105,8 @@ This default behaviour can be changed by user.</p>
 
 <table><tr><td valign="top">
 <pre>
-<x-expl id="loadlib"></x-expl><code class = "language-html">&lt;script src="d3-linked-charts.js"></script></code>
+<x-expl id="loadlib"></x-expl><code class = "language-html">&lt;script src="lib/linked-charts.min.js"></script></code>
+<x-expl id="loadlib"></x-expl><code class = "language-html">&lt;link rel="stylesheet" type="text/css" href="lib/linked-charts.css"></code>
 
 <x-expl id="inputdata"></x-expl><code class = "language-html">&lt;script></code>
 <x-expl id="labelVectors"></x-expl><code class = "language-javascript">  geneNames = [ "CD248", "CA6", ... , "PDGFB" ]</code>
@@ -128,12 +125,12 @@ This default behaviour can be changed by user.</p>
 <x-expl id="vars"></x-expl><code class = "language-javascript">  var selGene = 1;</code>
 <x-expl id="vars"></x-expl><code class = "language-javascript">  var selDrug = 1;</code>
 
-<x-expl id="scatter1"></x-expl><code class = "language-javascript">  var scatterplot = d3.scatterChart()</code>
+<x-expl id="scatter1"></x-expl><code class = "language-javascript">  var scatterplot = lc.scatterChart()</code>
 <x-expl id="xy"></x-expl><code class = "language-javascript">    .x( function( k ) { return geneExprs[selGene][k] } )</code>
 <x-expl id="xy"></x-expl><code class = "language-javascript">    .y( function( k ) { return drugScores[selDrug][k] } )</code>
 <x-expl id="place"></x-expl><code class = "language-javascript">    .place("#scatterplot");</code>
 
-<x-expl id="heatmap1"></x-expl><code class = "language-javascript">  var heatmap = d3.heatmapChart()</code>
+<x-expl id="heatmap1"></x-expl><code class = "language-javascript">  var heatmap = lc.heatmapChart()</code>
 <x-expl id="hm_prop"></x-expl><code class = "language-javascript">    .nrows( geneNames.length )</code>
 <x-expl id="hm_prop"></x-expl><code class = "language-javascript">    .ncols( drugNames.length )</code>
 <x-expl id="hm_prop"></x-expl><code class = "language-javascript">    .height( 650 )</code>
@@ -176,7 +173,7 @@ going from top to bottom, to see explanations of the code.</i></p>
 <br>
 
 <div class="expl" id="loadlib">
-<p>Here we load the <i>linked-charts</i> library. It comes bundled with D3.</p></div>
+<p>Here we load the <i>linked-charts</i> library and its stylesheet. It comes bundled with D3 and clusterfck.js.</p></div>
 
 <div class="expl" id="inputdata">
 <p>There are various ways to load the data. Here, we demonstrate the simplest way:

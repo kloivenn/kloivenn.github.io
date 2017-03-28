@@ -4,8 +4,6 @@
 
 <title>Linked charts - Lines and colour</title>
 
-<script src = "https://d3js.org/d3.v4.min.js"></script>
-<script src = "https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 <link rel="stylesheet" href="src/prism.css">
 <script src = "src/prism.js"></script>
 
@@ -21,9 +19,8 @@
 for both drugs to the bottom one. We also use colour to indicate the samples, where curvefitting wasn't succesfull.
 Red dots on the correlation scatterplots show cell lines with bad fitting for at least one of two selected drugs.</p>
 
-<link rel = "stylesheet" type = "text/css" href = "src/style.css">
-<script src = "src/d3-linked-charts.js"></script>
-<script src = "src/clusterfck.js"></script>
+<link rel = "stylesheet" type = "text/css" href = "lib/linked-charts.css">
+<script src = "lib/linked-charts.min.js"></script>
 <script src = "src/inputdata.js"></script>
 
 <table><tr>
@@ -33,14 +30,14 @@ Red dots on the correlation scatterplots show cell lines with bad fitting for at
 
 <script>
 
-inputData = d3.separateBy(inputData, ["screen", "Drug", "CellLine"]);
+inputData = lc.separateBy(inputData, ["screen", "Drug", "CellLine"]);
 var drugs = Object.keys(inputData.RTG),
   cellLines = Object.keys(inputData.RTG[drugs[0]]);
 
 var selDrugs = [drugs[0], drugs[1]],
   selCellLine = cellLines[0];
 
-var heatmap = d3.heatmapChart()
+var heatmap = lc.heatmapChart()
   .rowIds( drugs )
   .colIds( drugs )
   .colourRange( [ -1, 1 ] )
@@ -52,7 +49,7 @@ var heatmap = d3.heatmapChart()
       colValues = cellLines.map(function(e) {
         return inputData.RTG[colId][e].avInh;
       });
-    return d3.pearsonCorr( rowValues, colValues ); 
+    return lc.pearsonCorr( rowValues, colValues ); 
    })
   .on_click( function( rowId, colId ) {
      selDrugs = [rowId, colId]
@@ -75,7 +72,7 @@ var get_curve = function( drug, cellLine, x ){
     (1 + Math.pow(10, -(x - Math.log10(IC50/minConc)) * slope));
 }
 
-var scatterplot = d3.scatterChart()
+var scatterplot = lc.scatterChart()
   .width( 300 )
   .height( 300 )
   .dataIds( cellLines )
@@ -97,14 +94,14 @@ var scatterplot = d3.scatterChart()
     selCellLine = k;
     curveFit.update();
   });
-d3.lineChart("line", scatterplot)
+lc.lineChart("line", scatterplot)
   .npoints(1)
   .lineFun( function( k, x ){
     return x;
   })
   .place( "#scatterplot" );
 
-var curveFit = d3.scatterChart( "points" )
+var curveFit = lc.scatterChart( "points" )
   .width( 300 )
   .height( 200 )
   .npoints( 10 )
@@ -118,7 +115,7 @@ var curveFit = d3.scatterChart( "points" )
   .colour( function( k ) {
     return k > 4 ? "red" : "blue";
   } );
-d3.lineChart("lines", curveFit)
+lc.lineChart("lines", curveFit)
   .npoints(2)
   .lineFun( function( k, x ) {
     return get_curve( selDrugs[k], selCellLine, x );
@@ -150,7 +147,7 @@ onclick="window.open('linesAndColour_code.html', 'newwindow', 'width=800, height
 
 <table><tr><td valign="top">
 <pre class = "language-javascript">
-<x-expl id="heatmap"></x-expl><code>var heatmap = d3.heatmapChart()</code>
+<x-expl id="heatmap"></x-expl><code>var heatmap = lc.heatmapChart()</code>
 <x-expl id="skip"></x-expl><code>  ...</code>
 <x-expl id="heatmap"></x-expl><code>  .place( "#heatmap" );</code>
 
@@ -165,7 +162,7 @@ onclick="window.open('linesAndColour_code.html', 'newwindow', 'width=800, height
 <x-expl id="get_curve"></x-expl><code>         (1 + Math.pow(10, -(x - Math.log10(IC50/minConc)) * slope));</code>
 <x-expl id="get_curve"></x-expl><code>}</code>
 
-<x-expl id="scatter"></x-expl><code>var scatterplot = d3.scatterChart()</code>
+<x-expl id="scatter"></x-expl><code>var scatterplot = lc.scatterChart()</code>
 <x-expl id="skip"></x-expl><code>  ...</code>
 <x-expl id="aspectRatio"></x-expl><code>  .aspectRatio( 1 )</code>
 <x-expl id="colourValue"></x-expl><code>  .colourValue( function ( k ) {</code>
@@ -179,14 +176,14 @@ onclick="window.open('linesAndColour_code.html', 'newwindow', 'width=800, height
 <x-expl id="colourValue"></x-expl><code>  })</code>
 <x-expl id="palette"></x-expl><code>  .palette( ["green", "yellow","red"] )</code>
 <x-expl id="colourRange"></x-expl><code>  .colourRange([0, 30]);</code>
-<x-expl id="line"></x-expl><code>d3.lineChart("line", scatterplot)</code>
+<x-expl id="line"></x-expl><code>lc.lineChart("line", scatterplot)</code>
 <x-expl id="npoints"></x-expl><code>  .npoints(1)</code>
 <x-expl id="lineFun"></x-expl><code>  .lineFun( function( k, x ){</code>
 <x-expl id="lineFun"></x-expl><code>    return x;</code>
 <x-expl id="lineFun"></x-expl><code>  })</code>
 <x-expl id="place"></x-expl><code>  .place( "#scatterplot" );</code>
 
-<x-expl id="scatter"></x-expl><code>var curveFit = d3.scatterChart( "points" )</code>
+<x-expl id="scatter"></x-expl><code>var curveFit = lc.scatterChart( "points" )</code>
 <x-expl id="skip"></x-expl><code>  ...</code>
 <x-expl id="npoints"></x-expl><code>  .npoints( 10 )</code>
 <x-expl id="xy"></x-expl><code>  .x( function( k ) {</code>
@@ -199,7 +196,7 @@ onclick="window.open('linesAndColour_code.html', 'newwindow', 'width=800, height
 <x-expl id="colour"></x-expl><code>  .colour( function( k ) {</code>
 <x-expl id="colour"></x-expl><code>    return k > 4 ? "red" : "blue";</code>
 <x-expl id="colour"></x-expl><code>  } );</code>
-<x-expl id="line"></x-expl><code>d3.lineChart("lines", curveFit)</code>
+<x-expl id="line"></x-expl><code>lc.lineChart("lines", curveFit)</code>
 <x-expl id="npoints"></x-expl><code>  .npoints(2)</code>
 <x-expl id="lineFun"></x-expl><code>  .lineFun( function( k, x ) {</code>
 <x-expl id="lineFun"></x-expl><code>    return get_curve( selDrugs[k], selCellLine, x );</code>

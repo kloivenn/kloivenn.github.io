@@ -12,7 +12,8 @@
 <body>
 <pre class = "language-html">
 	<code>
-&lt;script src="d3-linked-charts.js">&lt;/script>
+&lt;script src="lib/linked-charts.min.js">&lt;/script>
+&lt;link rel="stylesheet" type="text/css" href="lib/linked-charts.css">
 
 &lt;script>
   inputData = [{"CellLine":"Pa16C","Drug":"Galunisertib","minConc":1, ...}, ... ];
@@ -24,14 +25,14 @@
 &lt;/tr>&lt;/table>
 
 &lt;script>
-	inputData = d3.separateBy(inputData, ["screen", "Drug", "CellLine"]);
+	inputData = lc.separateBy(inputData, ["screen", "Drug", "CellLine"]);
 	var drugs = Object.keys(inputData.RTG),
 	  cellLines = Object.keys(inputData.RTG[drugs[0]]);
 
 	var selDrugs = [drugs[0], drugs[1]],
 	  selCellLine = cellLines[0];
 
-	var heatmap = d3.heatmapChart()
+	var heatmap = lc.heatmapChart()
 	  .rowIds( drugs )
 	  .colIds( drugs )
 	  .colourRange( [ -1, 1 ] )
@@ -43,7 +44,7 @@
 	      colValues = cellLines.map(function(e) {
 	        return inputData.RTG[colId][e].avInh;
 	      });
-	    return d3.pearsonCorr( rowValues, colValues ); 
+	    return lc.pearsonCorr( rowValues, colValues ); 
 	   })
 	  .on_click( function( rowId, colId ) {
 	     selDrugs = [rowId, colId]
@@ -55,7 +56,7 @@
 	heatmap.cluster("Row")
 	  .cluster("Col");
 
-	var scatterplot = d3.scatterChart()
+	var scatterplot = lc.scatterChart()
 	  .width( 300 )
 	  .height( 300 )
 	  .dataIds( cellLines )
@@ -67,7 +68,7 @@
 	  })
 	  .place( "#scatterplot" );
 
-	var curveFit = d3.scatterChart("drug1")
+	var curveFit = lc.scatterChart("drug1")
 	  .width( 300 )
 	  .height( 200 )
 	  .npoints( 5 )
@@ -76,7 +77,7 @@
 	    return inputData.RTG[selDrugs[0]][selCellLine]["D" + (k + 1)];
 	  })
 	  .colour( "blue" );
-	d3.scatterChart("drug2", curveFit)
+	lc.scatterChart("drug2", curveFit)
 	  .npoints( 5 )
 	  .x( function( k ) {return k} )
 	  .y( function( k ) {

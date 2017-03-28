@@ -2,7 +2,7 @@
 
 <head>
 
-<title>Linked charts - Adding layers - Complete code</title>
+<title>Linked charts - Adding a colour slider - Complete code</title>
 
 <link rel="stylesheet" href="src/prism.css">
 <script src = "src/prism.js"></script>
@@ -12,7 +12,8 @@
 <body>
 <pre class = "language-html">
 	<code>
-&lt;script src="d3-linked-charts.js">&lt;/script>
+&lt;script src="lib/linked-charts.min.js">&lt;/script>
+&lt;link rel="stylesheet" type="text/css" href="lib/linked-charts.css">
 
 &lt;script>
   inputData = [{"CellLine":"Pa16C","Drug":"Galunisertib","minConc":1, ...}, ... ];
@@ -24,14 +25,14 @@
 &lt;/tr>&lt;/table>
 
 &lt;script>
-	inputData = d3.separateBy(inputData, ["screen", "Drug", "CellLine"]);
+	inputData = lc.separateBy(inputData, ["screen", "Drug", "CellLine"]);
 	var drugs = Object.keys(inputData.RTG),
 	  cellLines = Object.keys(inputData.RTG[drugs[0]]);
 
 	var selDrugs = [drugs[0], drugs[1]],
 	  selCellLine = cellLines[0];
 
-	var heatmap = d3.heatmapChart()
+	var heatmap = lc.heatmapChart()
 	  .rowIds( drugs )
 	  .colIds( drugs )
 	  .title("Drug-drug correlation")
@@ -46,7 +47,7 @@
 	      colValues = cellLines.map(function( e ) {
 	        return inputData.RTG[colId][e].avInh;
 	      });
-	    return d3.pearsonCorr( rowValues, colValues ); 
+	    return lc.pearsonCorr( rowValues, colValues ); 
 	   })
 	  .on_click( function( rowId, colId ) {
 	     selDrugs = [rowId, colId]
@@ -55,7 +56,7 @@
 	  })
 	  .place( "#heatmap" );
 
-	var heatmapSlider = d3.sigmoidColorSlider()
+	var heatmapSlider = lc.sigmoidColorSlider()
 		.set_margin( {left: 100} )
 		.straightColorScale( heatmap.colourScale )
 		.on_change(function(){
@@ -81,7 +82,7 @@
 	    (1 + Math.pow( 10, - ( x - Math.log10( IC50/minConc ) ) * slope));
 	}
 
-	var scatterplot = d3.scatterChart()
+	var scatterplot = lc.scatterChart()
 	  .width( 300 )
 	  .height( 300 )
 	  .set_margin( {bottom: 20} )
@@ -112,7 +113,7 @@
 	    selCellLine = k;
 	    curveFit.update();
 	  });
-	d3.lineChart( "line", scatterplot )
+	lc.lineChart( "line", scatterplot )
 	  .npoints(1)
 	  .lineFun( function( k, x ){
 	    return x;
@@ -121,7 +122,7 @@
 
 	var layer = scatterplot.get_layer( "layer0" );
 
-	var scatterSlider = d3.sigmoidColorSlider()
+	var scatterSlider = lc.sigmoidColorSlider()
 		.width( 300 )
 		.height( 110 )
 		.set_margin( {top: 50} )
@@ -137,7 +138,7 @@
 	});
 
 
-	var curveFit = d3.scatterChart( "points" )
+	var curveFit = lc.scatterChart( "points" )
 	  .width( 375 )
 	  .height( 200 )
 	  .npoints( 10 )
@@ -170,7 +171,7 @@
 	  } );
 	curveFit.legend.add(function() {return [selDrugs, ["blue", "red"]];}, 
 	                      "colour", "Drugs");  
-	d3.lineChart( "lines", curveFit )
+	lc.lineChart( "lines", curveFit )
 	  .npoints( 2 )
 	  .lineFun( function( k, x ) {
 	    return get_curve( selDrugs[k], selCellLine, x );

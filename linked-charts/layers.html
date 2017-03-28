@@ -4,8 +4,6 @@
 
 <title>Linked charts - Adding layers</title>
 
-<script src = "https://d3js.org/d3.v4.min.js"></script>
-<script src = "https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 <link rel="stylesheet" href="src/prism.css">
 <script src = "src/prism.js"></script>
 
@@ -30,9 +28,8 @@ selected drugs. By clicking on a data point one can select a cell line, and thus
 (right bottom corner) that demonstrate individual inhibition percent values for the two selected drugs and 
 the selected cell line.</p>
 
-<link rel = "stylesheet" type = "text/css" href = "src/style.css">
-<script src = "src/d3-linked-charts.js"></script>
-<script src = "src/clusterfck.js"></script>
+<link rel = "stylesheet" type = "text/css" href = "lib/linked-charts.css">
+<script src = "lib/linked-charts.min.js"></script>
 <script src = "src/inputdata.js"></script>
 
 <table><tr>
@@ -42,14 +39,14 @@ the selected cell line.</p>
 
 <script>
 
-inputData = d3.separateBy(inputData, ["screen", "Drug", "CellLine"]);
+inputData = lc.separateBy(inputData, ["screen", "Drug", "CellLine"]);
 var drugs = Object.keys(inputData.RTG),
   cellLines = Object.keys(inputData.RTG[drugs[0]]);
 
 var selDrugs = [drugs[0], drugs[1]],
   selCellLine = cellLines[0];
 
-var heatmap = d3.heatmapChart()
+var heatmap = lc.heatmapChart()
   .rowIds( drugs )
   .colIds( drugs )
   .colourRange( [ -1, 1 ] )
@@ -61,7 +58,7 @@ var heatmap = d3.heatmapChart()
       colValues = cellLines.map(function(e) {
         return inputData.RTG[colId][e].avInh;
       });
-    return d3.pearsonCorr( rowValues, colValues ); 
+    return lc.pearsonCorr( rowValues, colValues ); 
    })
   .on_click( function( rowId, colId ) {
      selDrugs = [rowId, colId]
@@ -73,7 +70,7 @@ var heatmap = d3.heatmapChart()
 heatmap.cluster("Row")
   .cluster("Col");
 
-var scatterplot = d3.scatterChart()
+var scatterplot = lc.scatterChart()
   .width( 300 )
   .height( 300 )
   .dataIds( cellLines )
@@ -85,7 +82,7 @@ var scatterplot = d3.scatterChart()
   })
   .place( "#scatterplot" );
 
-var curveFit = d3.scatterChart("drug1")
+var curveFit = lc.scatterChart("drug1")
   .width( 300 )
   .height( 200 )
   .npoints( 5 )
@@ -94,7 +91,7 @@ var curveFit = d3.scatterChart("drug1")
     return inputData.RTG[selDrugs[0]][selCellLine]["D" + (k + 1)];
   })
   .colour( "blue" );
-d3.scatterChart("drug2", curveFit)
+lc.scatterChart("drug2", curveFit)
   .npoints( 5 )
   .x( function( k ) {return k} )
   .y( function( k ) {
@@ -131,14 +128,14 @@ onclick="window.open('layers_code.html', 'newwindow', 'width=800, height=800');"
 <x-expl id="inputdata"></x-expl><code class = "language-html">&lt;/script></code>
 
 <x-expl id="mainscript"></x-expl><code class = "language-html">&lt;script></code>
-<x-expl id="separateBy"></x-expl><code class = "language-javascript">  inputData = d3.separateBy(inputData, ["screen", "Drug", "CellLine"]);</code>
+<x-expl id="separateBy"></x-expl><code class = "language-javascript">  inputData = lc.separateBy(inputData, ["screen", "Drug", "CellLine"]);</code>
 <x-expl id="list"></x-expl><code class = "language-javascript">  var drugs = Object.keys(inputData.RTG),</code>
 <x-expl id="list"></x-expl><code class = "language-javascript">    cellLines = Object.keys(inputData.RTG[drugs[0]]);</code>
 
 <x-expl id="vars"></x-expl><code class = "language-javascript">  var selDrugs = [drugs[0], drugs[1]],</code> 
 <x-expl id="vars"></x-expl><code class = "language-javascript">    selCellLine = cellLines[0];</code>
 
-<x-expl id="heatmap"></x-expl><code class = "language-javascript">  var heatmap = d3.heatmapChart()</code>
+<x-expl id="heatmap"></x-expl><code class = "language-javascript">  var heatmap = lc.heatmapChart()</code>
 <x-expl id="ids"></x-expl><code class = "language-javascript">    .rowIds( drugs )</code>
 <x-expl id="ids"></x-expl><code class = "language-javascript">    .colIds( drugs )</code>
 <x-expl id="hm_value"></x-expl><code class = "language-javascript">    .value( function( rowId, colId ) { </code> 
@@ -148,7 +145,7 @@ onclick="window.open('layers_code.html', 'newwindow', 'width=800, height=800');"
 <x-expl id="hm_value"></x-expl><code class = "language-javascript">        colValues = cellLines.map(function(e) {</code>
 <x-expl id="hm_value"></x-expl><code class = "language-javascript">          return inputData.RTG[colId][e].avInh;</code>
 <x-expl id="hm_value"></x-expl><code class = "language-javascript">        });</code>
-<x-expl id="hm_value"></x-expl><code class = "language-javascript">      return d3.pearsonCorr( rowValues, colValues );</code> 
+<x-expl id="hm_value"></x-expl><code class = "language-javascript">      return lc.pearsonCorr( rowValues, colValues );</code> 
 <x-expl id="hm_value"></x-expl><code class = "language-javascript">     })</code>
 <x-expl id="skip"></x-expl><code>    ...</code>
 <x-expl id="place"></x-expl><code class = "language-javascript">    .place( "#heatmap");</code>
@@ -156,12 +153,12 @@ onclick="window.open('layers_code.html', 'newwindow', 'width=800, height=800');"
 <x-expl id="cluster"></x-expl><code class = "language-javascript">  heatmap.cluster("Row")</code>
 <x-expl id="cluster"></x-expl><code class = "language-javascript">    .cluster("Col");</code>
 
-<x-expl id="scatter1"></x-expl><code class = "language-javascript">  var scatterplot = d3.scatterChart()</code>
+<x-expl id="scatter1"></x-expl><code class = "language-javascript">  var scatterplot = lc.scatterChart()</code>
 <x-expl id="ids"></x-expl><code class = "language-javascript">    .dataIds( cellLines )</code>
 <x-expl id="skip"></x-expl><code>    ...</code>
 <x-expl id="place"></x-expl><code class = "language-javascript">    .place( "#scatterplot" );</code>
 
-<x-expl id="layer1"></x-expl><code class = "language-javascript">  var curveFit = d3.scatterChart("drug1")</code>
+<x-expl id="layer1"></x-expl><code class = "language-javascript">  var curveFit = lc.scatterChart("drug1")</code>
 <x-expl id="skip"></x-expl><code>    ...</code>
 <x-expl id="npoints"></x-expl><code class = "language-javascript">    .npoints( 5 )</code>
 <x-expl id="xy"></x-expl><code class = "language-javascript">    .x( function( k ) {return k;} )</code>
@@ -169,7 +166,7 @@ onclick="window.open('layers_code.html', 'newwindow', 'width=800, height=800');"
 <x-expl id="xy"></x-expl><code class = "language-javascript">      return inputData.RTG[selDrugs[0]][selCellLine]["D" + (k + 1)];</code>
 <x-expl id="xy"></x-expl><code class = "language-javascript">    })</code>
 <x-expl id="colour"></x-expl><code class = "language-javascript">    .colour( "blue" );</code>
-<x-expl id="layer2"></x-expl><code class = "language-javascript">  d3.scatterChart("drug2", curveFit)</code>
+<x-expl id="layer2"></x-expl><code class = "language-javascript">  lc.scatterChart("drug2", curveFit)</code>
 <x-expl id="npoints"></x-expl><code class = "language-javascript">    .npoints( 5 )</code>
 <x-expl id="xy"></x-expl><code class = "language-javascript">    .x( function( k ) {return k} )</code>
 <x-expl id="xy"></x-expl><code class = "language-javascript">    .y( function( k ) {</code>
