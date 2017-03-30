@@ -13,6 +13,9 @@ var exampleList = [{
 	}, {
 		link: "colourSlider.html",
 		name: "Adding a colour slider"
+	}, {
+		link: "twoChannelsHeatmap.html",
+		name: "Heatmap with two channels"
 	}]
 
 function showNavigationPanel(element, ind){

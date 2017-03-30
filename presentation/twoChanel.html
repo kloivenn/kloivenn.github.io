@@ -1,0 +1,145 @@
+<html>
+	<head>
+		<title>Linked-charts - Two Chanels</title>
+		<style type = "text/css">
+			div.fill-screen {
+		    position: fixed;
+		    left: 0;
+		    right: 0;
+		    top: 0;
+		    bottom: 0;
+		    text-align: center;
+		    z-index: -10;
+			}
+
+			img.make-it-fit {
+		    max-width: 99%;
+		    max-height: 99%;
+			}
+		</style>
+		<script type = "text/javascript" src = 'src/switchSlides.js'></script>
+		<link rel="stylesheet" href="src/prism.css">
+		<script src = "src/prism.js"></script>
+		<script src="src/linked-charts.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="src/linked-charts.css">
+		<script src="src/inputdata.js"></script>
+	</head>
+	<body>
+		<table width="100%">
+			<tr>
+				<td align="center" id = "headline">
+					<div class="fill-screen"><img src = "images/n08.png" style = "max-height: 20%" id = "titleImg"></div>
+				</td>
+			</tr>
+				<table>
+					<tr>
+						<td id = "heatmap"></td>
+						<td id = "scatterplot"></td>
+						<td id = "code">
+							<pre class="language-javascript">
+<code>var heatmap = lc.heatmapChart()</code>
+<code>  .rowIds( drugs )</code>
+<code>  .colIds( cellLines )</code>
+<code>  .value( function( rowId, colId ) {  </code>
+<code>    return [inputData.RTG[rowId][colId].avInh, </code>
+<code>            inputData.CTX[rowId][colId].avInh];</code>
+<code>   })</code>
+<code>	...</code>
+<code>  .place( "#heatmap" );</code>
+
+<code>var RTGSlider = lc.sigmoidColorSlider()</code>
+<code>  .straightColorScale( </code>
+<code>    d3.scaleLinear()</code>
+<code>      .range( [ "black", "rgb(0, 255, 0)" ] )</code>
+<code>      .domain([0, 50]) </code>
+<code>  )</code>
+<code>  .on_change(function(){</code>
+<code>    heatmap.updateCellColour();</code>
+<code>	})</code>
+<code>  ...</code>
+<code>  .place( "#heatmap" );</code>
+
+<code>heatmap.colour( function( val ){</code>
+<code>  return "rgb(" + Math.round(CTXSlider.the_sigmoid(val[1]) * 255) + ", " </code>
+<code>             + Math.round(RTGSlider.the_sigmoid(val[0]) * 255) + ", 0)";</code>
+<code>} )</code>
+<code>  .updateCellColour();</code>
+							<pre>
+						</td>
+					</tr>
+				</table>
+			<tr>
+			</tr>
+		</table>
+		<script type="text/javascript">
+			var height = document.getElementById("titleImg").clientHeight;
+			d3.select("#headline").attr("height", height);
+
+inputData = lc.separateBy(inputData, ["screen", "Drug", "CellLine"]);
+var drugs = Object.keys(inputData.RTG),
+  cellLines = Object.keys(inputData.RTG[drugs[0]]);
+
+var heatmap = lc.heatmapChart()
+  .rowIds( drugs )
+  .colIds( cellLines )
+  .height(400)
+  .title( "Drug effect on viability and cytotoxicity" )
+  .showLegend( false )
+  .margin( {top: 100, left: 100, right: 10, bottom: 10} )
+  .value( function( rowId, colId ) {  
+    return [inputData.RTG[rowId][colId].avInh, 
+            inputData.CTX[rowId][colId].avInh];
+   })
+  .informText(function(rowId, colId) {
+      return "Row: <b>" + rowId + "</b>;<br>" + 
+            "Col: <b>" + colId + "</b>;<br>" + 
+            "RTG = " + heatmap.get_value(rowId, colId)[0].toFixed(2) +
+            " ; CTX = " + heatmap.get_value(rowId, colId)[1].toFixed(2);
+      })
+  .on_click( function( rowId, colId ) {
+    heatmap.mark( d3.select( this ) );
+  })
+  .markedUpdated( function(){
+    curveFit.update();
+  })
+  .place( "#heatmap" );
+
+var RTGSlider = lc.sigmoidColorSlider()
+	.set_margin( {left: 100} )
+  .title( "RealTime-Glo" )
+  .titleX( 45 )
+  .titleY( 40 )
+  .titleSize( 14 )
+	.straightColorScale( 
+    d3.scaleLinear()
+      .range( [ "black", "rgb(0, 255, 0)" ] )
+      .domain([0, 50]) 
+  )
+	.on_change(function(){
+		heatmap.updateCellColour();
+	})
+  .place( "#heatmap" );
+var CTXSlider = lc.sigmoidColorSlider()
+  .set_margin( {left: 100} )
+  .title( "CellTox" )
+  .titleX( 45 )
+  .titleY( 40 )
+  .titleSize( 14 )  
+  .straightColorScale( 
+    d3.scaleLinear()
+      .range( [ "black", "rgb(255, 0, 0)" ] )
+      .domain( [0, 50] ) 
+  )
+  .on_change(function(){
+    heatmap.updateCellColour();
+  })
+  .place( "#heatmap" );
+
+heatmap.colour( function( val ){
+  return "rgb(" + Math.round(CTXSlider.the_sigmoid(val[1]) * 255) + ", " 
+             + Math.round(RTGSlider.the_sigmoid(val[0]) * 255) + ", 0)";
+} )
+  .updateCellColour();
+		</script>
+	</body>
+</html>
