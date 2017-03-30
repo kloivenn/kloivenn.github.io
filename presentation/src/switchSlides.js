@@ -8,7 +8,7 @@ document.onkeydown = function(evt){
 		path = document.location.href.match(/^.*[\\\/]/, '');
 	
 	if(document.location.href.replace(/^.*[\\\/]/, '') == "")
-		n = 1;
+		n = 0;
 
 	if(n == -1)
 		throw "Error: something is wrong! :)";
