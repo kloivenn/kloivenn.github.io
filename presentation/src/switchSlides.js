@@ -1,4 +1,4 @@
-var slideList = ["index.html", "CombinAssay.html", "slide03.html", "slide04.html", "slide05.html",
+var slideList = ["", "index.html", "CombinAssay.html", "slide03.html", "slide04.html", "slide05.html",
 	"slide06.html", "slide07.html", "layers.html",  "slide08.html", "linesAndColour.html", "colourSlider.html",
 	"twoChanel.html", "ASC_AC_withHeatmap.html", "recalculate.html"]
 
