@@ -174,8 +174,6 @@ var curveFit = lc.scatterChart( "points" )
   .colour( function( k ) {
     return k > 4 ? "red" : "blue";
   } );
-curveFit.legend.add(function() {return [selDrugs, ["blue", "red"]];}, 
-                      "colour", "Drugs");  
 lc.lineChart( "lines", curveFit )
   .npoints( 2 )
   .lineFun( function( k, x ) {
@@ -185,6 +183,8 @@ lc.lineChart( "lines", curveFit )
     return k == 0 ? "blue" : "red";
   })
   .place( "#scatterplot" );
+curveFit.legend.add(function() {return [selDrugs, ["blue", "red"]];}, 
+                      "colour", "Drugs");
 
 </script>
 

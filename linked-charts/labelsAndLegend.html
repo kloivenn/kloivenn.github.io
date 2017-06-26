@@ -139,8 +139,6 @@ var curveFit = lc.scatterChart( "points" )
   .colour( function( k ) {
     return k > 4 ? "red" : "blue";
   } );
-curveFit.legend.add(function() {return [selDrugs, ["blue", "red"]];}, 
-                      "colour", "Drugs");  
 lc.lineChart("lines", curveFit)
   .npoints(2)
   .lineFun( function( k, x ) {
@@ -150,6 +148,8 @@ lc.lineChart("lines", curveFit)
     return k == 0 ? "blue" : "red";
   })
   .place( "#scatterplot" );
+curveFit.legend.add(function() {return [selDrugs, ["blue", "red"]];}, 
+                      "colour", "Drugs");  
 
 
 </script>
@@ -215,11 +215,11 @@ onclick="window.open('labelsAndLegend_code.html', 'newwindow', 'width=800, heigh
 <x-expl id="ticksColour"></x-expl><code>    ticks.colour = ["blue", "red"];</code>
 <x-expl id="ticks"></x-expl><code>    return ticks;</code>
 <x-expl id="ticks"></x-expl><code>  });</code>
-<x-expl id="legend"></x-expl><code>curveFit.legend.add(function() {return [selDrugs, ["blue", "red"]];}, </code>
-<x-expl id="legend"></x-expl><code>                      "colour", "Drugs");  </code>
 <x-expl id="line"></x-expl><code>lc.lineChart("lines", curveFit)</code>
 <x-expl id="skip"></x-expl><code>  ...</code>
 <x-expl id="curveFit"></x-expl><code>  .place( "#scatterplot" );</code></pre>
+<x-expl id="legend"></x-expl><code>curveFit.legend.add(function() {return [selDrugs, ["blue", "red"]];}, </code>
+<x-expl id="legend"></x-expl><code>                      "colour", "Drugs");  </code>
 </td>
 <td valign="top" style="padding-left:20px">
 
