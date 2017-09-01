@@ -32,10 +32,10 @@
 	var selDrugs = [drugs[0], drugs[1]],
 	  selCellLine = cellLines[0];
 
-	var heatmap = lc.heatmapChart()
+	var heatmap = lc.heatmap()
 	  .rowIds( drugs )
 	  .colIds( drugs )
-	  .colourRange( [ -1, 1 ] )
+	  .colourDomain( [ -1, 1 ] )
 	  .palette( d3.interpolateRdBu )
 	  .value( function( rowId, colId ) {  
 	    var rowValues = cellLines.map(function(e) {
@@ -67,7 +67,7 @@ var get_curve = function( drug, cellLine, x ){
     (1 + Math.pow(10, -(x - Math.log10(IC50/minConc)) * slope));
 }
 
-	var scatterplot = lc.scatterChart()
+	var scatterplot = lc.scatter()
 	  .width( 300 )
 	  .height( 300 )
 	  .dataIds( cellLines )
@@ -84,22 +84,22 @@ var get_curve = function( drug, cellLine, x ){
 	    res = Math.sqrt( res );
 	    return res;
 	  })
-	  .colourRange([0, 30]) 
+	  .colourDomain([0, 30]) 
 	  .on_click( function( k ) {
 	    selCellLine = k;
 	    curveFit.update();
 	  });
-	lc.lineChart("line", scatterplot)
-	  .npoints(1)
+	lc.xLine("line", scatterplot)
+	  .nelements(1)
 	  .lineFun( function( k, x ){
 	    return x;
 	  })
 	  .place( "#scatterplot" );
 
-	var curveFit = lc.scatterChart( "points" )
+	var curveFit = lc.scatter( "points" )
 	  .width( 300 )
 	  .height( 200 )
-	  .npoints( 10 )
+	  .nelements( 10 )
 	  .x( function( k ) {
 	    return k % 5;
 	  } )
@@ -110,8 +110,8 @@ var get_curve = function( drug, cellLine, x ){
 	  .colour( function( k ) {
 	    return k > 4 ? "red" : "blue";
 	  } );
-	lc.lineChart("lines", curveFit)
-	  .npoints(2)
+	lc.xLine("lines", curveFit)
+	  .nelements(2)
 	  .lineFun( function( k, x ) {
 	    return get_curve( selDrugs[k], selCellLine, x );
 	  })

@@ -32,7 +32,7 @@
 	var selDrugs = [drugs[0], drugs[1]],
 	  selCellLine = cellLines[0];
 
-	var heatmap = lc.heatmapChart()
+	var heatmap = lc.heatmap()
 	  .rowIds( drugs )
 	  .colIds( drugs )
 	  .colourRange( [ -1, 1 ] )
@@ -46,6 +46,8 @@
 	      });
 	    return lc.pearsonCorr( rowValues, colValues ); 
 	   })
+		.cluster("Row")
+	  .cluster("Col");	   
 	  .on_click( function( rowId, colId ) {
 	     selDrugs = [rowId, colId]
 	     scatterplot.update();
@@ -53,10 +55,7 @@
 	  })
 	  .place( "#heatmap");
 
-	heatmap.cluster("Row")
-	  .cluster("Col");
-
-	var scatterplot = lc.scatterChart()
+	var scatterplot = lc.scatter()
 	  .width( 300 )
 	  .height( 300 )
 	  .dataIds( cellLines )
@@ -68,17 +67,17 @@
 	  })
 	  .place( "#scatterplot" );
 
-	var curveFit = lc.scatterChart("drug1")
+	var curveFit = lc.scatter("drug1")
 	  .width( 300 )
 	  .height( 200 )
-	  .npoints( 5 )
+	  .nelements( 5 )
 	  .x( function( k ) {return k;} )
 	  .y( function( k ) {
 	    return inputData.RTG[selDrugs[0]][selCellLine]["D" + (k + 1)];
 	  })
 	  .colour( "blue" );
-	lc.scatterChart("drug2", curveFit)
-	  .npoints( 5 )
+	lc.scatter("drug2", curveFit)
+	  .nelements( 5 )
 	  .x( function( k ) {return k} )
 	  .y( function( k ) {
 	    return inputData.RTG[selDrugs[1]][selCellLine]["D" + (k + 1)];

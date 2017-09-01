@@ -3,17 +3,21 @@
 <head>
 
 <title>Linked charts - A very simple example</title>
-
-<link rel="stylesheet" href="src/prism.css">
-<script src = "src/prism.js"></script>
+<script src="../src/linked-charts.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../src/linked-charts.css">
+<link rel = "stylesheet" type = "text/css" href = "../src/default.css">
+<link rel = "stylesheet" type = "text/css" href = "../src/strapdown.css">
+<link rel = "stylesheet" type = "text/css" href = "../src/themes/bootstrap-responsive.min.css">
+<link rel = "stylesheet" type = "text/css" href = "../src/themes/simplex.min.css">
+<link rel="stylesheet" href="../src/prism.css">
+<script src = "../src/prism.js"></script>
 
 </head>
 
 <body>
-
-<h1>Linked charts</h1>
-
-<h2>A very simple example</h2>
+<script src="../src/navTop.js"></script>
+<div class="container">
+<h1>A very simple example</h1>
 
 <p>To demonstrate how easy it is to create interactive data exploration apps with <i>linked-charts</i>,
 we show here a very simple example, complete with the code needed to create it.</p>
@@ -39,12 +43,11 @@ expression of the selected gene on the x axis, sensitivity to the selected drug 
 point representing one sample.</p>
 
 <p>This linking of a chart visualizing a summary statistic with a chart drilling down into the data of a specific
-data element is a prototypical use case of <i>linked-charts</i>.
+data element is a prototypical use case of <i>linked-charts</i>.</p>
 
-<script src="lib/linked-charts.min.js"></script>
-<link rel="stylesheet" type="text/css" href="lib/linked-charts.css">
 
-<script src="src/inputdata_simple.js"></script>
+
+<script src="../src/data/inputdata_simple.js"></script>
 
 <table><tr>
   <td id="heatmap" valign="top"></td>
@@ -56,25 +59,25 @@ data element is a prototypical use case of <i>linked-charts</i>.
 var selGene = 1;                                               
 var selDrug = 1;
 
-var scatterplot = lc.scatterChart()
+var scatterplot = lc.scatter()
   .x( function( k ) { return geneExprs[selGene][k] } )
   .y( function( k ) { return drugScores[selDrug][k] } )
   .place("#scatterplot");
 
-var heatmap = lc.heatmapChart()
+var heatmap = lc.heatmap()
   .nrows( geneNames.length )
   .ncols( drugNames.length )
   .height( 650 )
   .width( 400 )
-  .colourRange( [ -1, 1 ] )
+  .colourDomain( [ -1, 1 ] )
   .palette( d3.interpolateRdBu )
   .value( function( row, col ) {  
      return lc.pearsonCorr( geneExprs[row], drugScores[col] ) 
    } )
-  .rowLabels( function(row) { 
+  .rowLabel( function(row) { 
      return geneNames[row] 
    } )
-  .colLabels( function(col) { 
+  .colLabel( function(col) { 
      return drugNames[col] 
    } )
   .on_click( function( rowId, colId ) {
@@ -86,12 +89,8 @@ var heatmap = lc.heatmapChart()
 
 </script>
 
-<p style = 'background: #daeaff; padding: 10px; width: 50%;'>Note that on both charts zooming is possible (double-click to show the entire chart). 
-To order rows or columns of the heatmap according to the values in some column or row one can click on the corresponding label on the heatmap. 
-This default behaviour can be changed by user.</p>
-
 <div id = "navPanel"></div>
-<script src = "src/navigation.js"></script>
+<script src = "../src/navigation.js"></script>
 <script>
   showNavigationPanel(d3.select("#navPanel"), 0);
 </script>
@@ -99,12 +98,12 @@ This default behaviour can be changed by user.</p>
 <br>
 <br>
 <br>
-<h2>The code for the example</h2>
+<h3>The code for the example</h3>
 
 <p>A user of our framework can create apps with very little code. The following is the complete code needed to create the app above, with comments. </p>
 
 <table><tr><td valign="top">
-<pre>
+<pre class="example">
 <x-expl id="loadlib"></x-expl><code class = "language-html">&lt;script src="lib/linked-charts.min.js"></script></code>
 <x-expl id="loadlib"></x-expl><code class = "language-html">&lt;link rel="stylesheet" type="text/css" href="lib/linked-charts.css"></code>
 
@@ -125,25 +124,25 @@ This default behaviour can be changed by user.</p>
 <x-expl id="vars"></x-expl><code class = "language-javascript">  var selGene = 1;</code>
 <x-expl id="vars"></x-expl><code class = "language-javascript">  var selDrug = 1;</code>
 
-<x-expl id="scatter1"></x-expl><code class = "language-javascript">  var scatterplot = lc.scatterChart()</code>
+<x-expl id="scatter1"></x-expl><code class = "language-javascript">  var scatterplot = lc.scatter()</code>
 <x-expl id="xy"></x-expl><code class = "language-javascript">    .x( function( k ) { return geneExprs[selGene][k] } )</code>
 <x-expl id="xy"></x-expl><code class = "language-javascript">    .y( function( k ) { return drugScores[selDrug][k] } )</code>
 <x-expl id="place"></x-expl><code class = "language-javascript">    .place("#scatterplot");</code>
 
-<x-expl id="heatmap1"></x-expl><code class = "language-javascript">  var heatmap = lc.heatmapChart()</code>
+<x-expl id="heatmap1"></x-expl><code class = "language-javascript">  var heatmap = lc.heatmap()</code>
 <x-expl id="hm_prop"></x-expl><code class = "language-javascript">    .nrows( geneNames.length )</code>
 <x-expl id="hm_prop"></x-expl><code class = "language-javascript">    .ncols( drugNames.length )</code>
 <x-expl id="hm_prop"></x-expl><code class = "language-javascript">    .height( 650 )</code>
 <x-expl id="hm_prop"></x-expl><code class = "language-javascript">    .width( 400 )</code>
-<x-expl id="hm_col"></x-expl><code class = "language-javascript">    .colourRange( [ -1, 1 ] )</code>
+<x-expl id="hm_col"></x-expl><code class = "language-javascript">    .colourDomain( [ -1, 1 ] )</code>
 <x-expl id="hm_col"></x-expl><code class = "language-javascript">    .palette( d3.interpolateRdBu )</code>
 <x-expl id="hm_value"></x-expl><code class = "language-javascript">    .value( function( row, col ) {</code>  
 <x-expl id="hm_value"></x-expl><code class = "language-javascript">       return pearsonCorr( geneExprs[row], drugScores[col] )</code>
 <x-expl id="hm_value"></x-expl><code class = "language-javascript">     } )</code>
-<x-expl id="rowcolnames"></x-expl><code class = "language-javascript">    .rowLabels( function(row) {</code>
+<x-expl id="rowcolnames"></x-expl><code class = "language-javascript">    .rowLabel( function(row) {</code>
 <x-expl id="rowcolnames"></x-expl><code class = "language-javascript">       return geneNames[row]</code>
 <x-expl id="rowcolnames"></x-expl><code class = "language-javascript">     } )</code>
-<x-expl id="rowcolnames"></x-expl><code class = "language-javascript">    .colLabels( function(col) { </code>
+<x-expl id="rowcolnames"></x-expl><code class = "language-javascript">    .colLabel( function(col) { </code>
 <x-expl id="rowcolnames"></x-expl><code class = "language-javascript">       return drugNames[col] </code>
 <x-expl id="rowcolnames"></x-expl><code class = "language-javascript">     } )</code>
 <x-expl id="click"></x-expl><code class = "language-javascript">    .on_click( function( rowId , colId ) {</code>
@@ -168,7 +167,7 @@ div.expl {
 }
 </style>
 
-<p style="background:#f0fff0; padding:10px"><i>Click on all the yellow bubbles (<img height="10pt" src="src/bubble_yellow.svg">),
+<p style="background:#f0fff0; padding:10px"><i>Click on all the yellow bubbles (<img height="10pt" src="../src/img/bubble_yellow.svg">),
 going from top to bottom, to see explanations of the code.</i></p>
 <br>
 
@@ -291,32 +290,22 @@ d3.selectAll( "x-expl" )
    .append( "img" )
       .attr( "height", "10pt" )
       .attr( "class", "bubble_icon" )
-      .attr( "src", "src/bubble_yellow.svg" )
+      .attr( "src", "../src/img/bubble_yellow.svg" )
       .style( "padding-right", "15px")
       .on( "click", function() {
       	  d3.selectAll( "div.expl" )
       	     .style( "display", "none" );
           d3.selectAll( "img.bubble_icon" )
-             .attr( "src", "src/bubble_yellow.svg")
+             .attr( "src", "../src/img/bubble_yellow.svg")
       	  var tagId = d3.select(this.parentNode).attr("id");
       	  d3.select( "div.expl#" + tagId )
       	     .style( "display", "block" )
           d3.selectAll( "x-expl#" + tagId ).select("img.bubble_icon")
-             .attr( "src", "src/bubble_red.svg")
+             .attr( "src", "../src/img/bubble_red.svg")
        })
 </script>
 
-<h2>Further remarks</h2>
-
-<p>As demonstrated in the <a href="">other examples</a>, this can be easily extended: Each drug sensitivity value
-is an area under a dose-response curve, and a click on a point in the scatter plot might show this dose-response
-curve. This would merely require one more code block of the style shown.</p>
-
-<p>We intend to provide functions for several important chart types, always allowing linking of charts via the
-call-back mechanism. We will provide documentation, tutorials and case studies in the form of examples such as the one given here.</p>
-
-<p>Currently (Feb 2017), we are also working on better functionality for the chart types shown here, e.g. adding dendograms for heatmaps,
-using different shape of points for scatterplots, etc. </p>
+</div>
 
 </body>
 
