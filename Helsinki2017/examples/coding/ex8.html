@@ -1,0 +1,69 @@
+<head>
+
+<link rel="stylesheet" type="text/css" href="../../lib/linked-charts.css">
+<script src="../../lib/linked-charts.min.js"></script>
+
+<script src="../../data/inputdata.js"></script>
+
+</head>
+
+<body>
+
+<h2>A clever heading</h2>
+<table><tr>
+  <td id="heatmap" valign="top"></td>
+  <td valign="top"> 
+     <div id="scatterplot"></div>
+     Select color: <select id="colorChoice">
+       <option value="black">black</option>
+       <option value="red">red</option>
+       <option value="green">green</option>
+       <option value="blue">blue</option>
+     </select>
+     <p><img src="../pictures/fimm_logo.webp"></p>
+  </td>
+</tr></table>
+
+
+
+<script>
+
+var heatmap = lc.heatmap()
+  .nrows( geneNames.length )
+  .ncols( drugNames.length )
+  .height( 2000 )
+  .width( 400 )
+  .colourDomain( [ -1, 1 ] )
+  .palette( d3.interpolateRdBu )
+  .value( function( row, col ) {  
+     return lc.pearsonCorr( geneExprs[row], drugScores[col] ) 
+   } )
+  .rowLabel( function(row) { 
+     return geneNames[row] 
+   } )
+  .colLabel( function(col) { 
+     return drugNames[col] 
+   } )
+  .on_click( function( d ) {
+     console.log( "Clicked:", d )
+     selGene = d[0];
+     selDrug = d[1];
+     scatterplot.update();
+  })
+  .place( "#heatmap")
+
+var selGene = 1;
+var selDrug = 1;
+
+var scatterplot = lc.scatter()
+  .nelements( geneExprs[selGene].length )
+  .x( function( k ) { return geneExprs[selGene][k] } )
+  .y( function( k ) { return drugScores[selDrug][k] } )
+  .colour( function( k ) { return d3.select("#colorChoice").property("value") } )
+  .place("#scatterplot");
+
+d3.select("#colorChoice").on("change", function(){ scatterplot.update() } )
+
+</script>
+
+</body>

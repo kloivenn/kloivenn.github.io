@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Bar chart</title>	
+
+</head>
+<body>
+
+<link rel = "stylesheet" type = "text/css" href = "../lib/linked-charts.css">
+<script src = "../lib/linked-charts.min.js"></script>
+<script src = "../data/input_difExpr.js"></script>
+
+<p>Some random text</p>
+<table><tr>
+	<td id = "barChart"></td>
+	<td id = "heatmap"></td>
+</tr></table>
+<script type="text/javascript">
+	var geneList = {ASC_AC: {}, KLSPC_KLCC10: {}, KP_KL: {}};
+	for(var i in geneList){
+		geneList[i]["MA"] = {};
+		geneList[i]["RNA"] = {};
+		for(var j in geneList[i]){
+			geneList[i][j]["up"] = [];
+			geneList[i][j]["down"] = [];
+		}
+	}
+	for(var i in inputData.info)
+		for(var j in geneList)
+			for(var k in geneList[j])
+				if(inputData.info[i][j + "_Adj.p.value_" + k] < 0.05)
+					if(inputData.info[i][j + "_LogFoldC_" + k] > 0)
+						geneList[j][k].up.push(i)
+					else
+						geneList[j][k].down.push(i);
+
+	var assay = "MA",
+		comp = "ASC_AC",
+		sign = "down";		
+
+	var bar = lc.barchart()
+		.groupIds(Object.keys(geneList))
+		.stackIds(["up", "down"])
+		.barIds(["MA", "RNA"])
+		.value(function(groupId, barId, stackId){
+			return geneList[groupId][barId][stackId].length;
+		})
+		.on_click(function(groupId, barId, stackId){
+			assay = barId;
+			comp = groupId;
+			sign = stackId;
+			heatmap.get_colIds("clear");
+			heatmap.cluster("Row")
+				.cluster("Col");
+			heatmap.update();
+		})
+		.place("#barChart");
+
+		var heatmap = lc.heatmap()
+			.rowIds(function(){
+				var gene = Object.keys(inputData[assay])[0];
+				return Object.keys(inputData[assay][gene]);
+			})
+			.colIds(lc.cache(function(){
+				var ids = [], mult;
+				sign == "up" ? mult = 1 : mult = -1;
+				for(var i in inputData.info)
+					if(inputData.info[i][comp + "_Adj.p.value_" + assay] < 0.05 &&
+							inputData.info[i][comp + "_LogFoldC_" + assay] * mult > 0)
+						ids.push(i);
+				return ids;
+			}))
+			.set_margins({top: 100, left: 150, right: 100, bottom: 150})
+			.value(function(rowId, colId){
+				return inputData[assay][colId][rowId];
+			})
+			.mode("canvas")
+			.cluster("Row")
+			.cluster("Col")
+			.place("#heatmap");
+
+</script>
+</body>
+</html>

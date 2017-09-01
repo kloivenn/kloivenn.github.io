@@ -1,0 +1,27 @@
+<head>
+
+<link rel="stylesheet" type="text/css" href="../../lib/linked-charts.css">
+<script src="../../lib/linked-charts.min.js"></script>
+
+<script src="../../data/inputdata.js"></script>
+</head>
+
+<body>
+
+<script>
+
+var heatmap = lc.heatmap()
+  .nrows( geneNames.length )
+  .ncols( drugNames.length )
+  .height( 2000 )
+  .width( 400 )
+  .colourDomain( [ -1, 1 ] )
+  .palette( d3.interpolateRdBu )
+  .value( function( row, col ) { return /* ... */ } )
+  .rowLabel( function(row) { return /* ... */ } )
+  .colLabel( function(col) { return /* ... */ } )
+  .place()
+
+</script>
+
+</body>

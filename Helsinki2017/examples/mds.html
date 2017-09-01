@@ -1,0 +1,56 @@
+<html>
+  <head>
+    <script src="../lib/linked-charts.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../lib/linked-charts.css">
+
+    <script src="../data/mds.js"></script>
+    <script src="../data/heatmap.js"></script>
+    <script src = '../data/input_data.js'></script>
+  </head>
+  <body>
+  <table>
+    <tr>
+      <td id="heatmap" valign="top"></td>
+      <td id="scatterplot" valign="top"></td>
+    </tr>
+  </table>
+  </body>
+  <script>
+  	var patientIds = Object.keys(heatmapData)
+  	var genes = Object.keys(heatmapData[patientIds[0]])
+    var selPatient = patientIds[0]
+  	var heatmap = lc.heatmap()
+      .transitionDuration(0)
+      .rowIds(patientIds)
+      .colIds(genes)
+      .showDendogramRow(false)
+      .showDendogramCol(false)
+      .height(1500)
+      .width(1000)
+      .colourDomain( [ -4, 4  ] )
+      .palette( function( val ) { return d3.interpolateRdBu( 1 - val ); })
+      .value(function(rowId, colId)
+      {
+        return Number(heatmapData[rowId][colId]);
+      })
+      .on_click(function(rowPatient, colGene)
+      {
+        selPatient = rowPatient;
+        MDS.update();
+      })
+      .place("#heatmap");
+    var MDS = lc.scatter()
+      .dataIds(patientIds)
+      .x(function(k)
+        { return mds[k][0]})
+      .y(function(k)
+        { return mds[k][1]})
+      .colour(function(k)
+      {
+        return k == selPatient ? "red" : "black";
+
+      })
+      .place("#scatterplot");
+  </script>
+
+ </html>

@@ -1,0 +1,69 @@
+<script src="../lib/linked-charts.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../lib/linked-charts.css">
+<script src="../data/data.js"></script>
+
+<body>
+
+<table><tr>
+<td id="left"></td>
+<td id="right"></td>
+</tr></table>
+
+<p>selected gene: <span id="genename">...</span></p>
+
+<div id="below"></div>
+
+<script>
+
+var gene = 1;
+
+var maplot = lc.scatter()
+  .nelements( resTbl.length )
+  .width(400)
+  .height(400)
+  .x( function( k ) { return Math.log10( 1 + resTbl[k]["baseMean"] ) } )
+  .y( function( k ) { return resTbl[k]["log2FoldChange"] } )
+  .colour( function(k) {
+    if( resTbl[k]["padj"] < 0.1)
+      return "red";
+  })
+  .opacity( function(k) {
+    if( resTbl[k]["padj"] >= 0.1)
+      return 0.3;
+  })
+  .size(function(k){
+    return (resTbl[k]["padj"] < 0.1) ? 4 : 2;
+  })
+  .title("MA Plot")
+  .labelX("Average Expression")
+  .labelY("log2FoldChange")
+  .on_click( function(k) {
+    console.log(k)
+     gene = k;
+     d3.select("#genename").text( resTbl[gene]["gene"] );
+     geneplot.update();
+     geneinfo.update();
+  } )
+  .legend.width(260)
+  .place("#left")
+
+maplot.legend.add_block([["Significant (p.adj < 0.1)", "Not significant (p.adj > 0.1)"], ["red", "black"]],
+    "colour", "Significance");
+
+var geneplot = lc.scatter()
+  .nelements( normcounts[1].length )
+  .width(400)
+  .height(400)
+  .labelX("DeltaPASI")
+  .labelY("log10NormalizedCounts")
+  .x( function( k ) { return sampleTbl[k]["DeltaPASI"] } )
+  .y( function( k ) { return Math.log10( 1 + normcounts[gene][k] ) } )
+  .place("#right")
+
+var geneinfo = lc.table()
+  .record( function() { return resTbl[gene] } )
+  .place( "#below")
+
+</script>
+
+</body>

@@ -1,0 +1,202 @@
+<html>
+
+<head>
+
+<title>Linked charts - Heatmap with two channels</title>
+
+<script src="../lib/linked-charts.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../lib/linked-charts.css">
+
+<script src="../data/inputdata_tch.js"></script>
+
+</head>
+
+<body>
+
+<table><tr>
+  <td id="heatmap" valign="top"></td>
+  <td id="scatterplot"></td>
+</tr></table>
+
+<script>
+
+inputData = lc.separateBy(inputData, ["screen", "Drug", "CellLine"]);
+var drugs = Object.keys(inputData.RTG),
+  cellLines = Object.keys(inputData.RTG[drugs[0]]);
+
+var get_curve = function( screen, drug, cellLine, x ){
+  var max = inputData[screen][drug][cellLine].max,
+    min = inputData[screen][drug][cellLine].min,
+    IC50 = inputData[screen][drug][cellLine].IC50,
+    slope = inputData[screen][drug][cellLine].Slope,
+    minConc = inputData[screen][drug][cellLine].minConc;
+      
+  return min + ( max - min )/
+    (1 + Math.pow( 10, - ( x - Math.log10( IC50/minConc ) ) * slope));
+}
+
+var heatmap = lc.heatmap()
+  .rowIds( drugs )
+  .colIds( cellLines )
+  .title( "Drug effect on viability and cytotoxicity" )
+  .showLegend( false )
+  //.mode("canvas")
+  .showDendogramRow(false)
+  .showDendogramCol(false)
+  .margins( {top: 100, left: 100, right: 10, bottom: 10} )
+  .value( function( rowId, colId ) {  
+    return [inputData.RTG[rowId][colId].avInh, 
+            inputData.CTX[rowId][colId].avInh];
+   })
+  .informText(function(rowId, colId) {
+      return "Row: <b>" + rowId + "</b>;<br>" + 
+            "Col: <b>" + colId + "</b>;<br>" + 
+            "RTG = " + heatmap.get_value(rowId, colId)[0].toFixed(2) +
+            " ; CTX = " + heatmap.get_value(rowId, colId)[1].toFixed(2);
+      })
+  .on_click( function( rowId, colId ) {
+    console.log(rowId);
+    console.log(colId);
+    heatmap.mark( heatmap.get_elements([rowId, colId]) );
+  })
+  .markedUpdated( function(){
+    var ids = [],
+    	data = heatmap.get_marked();
+    for(var i = 0; i < data.length; i++){
+    	ids.push(data[i][0] + "/" + data[i][1] + "/scatter");
+      ids.push(data[i][0] + "/" + data[i][1] + "/xLine");
+    }
+    curveFit
+    	.layerIds( ids )
+    	.layerType( function( layerId ) {
+        return layerId.split("/")[2];
+      })
+    	.select_layers()
+    		.nelements( function( layerId ) {
+          return layerId.split("/")[2] == "scatter" ? 10 : 2;
+        } )
+    		.x(function( layerId, k ) {
+    			return k % 5;
+    		})
+    		.y(function( layerId, k ) {
+    			var drug = layerId.split( "/" )[0],
+    				cellLine = layerId.split( "/" )[1];
+    			return Math.floor(k / 5) == 0 ? inputData.RTG[drug][cellLine]["D" + (+k + 1)] :
+                                          inputData.CTX[drug][cellLine]["D" + (k - 5 + 1)];
+    		})
+        .symbol(function(layerId, k) {return +k > 4 ? "Triangle" : "Wye";})
+        .lineFun( function( layerId, k, x ) {
+          var drug = layerId.split("/")[0],
+            cellLine = layerId.split("/")[1], 
+            screen;
+          k == 0 ? screen = "RTG" : screen = "CTX";
+          return get_curve( screen, drug, cellLine, x );
+        })
+        .dasharray ( function( layerId, k ) {
+          return k == 0 ? undefined : 5;
+        })
+        .colour(function( layerId ) {
+          return d3.schemeCategory10[Math.floor(curveFit.layerIds().indexOf( layerId ) % 20 / 2)]
+        });
+    var legIds = [], colours = [];
+    for(var i = 0; i < ids.length; i += 2){
+      legIds.push(ids[i].split("/")[0] + "/" + ids[i].split("/")[1]);
+      colours.push(d3.schemeCategory10[Math.floor(curveFit.layerIds().indexOf( ids[i] ) % 20 / 2)]);
+    }
+    curveFit
+    	.update();
+    curveFit.legend.updateScale([legIds, colours], "drug_and_cell_line");      
+  })
+  .place( "#heatmap" );
+
+var RTGSlider = lc.colourSlider()
+	.set_margins( {left: 100} )
+  .title( "RealTime-Glo" )
+  .titleX( 45 )
+  .titleY( 40 )
+  .titleSize( 14 )
+	.straightColorScale( 
+    d3.scaleLinear()
+      .range( [ "black", "rgb(0, 255, 0)" ] )
+      .domain([0, 50]) 
+  )
+	.on_change(function(){
+		heatmap.updateCellColour();
+	})
+  .place( "#heatmap" );
+var CTXSlider = lc.colourSlider()
+  .set_margins( {left: 100} )
+  .title( "CellTox" )
+  .titleX( 45 )
+  .titleY( 40 )
+  .titleSize( 14 )  
+  .straightColorScale( 
+    d3.scaleLinear()
+      .range( [ "black", "rgb(255, 0, 0)" ] )
+      .domain( [0, 50] ) 
+  )
+  .on_change(function(){
+    heatmap.updateCellColour();
+  })
+  .place( "#heatmap" );
+
+heatmap.colour( function( val ){
+  return "rgb(" + Math.round(CTXSlider.the_sigmoid(val[1]) * 255) + ", " 
+             + Math.round(RTGSlider.the_sigmoid(val[0]) * 255) + ", 0)";
+} )
+  .updateCellColour();
+
+
+var curveFit = lc.scatter( "void" )
+  .width( 300 )
+  .height( 300 )
+  .labelX( "Drug concentration" )
+  .labelY( "Inhibition" )
+  .domainY( [-25, 100] )
+  .domainX( [0, 4] )
+  .place("#scatterplot");
+  
+  curveFit.legend.ncol(1)
+    .legend.add_block([["RTG", "CTX"], ["Wye", "Triangle"]], "symbol", "screen")
+    .legend.add_block([["RTG", "CTX"], [undefined, 5]], "dash", "fit")
+    .legend.add_block([[], []], "colour", "drug_and_cell_line");  
+
+/*  .ticksX( function() {
+    var ticks = [d3.range( 5 ), 
+      d3.range( 5 ).map( function( e ) {
+        return inputData.RTG[selDrugs[0]][selCellLine].minConc * 
+                Math.pow( 10, e )
+      } ),
+      d3.range( 5 ).map( function( e ) {
+        return inputData.RTG[selDrugs[1]][selCellLine].minConc * 
+                Math.pow( 10, e )
+      })];
+    ticks.colour = ["blue", "red"];
+    return ticks;
+  })
+  .x( function( k ) {
+    return k % 5;
+  } )
+  .y( function( k ) {
+    var ind = Math.floor( k / 5 );
+    return inputData.RTG[selDrugs[ind]][selCellLine]["D" + (k % 5 + 1)];
+  })
+  .colour( function( k ) {
+    return k > 4 ? "red" : "blue";
+  } );
+curveFit.legend.add(function() {return [selDrugs, ["blue", "red"]];}, 
+                      "colour", "Drugs");  
+lc.lineChart( "lines", curveFit )
+  .npoints( 2 )
+  .lineFun( function( k, x ) {
+    return get_curve( selDrugs[k], selCellLine, x );
+  })
+  .colour(function( k ){
+    return k == 0 ? "blue" : "red";
+  })*/
+
+</script>
+
+</body>
+
+</html>

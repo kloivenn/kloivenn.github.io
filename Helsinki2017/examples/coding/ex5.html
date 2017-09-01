@@ -1,0 +1,44 @@
+<head>
+
+<link rel="stylesheet" type="text/css" href="../../lib/linked-charts.css">
+<script src="../../lib/linked-charts.min.js"></script>
+
+<script src="../../data/inputdata.js"></script>
+</head>
+
+<body>
+
+<table><tr>
+  <td id="heatmap" valign="top"></td>
+  <td id="scatterplot" valign="top"></td>
+</tr></table>
+
+<script>
+
+var heatmap = lc.heatmap()
+  .nrows( geneNames.length )
+  .ncols( drugNames.length )
+  .height( 2000 )
+  .width( 400 )
+  .colourDomain( [ -1, 1 ] )
+  .palette( d3.interpolateRdBu )
+  .value( function( row, col ) {  
+     return lc.pearsonCorr( geneExprs[row], drugScores[col] ) 
+   } )
+  .rowLabel( function(row) { 
+     return geneNames[row] 
+   } )
+  .colLabel( function(col) { 
+     return drugNames[col] 
+   } )
+  .place( "#heatmap")
+
+var scatterplot = lc.scatter()
+  .nelements( 0 )
+  .x( function( k ) { return 0 } )
+  .y( function( k ) { return 0 } )
+  .place("#scatterplot");
+
+</script>
+
+</body>
