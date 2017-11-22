@@ -1,0 +1,70 @@
+<html>
+	<head>
+		<title>Linked-charts - Heatmap</title>
+		<style type = "text/css">
+			div.fill-screen {
+		    position: fixed;
+		    left: 0;
+		    right: 0;
+		    top: 0;
+		    bottom: 0;
+		    text-align: center;
+		    z-index: -10;
+			}
+
+			img.make-it-fit {
+		    max-width: 99%;
+		    max-height: 99%;
+			}
+		</style>
+		<script type = "text/javascript" src = 'src/switchSlides.js'></script>
+		<link rel="stylesheet" href="src/prism.css">
+		<script src = "src/prism.js"></script>
+		<script src="src/linked-charts.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="src/linked-charts.css">
+		<script src="src/inputdata_simple.js"></script>
+	</head>
+	<body>
+		<table width="100%">
+			<tr>
+				<td align="center" id = "headline">
+					<div class="fill-screen"><img src = "images/n04.png" style = "max-height: 20%" id = "titleImg"></div>
+				</td>
+			</tr>
+				<table>
+					<tr>
+						<td id = "heatmap"></td>
+						<td id = "code">
+							<pre class = "language-javascript">
+<code>var heatmap = lc.heatmap()</code>
+<code>	.rowIds( geneNames )</code>
+<code>	.colIds( drugNames )</code>
+<code>	.value( function( row, col ) {  </code>
+<code>		return lc.pearsonCorr( </code>
+<code>			geneExprs[geneNames.indexOf( row )], </code>
+<code>			drugScores[drugNames.indexOf( col )] ) </code>
+<code>	} )</code>
+<code>  .place( "#heatmap" )</code>
+							</pre>
+						</td>
+					</tr>
+				</table>
+			<tr>
+			</tr>
+		</table>
+		<script type="text/javascript">
+			var height = document.getElementById("titleImg").clientHeight;
+			d3.select("#headline").attr("height", height);
+
+			var heatmap = lc.heatmap()
+  			.set_margins({top: 50})
+  			.height(450)
+  			.rowIds( geneNames )
+  			.colIds( drugNames )
+  			.value( function( row, col ) {  
+     			return lc.pearsonCorr( geneExprs[geneNames.indexOf(row)], drugScores[drugNames.indexOf(col)] ) 
+   			} )
+		  .place( "#heatmap" )
+		</script>
+	</body>
+</html>

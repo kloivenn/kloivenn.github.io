@@ -1,0 +1,106 @@
+<html>
+	<head>
+		<title>Linked-charts - Scatter</title>
+		<style type = "text/css">
+			div.fill-screen {
+		    position: fixed;
+		    left: 0;
+		    right: 0;
+		    top: 0;
+		    bottom: 0;
+		    text-align: center;
+		    z-index: -10;
+			}
+
+			img.make-it-fit {
+		    max-width: 99%;
+		    max-height: 99%;
+			}
+		</style>
+		<script type = "text/javascript" src = 'src/switchSlides.js'></script>
+		<link rel="stylesheet" href="src/prism.css">
+		<script src = "src/prism.js"></script>
+		<script src="src/linked-charts.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="src/linked-charts.css">
+		<script src="src/inputdata_simple.js"></script>
+	</head>
+	<body>
+		<table width="100%">
+			<tr>
+				<td align="center" id = "headline">
+					<div class="fill-screen"><img src = "images/n07.png" style = "max-height: 20%" id = "titleImg"></div>
+				</td>
+			</tr>
+				<table>
+					<tr>
+						<td id = "heatmap"></td>
+						<td id = "scatterplot"></td>
+						<td id = "code">
+							<pre class="language-javascript">
+<code>var selGene = 0,</code>
+<code>  selDrug = 0;</code>
+
+<code>var heatmap = lc.heatmap()</code>
+<code>	.rowIds( geneNames )</code>
+<code>	.colIds( drugNames )</code>
+<code>	.value( function( row, col ) {  </code>
+<code>		return lc.pearsonCorr( </code>
+<code>			geneExprs[geneNames.indexOf( row )], </code>
+<code>			drugScores[drugNames.indexOf( col )] ) </code>
+<code>	} )</code>
+<code>  .on_click( function( rowId, colId ) {</code>
+<code>    selGene = geneNames.indexOf( rowId );</code>
+<code>		selDrug = drugNames.indexOf( colId );</code>
+<code>    scatterplot.update();</code>
+<code>  } )</code>
+<code>  .place( "#heatmap" )</code>
+
+<code>var scatterplot = lc.scatter()</code>
+<code>  .x( function( k ) { return geneExprs[selGene][k] } )</code>
+<code>  .y( function( k ) { return drugScores[selDrug][k] } )</code>
+<code>  .place("#scatterplot");</code>
+							<pre>
+						</td>
+					</tr>
+				</table>
+			<tr>
+			</tr>
+		</table>
+		<script type="text/javascript">
+			var height = document.getElementById("titleImg").clientHeight;
+			d3.select("#headline").attr("height", height);
+
+var selGene = 1;                                               
+var selDrug = 1;
+
+var scatterplot = lc.scatter()
+	.height(300)
+	.width(300)
+  .x( function( k ) { return geneExprs[selGene][k] } )
+  .y( function( k ) { return drugScores[selDrug][k] } )
+  .place("#scatterplot");
+
+var heatmap = lc.heatmap()
+  .nrows( geneNames.length )
+  .ncols( drugNames.length )
+  .set_margins({top:50})
+  .height( 450 )
+  .width( 400 )
+  .value( function( row, col ) {  
+     return lc.pearsonCorr( geneExprs[row], drugScores[col] ) 
+   } )
+  .rowLabel( function(row) { 
+     return geneNames[row] 
+   } )
+  .colLabel( function(col) { 
+     return drugNames[col] 
+   } )
+  .on_click( function( rowId, colId ) {
+     selGene = rowId;
+     selDrug = colId;
+     scatterplot.update();
+  })
+  .place( "#heatmap")
+		</script>
+	</body>
+</html>

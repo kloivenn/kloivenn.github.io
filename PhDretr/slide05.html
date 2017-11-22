@@ -1,0 +1,64 @@
+<html>
+	<head>
+		<title>Linked-charts - Scatter</title>
+		<style type = "text/css">
+			div.fill-screen {
+		    position: fixed;
+		    left: 0;
+		    right: 0;
+		    top: 0;
+		    bottom: 0;
+		    text-align: center;
+		    z-index: -10;
+			}
+
+			img.make-it-fit {
+		    max-width: 99%;
+		    max-height: 99%;
+			}
+		</style>
+		<script type = "text/javascript" src = 'src/switchSlides.js'></script>
+		<link rel="stylesheet" href="src/prism.css">
+		<script src = "src/prism.js"></script>
+		<script src="src/linked-charts.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="src/linked-charts.css">
+		<script src="src/inputdata_simple.js"></script>
+	</head>
+	<body>
+		<table width="100%">
+			<tr>
+				<td align="center" id = "headline">
+					<div class="fill-screen"><img src = "images/n05.png" style = "max-height: 20%" id = "titleImg"></div>
+				</td>
+			</tr>
+				<table>
+					<tr>
+						<td id = "scatterplot"></td>
+						<td id = "code">
+							<pre class = "language-javascript">
+<code>var scatterplot = lc.scatter()</code>
+<code>  .x( function( k ) { return geneExprs[selGene][k] } )</code>
+<code>  .y( function( k ) { return drugScores[selDrug][k] } )</code>
+<code>  .place("#scatterplot");</code>
+							</pre>
+						</td>
+					</tr>
+				</table>
+			<tr>
+			</tr>
+		</table>
+		<script type="text/javascript">
+			var height = document.getElementById("titleImg").clientHeight;
+			d3.select("#headline").attr("height", height);
+
+			var selGene = 1,
+				selDrug = 1;
+
+			var scatterplot = lc.scatter()
+				.height(450)
+			  .x( function( k ) { return geneExprs[selGene][k] } )
+			  .y( function( k ) { return drugScores[selDrug][k] } )
+			  .place("#scatterplot");
+		</script>
+	</body>
+</html>
