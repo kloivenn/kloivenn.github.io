@@ -40,3 +40,16 @@ p.description {
 	font-size: 120%;
 	letter-spacing: 1px;
 }
+
+td#toc {
+	vertical-align: top;
+}
+
+td#toc a {
+	text-decoration: none;
+	color: #646;
+}
+
+td#page a {
+	text-decoration: none;
+}

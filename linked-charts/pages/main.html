@@ -1,21 +1,15 @@
-<head>
-<link rel = "stylesheet" type = "text/css" href = "../src/default.css">
+<html><head>
+<title></title>
+<link rel="stylesheet" type="text/css" href="../src/default.css">
 <script src="https://d3js.org/d3.v4.min.js"></script>
 </head>
 <body>
 <script src="../src/navTop.js"></script>
-<xmp theme = "simplex">
-Linked Charts
-=============
-
-<pre class="tiy" showCode="false"
-  tiy-preload="../src/linked-charts.min.js;../src/data/inputdata_simple.js;../src/linked-charts.css"
-  width="1100" height="400" 
-  subscr="Here is a simple example of linked charts. Heatmap shows correlations between gene 
+<div class="contentContainer" id="content"><h1 id="linked-charts">Linked Charts</h1>
+<pre class="tiy" showcode="false" tiy-preload="../src/linked-charts.min.js;../src/data/inputdata_simple.js;../src/linked-charts.css" width="1100" height="400" subscr="Here is a simple example of linked charts. Heatmap shows correlations between gene 
           expression and drug response for 52 samples from patients with acute myeloid leukaemia (AML).
           Scatterplot shows individual values of logarithmised read counts and drug scores for all the
-          samples. Feel free to explore basic functionality of the linked charts by clicking on its elements.">
-  //create a layout for the charts to be placed in
+          samples. Feel free to explore basic functionality of the charts by clicking on their elements.">  //create a layout for the charts to be placed in
   var line = d3.select("body")
     .append("table")
       .append("tr");
@@ -70,65 +64,32 @@ Linked Charts
     .legend.width(75)
     .place( "#heatmap")
 </pre>
-
-### Introduction
-
-The <tt>linked-charts</tt> is a [d3-based](https://d3js.org/) JavaSript library that 
-provides user with an easy way to generate sets of linked interactive charts to allow
-easy data exploration.
-
-A process of analysing experimental data usually implies several steps of 
-transformation and generalisation of raw read outs. And despite the fact 
-that various quality control approaches are being used, manual inspection of the
-data is still required. The <tt>linked-charts</tt> library is aimed to facilitate this 
-inspection by the means of a set of interactive charts that provide a detailed insight
-into the main figure. 
-
-To see how it works check our [examples](https://kloivenn.github.io/linked-charts/).
-
-The <tt>linked-charts</tt> library allows one to generate a single stand-alone web-page
-that contains all the data and functionality to explore it. Thus, it can be considered as
-a way to share the data or presenting it to broad audience.
-
-#### Plot types
-
-Currently supported types of charts are:
-
-*   [Heatmap](../types/heatmap.html)
-*   [Scatterplot](../types/scatter.html)
-*   Lineplot (y = f(x), x = f(y), x = f(t) and y = g(t))
-*   Barchart
-*   Beeswarm
-*   Simple table
-
-### Getting started
-
-To link the current release of the <tt>linked-charts</tt> library add to you page use the following code.
-```
-<script src = "https://kloivenn.github.io/linked-charts/lib/linked-charts.min.js"></script>
-<link rel = "stylesheet" href="https://kloivenn.github.io/linked-charts/lib/linked-charts.css">
-```
-You can also download latest version and the source code on [GitHub](https://github.com/anders-biostat/linked-charts).
-Pull requests and issue reports are greatly welcome.
-
-### Usage
-
-The <tt>linked-charts</tt> is a JavaScript library and therefore at least minimal knowledge of this
-language is required to use it. Understanding of [d3](https://d3js.org/) library is highly recomended.
-
-The core of the library are chart-objects that are initialised by calling a respective function.
-These functions return objects which are further modified by defining a set of [properties](../tutorials/properties.html). Some of them (such as
-data values) are required, others (colour, title, size etc.) are optional.
-
-Function <tt>place()</tt> is used to put the chart on a page, <tt>update()</tt> function changes the chart to 
-bring it in concordance with the current state of the environment and <tt>on_click</tt> property ensures the
-linkage between different charts on the page.
-
+<h2 id="introduction">Introduction</h2>
+<p>The <em>linked-charts</em> is a <a href="https://d3js.org/">d3-based</a> JavaSript library that provides user with an easy way to generate sets of linked interactive charts to allow easy data exploration.</p>
+<p>A process of analysing experimental data usually implies several steps of transformation and generalisation of raw read outs. And despite the fact that various quality control approaches are being used, manual inspection of the data is still required. The <em>linked-charts</em> library is aimed to facilitate this inspection by the means of a set of interactive charts that provide a detailed insight into the main figure.</p>
+<p>To see how it works check our <a href="../examples/simpleExample.html">examples</a>.</p>
+<p>The <em>linked-charts</em> library allows one to generate a single stand-alone web-page that contains all the data and functionality to explore it. Thus, it can be considered as a way to share the data or presenting it to broad audience.</p>
+<h3 id="plot-types">Plot types</h3>
+<p>Currently supported types of charts are:</p>
+<ul>
+<li><a href="../types/heatmap.html">Heatmap</a></li>
+<li><a href="../types/scatter.html">Scatterplot</a></li>
+<li>Lineplot ([y = f(x)], x = f(y), x = f(t) and y = g(t))</li>
+<li>Barchart</li>
+<li>Beeswarm</li>
+<li>Simple table</li>
+</ul>
+<h2 id="getting-started">Getting started</h2>
+<p>To include the current release of the <em>linked-charts</em> library add in you page use the following code.</p>
+<pre><code>&lt;script src = "https://kloivenn.github.io/linked-charts/lib/linked-charts.min.js"&gt;&lt;/script&gt;
+&lt;link rel = "stylesheet" href="https://kloivenn.github.io/linked-charts/lib/linked-charts.css"&gt;</code></pre>
+<p>You can also download latest version and the source code from <a href="https://github.com/anders-biostat/linked-charts">GitHub</a>. Pull requests and issue reports are greatly welcome.</p>
+<h2 id="usage">Usage</h2>
+<p>The <em>linked-charts</em> is a JavaScript library and therefore at least minimal knowledge of this language is required to use it. Specifically, one need to know the basic JavaScript syntax, understand the concenpt of global and local variables and be able to define a function. Understanding of <a href="https://d3js.org/">d3</a> library is highly recomended, although not required.</p>
+<p>The core of the library are chart-objects that are initialised by calling a respective function. These functions return objects which are further modified by defining a set of <a href="../tutorials/properties.html">properties</a>. Some of them (such as <a href="../pages/api.html#layer_elementIds"><code>elementIds</code></a>) are required, others (<a href="../pages/api.html#layer_colour"><code>colour</code></a>, <a href="../pages/api.html#legend_title"><code>title</code></a>, <a href="../pages/api.html#scatter_size"><code>size</code></a> etc.) are optional.</p>
+<p>Function <a href="../pages/api.html#chart_place"><code>place</code></a> is used to put the chart on a page, <a href="../pages/api.html#chart_update"><code>update</code></a> function changes the chart to bring it in concordance with the current state of the environment and <a href="../pages/api.html#layer_on_click"><code>on_click</code></a> property ensures the linkage between different charts on the page.</p>
 The minimal code, needed to create a set of charts similar to the one on the top of this page, is following:
-<pre class="tiy" loadOnStart="true" fitHeight="true" width="100%"
-  tiy-preload="../src/linked-charts.min.js;../src/data/inputdata_simple.js;../src/linked-charts.css"
-  subscr="Minimal code to generate two linked charts.">
-  //global variables to store the clicked cell
+<pre class="tiy" loadonstart="true" fitheight="true" width="100%" tiy-preload="../src/linked-charts.min.js;../src/data/inputdata_simple.js;../src/linked-charts.css" subscr="Minimal code to generate two linked charts.">  //global variables to store the clicked cell
   var selGene = 0;
   var selDrug = 0;
 
@@ -160,11 +121,23 @@ The minimal code, needed to create a set of charts similar to the one on the top
     .y( function( k ) { return drugScores[selDrug][k] } )
     .place();
 </pre>
-
-For more information on how to use the <tt>linked-charts</tt> library browse
-this API or look at our tutorials.
-</xmp>
-<script src="../src/strapdown.js"></script>
+<p>For more information on how to use the <em>linked-charts</em> library you can have a look at our tutorials or browse the <a href="api.html">list</a> of all the available properties and methods.</p>
+<h2 id="contacts">Contacts</h2>
+<p>Feel free to contact us with any questions or suggestions.</p>
+<p>Simon Anders: <script type="text/javascript">
+<!--
+h='&#122;&#x6d;&#98;&#104;&#46;&#x75;&#110;&#x69;&#x2d;&#104;&#x65;&#x69;&#100;&#x65;&#108;&#98;&#x65;&#114;&#x67;&#46;&#100;&#x65;';a='&#64;';n='&#x73;&#46;&#x61;&#110;&#100;&#x65;&#114;&#x73;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\/'+'a'+'>');
+// -->
+</script><noscript>&#x73;&#46;&#x61;&#110;&#100;&#x65;&#114;&#x73;&#32;&#x61;&#116;&#32;&#122;&#x6d;&#98;&#104;&#32;&#100;&#x6f;&#116;&#32;&#x75;&#110;&#x69;&#x2d;&#104;&#x65;&#x69;&#100;&#x65;&#108;&#98;&#x65;&#114;&#x67;&#32;&#100;&#x6f;&#116;&#32;&#100;&#x65;</noscript></p>
+<p>Svetlana Ovchinnikova: <script type="text/javascript">
+<!--
+h='&#122;&#x6d;&#98;&#104;&#46;&#x75;&#110;&#x69;&#x2d;&#104;&#x65;&#x69;&#100;&#x65;&#108;&#98;&#x65;&#114;&#x67;&#46;&#100;&#x65;';a='&#64;';n='&#x73;&#46;&#x61;&#110;&#100;&#x65;&#114;&#x73;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+'&#x73;&#46;&#x6f;&#118;&#x63;&#104;&#x69;&#110;&#110;&#x69;&#x6b;&#x6f;&#118;&#x61;&#64;&#x75;&#110;&#x69;&#x2d;&#104;&#x65;&#x69;&#100;&#x65;&#108;&#98;&#x65;&#114;&#x67;&#46;&#100;&#x65;'+'<\/'+'a'+'>');
+// -->
+</script><noscript>&#x73;&#46;&#x6f;&#118;&#x63;&#104;&#x69;&#110;&#110;&#x69;&#x6b;&#x6f;&#118;&#x61;&#64;&#x75;&#110;&#x69;&#x2d;&#104;&#x65;&#x69;&#100;&#x65;&#108;&#98;&#x65;&#114;&#x67;&#46;&#100;&#x65;&#32;&#40;&#x73;&#46;&#x61;&#110;&#100;&#x65;&#114;&#x73;&#32;&#x61;&#116;&#32;&#122;&#x6d;&#98;&#104;&#32;&#100;&#x6f;&#116;&#32;&#x75;&#110;&#x69;&#x2d;&#104;&#x65;&#x69;&#100;&#x65;&#108;&#98;&#x65;&#114;&#x67;&#32;&#100;&#x6f;&#116;&#32;&#100;&#x65;&#x29;</noscript></p>
+</div>
+<div class="tocContainer" id="toc"></div>
 <script src="../src/codeMirror/codemirror.js"></script>
 <link rel="stylesheet" href="../src/codeMirror/codemirror.css"> 
 <link rel="stylesheet" href="../src/codeMirror/mdn-like.css">
@@ -172,4 +145,18 @@ this API or look at our tutorials.
 <script src="../src/tiy.js"></script>
 <link rel="stylesheet" href="../src/tiy.css">
 <script>tiy.make_boxes();</script>
-</body>
+<script type="text/javascript" src="../src/tocbot.min.js"></script>
+<link rel="stylesheet" href="../src/tocbot.css">
+<script>
+	d3.select("head")
+		.select("title")
+			.text(d3.select("#content")
+							.select("h1").text());
+	tocbot.init({
+	  tocSelector: '#toc',
+	  contentSelector: '#content',
+	  headingSelector: 'h1, h2, h3, h4',
+	});
+	tocbot.refresh();
+</script>
+</body></html>

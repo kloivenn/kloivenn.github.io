@@ -1,13 +1,16 @@
-body {font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 .navigationTop {
-		
 		top: 0px;
 		width: 100%;
     list-style-type: none;
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #446;	
+    background-color: #446;
+    z-index: 1;	
 }
 .navigationTop .main {
 	font-family: Georgia;
@@ -63,15 +66,70 @@ div.dropdown-content a:hover {background-color: #c1c1d1}
   border-left: 4px solid transparent;
 }
 
-div.container {
+div.contentContainer {
   padding-top: 60px;
   padding-bottom: 40px;
-  padding-left: 10%;
+  padding-left: 270px;
   width: 60%;
   font-size: 15px;
   line-height: 150%;
+  color: #222;
+  text-align: justify;
+}
+
+div.tocContainer {
+  position: fixed;
+  margin-top: 100px;
+  top: 1%;
+  left: 50px;
+  width: 200px;
+  height: 75%;
+  border-right: 1px solid #335;
 }
 
 pre.example code {
   font-size: 16px !important; 
+}
+
+.contentContainer a {
+  text-decoration: none;
+  color: #e22;
+}
+
+code, pre {
+  padding: 0 3px 2px;
+  font-family: Menlo, Monaco, Consolas,"Courier New", monospace;
+  font-size: 12px;
+  color: #333333;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px; border-radius: 3px;
+}
+code {
+  padding: 2px 4px;
+  color: #d14; background-color: #f7f7f9;
+  border: 1px solid #e1e1e8;
+}
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size:13px;
+  line-height:20px;
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: pre;
+  white-space: pre-wrap;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+pre code {
+  padding: 0;
+  color: inherit;
+  background-color: transparent;
+  border: 0;
 }
