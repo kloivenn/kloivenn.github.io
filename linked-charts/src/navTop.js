@@ -8,7 +8,8 @@ var pages = {
 	},
 	tutorials: {
 		properties: "Properties in the Linked-charts",
-		types: "Types of charts"
+		types: "Types of charts",
+		legends: "Legends"
 	},
 	examples: {
 		simpleExample: "A very simple example",

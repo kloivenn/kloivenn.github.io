@@ -7,25 +7,27 @@
 <script src="../src/navTop.js"></script>
 <div class="contentContainer" id="content"><h1 id="scatter-plots">Scatter plots</h1>
 <h2 id="minimal-requirements">Minimal requirements</h2>
-<p>To generate a scatter plot one needs to define <tt>x</tt> and <tt>y</tt> properties. They expect a function that will take data IDs as arguments and return corresponding <tt>x</tt> or <tt>y</tt> values. In some simplest cases this may be enough, since the chart will try to automatically estimate the number of points, assuming that their IDs are consequtive numbers and trying to access <tt>x</tt> values one by one. The first ID, for which <tt>x</tt> is unaccessable becomes the number of points. If this for some reason fails, an error will be trown asking user to define the number of points himself via the <tt>nelements</tt> property.</p>
+<p>To generate a scatter plot one needs to define <a href="../pages/api.html#scatter_x"><code>x</code></a> and <a href="../pages/api.html#scatter_y"><code>y</code></a> properties. They should be functions that will take point IDs as an argument and return corresponding <code>x</code> or <code>y</code> values. In some simplest cases this may be enough, since the chart will try to automatically estimate the number of points, assuming that their IDs are consequtive numbers. To this end the chart tries to access <a href="../pages/api.html#scatter_x"><code>x</code></a> values one by one. The first ID, for which <a href="../pages/api.html#scatter_x"><code>x</code></a> is undefined or unaccessable for any reason, becomes the number of points. If this for some reason fails, an error will be trown asking the user to define the number of points him- or herself via the <a href="../pages/api.html#layer_nelements"><code>nelements</code></a> property.</p>
 <p>So the simplest possible scatter plot can be created like this</p>
 <pre class="tiy" width="100%" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/data/iris.js;../src/linked-charts.css">var scatterplot = lc.scatter()
   .x(function(k) {return data[k].sepalLength})
   .y(function(k) {return data[k].petalLength})
   .place();
 </pre>
-<p>In this example, the IDs are just numbers, and you can see that on the information labels for each point. You can change the names using <tt>elementLabel</tt>. Unlike IDs, names do not need to be unique. This actually can be any text you want to be associated with a data point. Fot example, try to add this line of code</p>
+<p>In this example, the IDs are just numbers, and you can see that on the information labels for each point. You can change the names using <a href="../pages/api.html#layer_elementLabel"><code>elementLabel</code></a>. Unlike IDs, names do not need to be unique. This actually can be any text you want to be associated with a data point. Fot example, try to add these lines to the code</p>
 <pre class="tiy" runnable="false">scatterplot
   .elementLabel(function(k) {return data[k].species})
+  .update();
 </pre>
-<p>More straightforward way to put your text on the information label is, of course, just to set the HTML code for this label through <tt>informText</tt> property.</p>
+<p>More straightforward way to put your text on the information label is, of course, just to set the HTML code for this label through <a href="../pages/api.html#layer_informText"><code>informText</code></a> property.</p>
 <pre class="tiy" runnable="false">scatterplot
   .informText(function(k) {
-    return "Species: " + data[k].species;
+    return "<b>Species:</b> " + data[k].species;
   })
+  .update();
 </pre>
-<p>If you don&apos;t want IDs to be consequtive numbers, you can set them manually, using the <tt>dataIds</tt> property, which should be an array of all the IDs. This may be useful if your data are stored in a form of object with named fields.</p>
-<p>On the chart bellow you can logarithmised expression values of several genes for two patient samples. The <tt>scatterData</tt> variable has the following structure</p>
+<p>If you don&apos;t want IDs to be consequtive numbers, you can set them manually, using the <a href="../pages/api.html#layer_elementIds"><code>elementIds</code></a> property, which should be an array of all the IDs. This may be useful if your data are stored in a form of an object with named fields.</p>
+<p>On the chart bellow you can see logarithmised expression values of several genes for two patient samples. The <code>scatterData</code> variable has the following structure</p>
 <pre class="tiy" runnable="false">{
   gene1: {sample_1: v11, sample_2: v21},
   gene2: {sample_1: v12, sample_2: v22},
@@ -42,9 +44,9 @@
 </pre>
 <h2 id="size-colour-and-shape">Size, colour and shape</h2>
 <p>All these aspects can be set either for all the points or for each of them separately.</p>
-<p>The <tt>size</tt> property defines the size of each point (default size is 6). To define colour use <tt>colour</tt> or <tt>colourValue</tt> properties. The difference between the two is that <tt>colour</tt> property should return colour in any form that can be interpreted by JavaScript, while <tt>colourValue</tt> can be anything. It can be numeric values or it can be some text. This will be converted either in continuous or in categorical colour scale. You can also define a set of colours using the <tt>palette</tt> property, which can be an array of colours or a function that converts values from 0 to 1 into colours.</p>
-<p>Shape can be set by the <tt>symbol</tt> or <tt>symbolValue</tt> property. The difference between them is exactly the same as the difference between <tt>colour</tt> and <tt>colourValues</tt>. <tt>symbol</tt> is expected to return one of the supported types of symbols which currently are <tt>"Circle", "Cross", "Diamond", "Square", "Star", "Triangle", "Wye"</tt>. <tt>symolValues</tt> can be any number or string.</p>
-<p>Note that when <tt>colourValue</tt> or <tt>symbolValue</tt> are set, <tt>legend</tt> is automatically generated, while after setting <tt>colour</tt> or <tt>symbol</tt> user should add the legend manually.</p>
+<p>The <a href="../pages/api.html#scatter_size"><code>size</code></a> property defines the size of each point (default size is 6). To define colour use the <a href="../pages/api.html#layer_colour"><code>colour</code></a> or <a href="../pages/api.html#layer_colourValue"><code>colourValue</code></a> properties. The difference between the two is that the <a href="../pages/api.html#layer_colour"><code>colour</code></a> property should return colour in any form that can be interpreted by JavaScript, while <a href="../pages/api.html#layer_colourValue"><code>colourValue</code></a> can be anything. It can be a numeric value, or it can be some text, or actually anything else. This will be converted either in a continuous or in a categorical colour scale. You can also define a set of colours using the <a href="../pages/api.html#layer_palette"><code>palette</code></a> property, which can be an array of colours or a function that converts values from 0 to 1 into colours.</p>
+<p>Shape can be set by the <a href="../pages/api.html#scatter_symbol"><code>symbol</code></a> or <a href="../pages/api.html#scatter_symbolValue"><code>symbolValue</code></a> properties. The difference between them is exactly the same as the difference between <a href="../pages/api.html#layer_colour"><code>colour</code></a> and <a href="../pages/api.html#layer_colourValue"><code>colourValue</code></a>. <a href="../pages/api.html#scatter_symbol"><code>symbol</code></a> is expected to be one of the supported types of symbols which currently are <code>"Circle", "Cross", "Diamond", "Square", "Star", "Triangle", "Wye"</code>. <a href="../pages/api.html#scatter_symbolValue"><code>symbolValue</code></a> can be any number or string.</p>
+<p>Note, that when <a href="../pages/api.html#layer_colourValue"><code>colourValue</code></a> or <a href="../pages/api.html#scatter_symbolValue"><code>symbolValue</code></a> is set, a <a href="../pages/api.html#legend"><code>legend</code></a> is automatically generated, while after setting <a href="../pages/api.html#layer_colour"><code>colour</code></a> or <a href="../pages/api.html#scatter_symbol"><code>symbol</code></a> the user should add a legend manually.</p>
 <p>Let&apos;s put all this together into an example</p>
 <pre class="tiy" width="100%" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/data/iris.js;../src/linked-charts.css">var scatterplot = lc.scatter()
   .x(function(k) {return data[k].sepalLength})
@@ -54,7 +56,7 @@
   .symbolValue(function(k) {return data[k].species})
   .place(); 
 </pre>
-<p>To set the same shapes with <tt>symbol</tt> property, one will need to use the following code.</p>
+<p>To set the same shapes with <a href="../pages/api.html#scatter_symbol"><code>symbol</code></a> property, one will need to use the following code (insert it instead of the <a href="../pages/api.html#scatter_symbolValue"><code>symbolValue</code></a> property in the example above).</p>
 <pre class="tiy" runnable="false">scatterplot
   .symbol(function(k) { 
     if(data[k].species == "setosa") 
@@ -66,8 +68,8 @@
   }) 
 </pre>
 <h2 id="titles-and-labels">Titles and labels</h2>
-<p>One more thing that any chart needs is meaningful labels and titles. You can set the main title of the chart using <tt>title</tt> property and you can add labels to axes through <tt>labelX</tt> and <tt>labelY</tt> properties.</p>
-<p>You can also add, rename or remove parts of the legend to make it customised. The more detailed chapter on legends you can find over here. In this article we just quickly mention the way to change automatically generated name, which is by defauld "type of legend"_"layerID". To this end you can use properties <tt>colourLegendName</tt> and <tt>symbolLegendName</tt>. Keep in mind that these names are also used as IDs, so they need to be unique.</p>
+<p>One more thing that any chart needs is meaningful labels and titles. You can set the main title of the chart using the <a href="../pages/api.html#chart_title"><code>title</code></a> property and you can add labels to axes using <a href="../pages/api.html#axesChart_axisTitleX"><code>axisTitleX</code></a> and <a href="../pages/api.html#axesChart_axisTitleY"><code>axisTitleY</code></a> properties.</p>
+<p>You can also add, rename or remove parts of the legend to make it customised. The more detailed chapter on legends you can find <a href="../tutorials/legends.html">here</a>. In this article we just quickly mention a way to change the automatically generated name, which is by defauld <code>"type of legend"_"layerID"</code>. To this end you can use properties <a href="../pages/api.html#layer_colourLegendTitle"><code>colourLegendTitle</code></a> and <a href="../pages/api.html#scatter_symbolLegendTitle"><code>symbolLegendTitle</code></a>. Keep in mind that these names are also used as IDs, so they need to be unique.</p>
 <pre class="tiy" width="100%" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/data/iris.js;../src/linked-charts.css">var scatterplot = lc.scatter()
   .x(function(k) {return data[k].sepalLength})
   .y(function(k) {return data[k].petalLength})
@@ -81,6 +83,15 @@
   .symbolLegendTitle("Species")
   .place(); 
 </pre>
+<h2 id="update">Update</h2>
+<p>For any changes, you&apos;ve added to the chart, to have an effect, you need firt to update the chart. Each chart in the <em>linked-charts</em> library has an <a href="../pages/api.html#chart_update"><code>update</code></a> method, which recalculates and updates all the elements of the chart. But if you know that only some of them have been changed since the last update, you may want to change only these ones for the sake of performance time. So the <a href="../pages/api.html#chart_update"><code>update</code></a> method actually consists of several modules, each responsible for a certain type of changes. These partial updates can be called independently if necessary. The most important ones are</p>
+<ul>
+<li><p><a href="../pages/api.html#chart_updateSize"><code>updateSize</code></a> - changes the size of the chart. Internally calls <a href="../pages/api.html#axesChart_updateAxes"><code>updateAxes</code></a>.</p></li>
+<li><p><a href="../pages/api.html#axesChart_updateAxes"><code>updateAxes</code></a> - recalculates the domains and updates both axes. Internally calls <a href="../pages/api.html#layer_updateElementPosition"><code>updateElementPosition</code></a>.</p></li>
+<li><p><a href="../pages/api.html#layer_updateElements"><code>updateElements</code></a> - adds or removes elements to fit the current data.</p></li>
+<li><p><a href="../pages/api.html#layer_updateElementPosition"><code>updateElementPosition</code></a> - updates the position of all the points of the chart.</p></li>
+<li><p><a href="../pages/api.html#layer_updateElementStyle"><code>updateElementStyle</code></a> - updates colour, shape, size, etc. of all the points.</p></li>
+</ul>
 </div>
 <div class="tocContainer" id="toc"></div>
 <script src="../src/codeMirror/codemirror.js"></script>

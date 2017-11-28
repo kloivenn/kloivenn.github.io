@@ -1,0 +1,182 @@
+<html><head>
+
+<title>Linked charts - Adding layers - Complete code</title>
+
+<link rel="stylesheet" href="src/prism.css">
+<script src="src/prism.js"></script>
+
+</head>
+
+<body>
+<pre class="language-html">	<code>
+&lt;script src=&quot;d3-linked-charts.js&quot;&gt;&lt;/script&gt;
+
+&lt;script&gt;
+  inputData = [{&quot;CellLine&quot;:&quot;Pa16C&quot;,&quot;Drug&quot;:&quot;Galunisertib&quot;,&quot;minConc&quot;:1, ...}, ... ];
+&lt;/script&gt;
+
+&lt;table&gt;&lt;tr&gt;
+  &lt;td id=&quot;heatmap&quot; valign=&quot;top&quot;&gt;&lt;/td&gt;
+  &lt;td id=&quot;scatterplot&quot; valign=&quot;top&quot;&gt;&lt;/td&gt;
+&lt;/tr&gt;&lt;/table&gt;
+
+&lt;script&gt;
+	inputData = d3.separateBy(inputData, [&quot;screen&quot;, &quot;Drug&quot;, &quot;CellLine&quot;]);
+	var drugs = Object.keys(inputData.RTG),
+	  cellLines = Object.keys(inputData.RTG[drugs[0]]);
+
+	var selDrugs = [drugs[0], drugs[1]],
+	  selCellLine = cellLines[0];
+
+	var heatmap = d3.heatmapChart()
+	  .rowIds( drugs )
+	  .colIds( drugs )
+	  .title(&quot;Drug-drug correlation&quot;)
+	  .colourRange( [ -1, 1 ] )
+	  .showLegend( false )
+	  .margin( {top: 100, left: 100, right: 10, bottom: 10} )
+	  .palette( function( val ) { return d3.interpolateRdBu( 1 - val ); } )
+	  .value( function( rowId, colId ) {  
+	    var rowValues = cellLines.map(function( e ) {
+	        return inputData.RTG[rowId][e].avInh;
+	      }),
+	      colValues = cellLines.map(function( e ) {
+	        return inputData.RTG[colId][e].avInh;
+	      });
+	    return d3.pearsonCorr( rowValues, colValues ); 
+	   })
+	  .on_click( function( rowId, colId ) {
+	     selDrugs = [rowId, colId]
+	     scatterplot.update();
+	     curveFit.update();
+	  })
+	  .place( &quot;#heatmap&quot; );
+
+	var heatmapSlider = d3.sigmoidColorSlider()
+		.set_margin( {left: 100} )
+		.straightColorScale( heatmap.colourScale )
+		.on_change(function(){
+			heatmap.updateCellColour();
+		})
+	  .place( &quot;#heatmap&quot; );
+
+	heatmap.cluster( &quot;Row&quot; )
+	  .cluster( &quot;Col&quot; );
+	heatmap.colour( function( val ){
+		return heatmapSlider.colourScale( val );
+	} );
+
+
+	var get_curve = function( drug, cellLine, x ){
+	  var max = inputData.RTG[drug][cellLine].max,
+	    min = inputData.RTG[drug][cellLine].min,
+	    IC50 = inputData.RTG[drug][cellLine].IC50,
+	    slope = inputData.RTG[drug][cellLine].Slope,
+	    minConc = inputData.RTG[drug][cellLine].minConc;
+	      
+	  return min + ( max - min )/
+	    (1 + Math.pow( 10, - ( x - Math.log10( IC50/minConc ) ) * slope));
+	}
+
+	var scatterplot = d3.scatterChart()
+	  .width( 300 )
+	  .height( 300 )
+	  .set_margin( {bottom: 20} )
+	  .showLegend( false )
+	  .dataIds( cellLines )
+	  .x( function( k ) { return inputData.RTG[selDrugs[0]][k].avInh } )
+	  .y( function( k ) { return inputData.RTG[selDrugs[1]][k].avInh } )
+	  .labelX( function() {return selDrugs[0]} )
+	  .labelY( function() {return selDrugs[1]} )
+	  .title( &quot;Average inhibition&quot; )
+	  .domainX( [-10, 50] )
+	  .domainY( [-10, 50] )
+	  .palette( [&quot;green&quot;, &quot;yellow&quot;,&quot;red&quot;] )
+	  .colourValue( function( k ) {
+	    var res = 0;
+	    for( var x = 0; x &lt; 5; x++ )
+	      for( var l = 0; l &lt; 2; l++ )
+	        res += Math.pow( get_curve( selDrugs[l], k, x ) - 
+	                    inputData.RTG[selDrugs[l]][k][&quot;D&quot; + (x + 1)], 2 ); 
+	    res = Math.sqrt( res );
+	    return res;
+	  })
+	  .colourRange( [ 0, 30 ] ) 
+	  .on_click( function( k ) {
+	    scatterplot.svg.selectAll( &quot;.clicked&quot; )
+	    	.classed( &quot;clicked&quot;, false );
+	    d3.select( this ).classed( &quot;clicked&quot;, true );
+	    selCellLine = k;
+	    curveFit.update();
+	  });
+	d3.lineChart( &quot;line&quot;, scatterplot )
+	  .npoints(1)
+	  .lineFun( function( k, x ){
+	    return x;
+	  })
+	  .place( &quot;#scatterplot&quot; );
+
+	var layer = scatterplot.get_layer( &quot;layer0&quot; );
+
+	var scatterSlider = d3.sigmoidColorSlider()
+		.width( 300 )
+		.height( 110 )
+		.set_margin( {top: 50} )
+		.title( &quot;Total curvefitting error&quot; )
+		.straightColorScale( layer.colourScale )
+		.on_change( function(){
+			layer.updatePointStyle();
+		} )
+	  .place( &quot;#scatterplot&quot; );
+
+	layer.colour(function( id ){
+		return scatterSlider.colourScale( layer.get_colourValue( id ) );
+	});
+
+
+	var curveFit = d3.scatterChart( &quot;points&quot; )
+	  .width( 375 )
+	  .height( 200 )
+	  .npoints( 10 )
+	  .title( function() {return selCellLine;} )
+	  .labelX( &quot;Drug concentration&quot; )
+	  .labelY( &quot;Inhibition&quot; )
+	  .domainY( [-25, 100] )
+	  .ticksX( function() {
+	    var ticks = [d3.range( 5 ), 
+	      d3.range( 5 ).map( function( e ) {
+	        return inputData.RTG[selDrugs[0]][selCellLine].minConc * 
+	                Math.pow( 10, e )
+	      } ),
+	      d3.range( 5 ).map( function( e ) {
+	        return inputData.RTG[selDrugs[1]][selCellLine].minConc * 
+	                Math.pow( 10, e )
+	      })];
+	    ticks.colour = [&quot;blue&quot;, &quot;red&quot;];
+	    return ticks;
+	  })
+	  .x( function( k ) {
+	    return k % 5;
+	  } )
+	  .y( function( k ) {
+	    var ind = Math.floor( k / 5 );
+	    return inputData.RTG[selDrugs[ind]][selCellLine][&quot;D&quot; + (k % 5 + 1)];
+	  })
+	  .colour( function( k ) {
+	    return k &gt; 4 ? &quot;red&quot; : &quot;blue&quot;;
+	  } );
+	curveFit.legend.add(function() {return [selDrugs, [&quot;blue&quot;, &quot;red&quot;]];}, 
+	                      &quot;colour&quot;, &quot;Drugs&quot;);  
+	d3.lineChart( &quot;lines&quot;, curveFit )
+	  .npoints( 2 )
+	  .lineFun( function( k, x ) {
+	    return get_curve( selDrugs[k], selCellLine, x );
+	  })
+	  .colour(function( k ){
+	    return k == 0 ? &quot;blue&quot; : &quot;red&quot;;
+	  })
+	  .place( &quot;#scatterplot&quot; );
+&lt;/script&gt;
+	</code>
+</pre>
+</body></html>

@@ -116,7 +116,7 @@ Try to play with <tt>width</tt> and <tt>height</tt> properties of a scatter plot
 <p>Note that there is also <tt>colour</tt> property, but it expected to return colours in any understable by CSS format. If you have names or numeric values and you want them to be converted into a colour scale, use <tt>colourValue</tt> property instead. Setting <tt>colour</tt> property overrides <tt>colourValue</tt>. Try, for example, adding</p>
 <pre class="tiy" runnable="false">scatterplot.colour("blue");
 </pre>
-<p><a name="layers" class="anchor" href="../pages/api.html#beeswarm_"><code></code></a> ## Properties and layers</p>
+<p><a name="layers" class="anchor" href=""></a> ## Properties and layers</p>
 <p>The <tt>linked-charts</tt> library allow some types of plots to have several layers that can be of the same or of different types. Properties that affect the entire chart (such as <tt>width</tt>, <tt>height</tt> or <tt>title</tt>) are chart-properties and their usage is not influenced by the number of layers. But there are also layer-properties which shoud be set for each layer individually. The proper way would be</p>
 <pre class="tiy" runnable="false">chart.get_layer(layerID).property(newValue);
 </pre>
