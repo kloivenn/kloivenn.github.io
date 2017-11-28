@@ -5,20 +5,20 @@
 </head>
 <body>
 <script src="../src/navTop.js"></script>
-<div class="contentContainer" id="content"><h1 id="proprerties-in-the-linked-charts">Proprerties in the Linked-Charts</h1>
-<p>Each chart object in the <tt>linked-charts</tt> library has a number of properties that define all its aspects such as size, scales or colour and links chart to the data. They are the main interface of any chart and therefore their understandig is crucial to use the library.</p>
-<p>Some properties (such as <tt>width</tt> or <tt>height</tt>) are shared between all objects in the <tt>linked-charts</tt> library, others are specific to a particular chart type. Some are defined for the entire chart, while others can be set for each data point separately. A property may be a value, or a function that returns a value, or even a fucntion that just perform some actions under certain conditions (like the <tt>on_click</tt> property).</p>
+<div class="contentContainer" id="content"><h1 id="proprerties">Proprerties</h1>
+<p>Each chart object in the <em>linked-charts</em> library has a number of properties that define all its aspects such as size, scales or colour and links chart to the data. They are the main interface of any chart and therefore their understandig is crucial to use the library.</p>
+<p>Some properties (such as <a href="../pages/api.html#chart_width"><code>width</code></a> or <a href="../pages/api.html#chart_height"><code>height</code></a>) are shared between all objects in the <em>linked-charts</em> library, others are specific to the particular chart type. Some are defined for the entire chart, while others can be set for each data point separately. A property may be a value, or a function that returns the value, or even a fucntion that just performs some actions under certain conditions (like the <a href="../pages/api.html#layer_on_click"><code>on_click</code></a> property).</p>
 <h2 id="getters-and-setters">Getters and setters</h2>
 <p>All properties follow the same logic. Each property has a getter and a setter function. Setters are always called after the name of the property and always return the chart object to make chained calls possible.</p>
 <pre class="tiy" runnable="false">chart.property1(new_value_for_property1)
   .property2(new_value_for_property2);
 </pre>
-<p>After a property has been set, one of the <tt>update</tt> functions should be called to redraw the chart.</p>
-<p>Getters are called by <tt>get_"property_name"()</tt> functions and return the current value of the property.</p>
+<p>After a property has been set, one of the <a href="../pages/api.html#chart_update"><code>update</code></a> functions should be called to redraw the chart.</p>
+<p>Getters are defined as <code>get_"property_name"()</code> functions and return the current value of the property.</p>
 <pre class="tiy" runnable="false">var value = chart.get_property();
 </pre>
-<p>Note that calling a setter without any arguments is equivalent to calling a corresponding getter.</p>
-Try to play with <tt>width</tt> and <tt>height</tt> properties of a scatter plot.
+<p>Note, that calling a setter without any arguments is equivalent to calling the corresponding getter.</p>
+Try to play with <a href="../pages/api.html#chart_width"><code>width</code></a> and <a href="../pages/api.html#chart_height"><code>height</code></a> properties of a scatter plot.
 <pre class="tiy" width="100%" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/data/iris.js;../src/linked-charts.css">  //create a scatterplot
   var scatterplot = lc.scatter()
     //set x and y values
@@ -27,7 +27,7 @@ Try to play with <tt>width</tt> and <tt>height</tt> properties of a scatter plot
     //set width and heigh
     .width(300)
     .height(400)
-    //put scatterplot on the page
+    //put the scatter plot on the page
     .place();
 
   //to get a value of the property one can
@@ -44,10 +44,10 @@ Try to play with <tt>width</tt> and <tt>height</tt> properties of a scatter plot
     .updateSize();
 </pre>
 <h2 id="static-and-dynamic-values">Static and dynamic values</h2>
-<p>In the previous example we used fixed values for width and height, but property setters also accept functions instead of values. The difference being that static value is fixed until you explicitely reset the property by calling its setter. A dynamic value is checked on each getter call. It&apos;s usefult if you think that some external factors can influence the property.</p>
-<p>In the following example we have two global variables - <tt>width</tt> and <tt>height</tt> - that can be changed through input boxes. We will set <tt>width</tt> property dynamically and pass <tt>height</tt> as a static value. It makes no difference, when the cahrt is initialised, but if global variables are changed, then calling the <tt>update</tt> function will only change width.</p>
+<p>In the previous example we used fixed values for <a href="../pages/api.html#chart_width"><code>width</code></a> and <a href="../pages/api.html#chart_height"><code>height</code></a>, but property setters also accept functions instead of values. The difference being that static value is fixed until you explicitely reset the property by calling its setter. A dynamic value is checked on each getter call. It&apos;s useful if you think that some external factors can influence the property value.</p>
+<p>In the following example we have two global variables - <code>width</code> and <code>height</code> - that can be changed through input boxes. We will set <a href="../pages/api.html#chart_width"><code>width</code></a> property dynamically and pass <a href="../pages/api.html#chart_height"><code>height</code></a> as a static value. It makes no difference, when the cahrt is initialised, but if global variables are changed, then calling the <a href="../pages/api.html#chart_updateSize"><code>updateSize</code></a> method will only change width.</p>
 <pre class="tiy" width="100%" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/data/iris.js;../src/linked-charts.css">  var cells = d3.select("body").append("table")
-    .selectAll("tr").data(["Width", "Height"])
+    .selectAll("tr").data(["width", "height"])
       .enter().append("tr")
         .append("td")
           .attr("class", function(d) {return d});
@@ -71,7 +71,7 @@ Try to play with <tt>width</tt> and <tt>height</tt> properties of a scatter plot
     //set width and height
     .width(function() {return width;})
     .height(height)
-    //put scatterplot on the page
+    //put the scatter plot on the page
     .place();
 
   //Add an update button
@@ -80,7 +80,7 @@ Try to play with <tt>width</tt> and <tt>height</tt> properties of a scatter plot
       .on("click", scatterplot.updateSize)
       .text("Update");
 
-  /* As you can see, now changing height has no effect
+  /* As you can see, now changing the height has no effect
     on the chart. To make it work, replace 
     the onclick function (line 18) with
     function() {
@@ -90,15 +90,15 @@ Try to play with <tt>width</tt> and <tt>height</tt> properties of a scatter plot
   */
 </pre>
 <h2 id="setting-properties-for-specific-points">Setting properties for specific points</h2>
-<p>To change size, colour, symbol etc. of a particular data point we need first to identify this poitn. All charts in the <tt>linked-charts</tt> library assign an ID to each point (or to each row and column for heatmaps). User can set the IDs himself using <tt>dataIds</tt> (or <tt>rowIds</tt> and <tt>colIds</tt>) property, which expects an array of IDs for all the points in the plot. If not set, the IDs are generated as consecutive numbers.</p>
-<p>Getters of properties such as colour or size can take ID as an argument and return a value of this property for a point with this ID. You&apos;ve already seen it in previous examples.</p>
+<p>To change size, colour, symbol etc. of a particular data point we need first to identify this point. All charts in the <em>linked-charts</em> library assign an ID to each point (or to each row and column for heatmaps). The user can set the IDs him- or herself using the <a href="../pages/api.html#layer_elementIds"><code>elementIds</code></a> (or <a href="../pages/api.html#heatmap_rowIds"><code>rowIds</code></a> and <a href="../pages/api.html#heatmap_colIds"><code>colIds</code></a>) property, which expects an array of IDs for all the points in the plot. If not set, the IDs are generated as consecutive numbers.</p>
+<p>Getters of the properties such as <a href="../pages/api.html#layer_colour"><code>colour</code></a> or <a href="../pages/api.html#scatter_size"><code>size</code></a> can take an ID as an argument and return a value of this property for a point with this ID. You&apos;ve already seen it in previous examples.</p>
 <pre class="tiy" runnable="false">scatterplot.x(function(k) {return data[k].sepalLength});
 </pre>
-<p>Here <tt>k</tt> is a point ID (a number in our case), and property <tt>x</tt> is defined separately for each ID. To get an <tt>x</tt> value of a point with ID <tt>k</tt>, one should use getter like this:</p>
+<p>Here <code>k</code> is a point ID (a number in our case), and the property <a href="../pages/api.html#scatter_x"><code>x</code></a> is defined independently for each ID. To get the <code>x</code> value of the point with an ID <code>k</code>, one should use the getter in the following way:</p>
 <pre class="tiy" runnable="false">var x = scatterplot.get_x(k);
 </pre>
-<p>These properties may also be independent of the IDs or even static. In this case the same value will be set for all the points.</p>
-<p>In this example, we will set to properties: <tt>size</tt> and <tt>colour</tt>. Size will be the same for all the points and colour will indicate species (here, we are using Iris data set).</p>
+<p>These properties may also be independent of the IDs or even static. In such a case, the same value will be set for all the points.</p>
+<p>In this example, we will set two properties: <a href="../pages/api.html#scatter_size"><code>size</code></a> and <a href="../pages/api.html#layer_colourValue"><code>colourValue</code></a>. Size will be the same for all the points and colour will indicate species (here, we are using the Iris data set).</p>
 <pre class="tiy" width="100%" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/data/iris.js;../src/linked-charts.css">  //create a scatterplot
   var scatterplot = lc.scatter()
     //set x and y values
@@ -113,29 +113,33 @@ Try to play with <tt>width</tt> and <tt>height</tt> properties of a scatter plot
 
   //try to use &apos;sepalWidth&apos; as size
 </pre>
-<p>Note that there is also <tt>colour</tt> property, but it expected to return colours in any understable by CSS format. If you have names or numeric values and you want them to be converted into a colour scale, use <tt>colourValue</tt> property instead. Setting <tt>colour</tt> property overrides <tt>colourValue</tt>. Try, for example, adding</p>
-<pre class="tiy" runnable="false">scatterplot.colour("blue");
+<p>Note that there is also the <a href="../pages/api.html#layer_colour"><code>colour</code></a> property, but it supposed to return colours in any understable by CSS format. If you have names or numeric values and you want them to be converted into a colour scale, use the <a href="../pages/api.html#layer_colourValue"><code>colourValue</code></a> property instead.</p>
+<p>Setting the <a href="../pages/api.html#layer_colour"><code>colour</code></a> property overrides <a href="../pages/api.html#layer_colourValue"><code>colourValue</code></a>. Try, for example, adding</p>
+<pre class="tiy" runnable="false">scatterplot
+  .colour("blue")
+  .updateElementStyle();
 </pre>
-<p><a name="layers" class="anchor" href=""></a> ## Properties and layers</p>
-<p>The <tt>linked-charts</tt> library allow some types of plots to have several layers that can be of the same or of different types. Properties that affect the entire chart (such as <tt>width</tt>, <tt>height</tt> or <tt>title</tt>) are chart-properties and their usage is not influenced by the number of layers. But there are also layer-properties which shoud be set for each layer individually. The proper way would be</p>
+<p>Note, that although all the points are now blue, the legend still shows three different colours. This happens because the legend is generated according to the <a href="../pages/api.html#layer_colourValue"><code>colourValue</code></a> property and the <a href="../pages/api.html#layer_colour"><code>colour</code></a> property overrides it, but doesn&apos;t change.</p>
+<h2 id="properties-and-layers">Properties and layers</h2>
+<p>In the <em>linked-charts</em> library some of the charts can have several layers of the same or of different types. Properties that affect the entire chart (such as <a href="../pages/api.html#chart_width"><code>width</code></a>, <a href="../pages/api.html#chart_height"><code>height</code></a> or <a href="../pages/api.html#chart_title"><code>title</code></a>) are chart-properties and their usage is not influenced by the number of layers. But there are also layer-properties which shoud be set for each layer individually. The proper way would be</p>
 <pre class="tiy" runnable="false">chart.get_layer(layerID).property(newValue);
 </pre>
-<p>One may find it really annoying, especially since setters always return chart object (not layers!). So in the <tt>linked-chart</tt> an acitve layer concept is introduced. Properties of the active layer can be set the same way you set chart-prperties, without selecting a layer.</p>
-<p>So if <tt>property1</tt> is a chart-property, <tt>property2</tt> is a property of an active layer and <tt>property3</tt> is a property of some other layer, one can set them like this.</p>
+<p>One may find it really annoying, especially since setters always return chart object <em>(not layers!)</em>. So in the <em>linked-chart</em> library an acitve layer concept is introduced. Properties of the active layer can be set the same way you set chart-properties, without selecting a layer.</p>
+<p>So if <chart>property1 is a chart-property, <code>property2</code> is a property of the active layer and <code>property3</code> is a property of some other layer, one can set them like this.</chart></p>
 <pre class="tiy" runnable="false">chart.property1(newValue1)
   .property2(newValue2)
   .get_layer(id)
     .property3(newValue3);
 </pre>
-<p>By default, each layer becomes active immediately after it is added to the chart, so when you work with a chart that has only one layer, you can even miss the fact that there are any layers at all. You can also change active layer using <tt>activeLayer</tt> property.</p>
-<pre class="tiy" runnable="false">chart.activeLayer(layerId);
+<p>By default, each layer becomes active immediately after it has been added to the chart, so when you work with a chart that has only one layer, you can even miss the fact that there are any layers at all. You can also change active layer using the <a href="../pages/api.html#layerChart_activeLayer"><code>activeLayer</code></a> property.</p>
+<pre class="tiy" runnable="false">chart.activeLayer(chart.get_layer(layerId));
 </pre>
 <p>You can also select several layers and set properties for all of them simultaniously.</p>
 <pre class="tiy" runnable="false">chart.select_layers([id1, id2])
   .property(newValue);
 </pre>
 <p>You can&apos;t do without layers, if you want to put several types of plots in one chart. In examples, like the one bellow, it&apos;s possible to have all the points on one layer, but here, for demonstration purpuses, we will utilise layers.</p>
-<p>In this example 50 drugs in 5 concentrations that have been tested against 2 pancreatic cancer cell lines (Pa16C and Pa14C). Plot to the right shows inhibition percantaged averaged between all five concentrarions. Plot to the left shows individual values of inhibition percentage for a selected drug.</p>
+<p>In this example 50 drugs in 5 concentrations have been tested against 2 pancreatic cancer cell lines (Pa16C and Pa14C). Plot to the right shows inhibition percantage averaged between all five concentrarions. Plot to the left shows individual values of inhibition percentage for the selected drug.</p>
 <pre class="tiy" width="100%" fitheight="true" fitwidth="true" tiy-preload="../src/linked-charts.min.js;../src/data/inputdata.js;../src/linked-charts.css">  d3.select("body")
     .append("table")
       .append("tr")
@@ -150,19 +154,19 @@ Try to play with <tt>width</tt> and <tt>height</tt> properties of a scatter plot
   //global variable to store the clicked point
   var selDrug = "Filanesib";
 
-  //create scatter plot with average inhibition values
+  //create a scatter plot with average inhibition values
   var scatterplot = lc.scatter()
-    //id for each point is a corresponding drug name
-    .dataIds(Object.keys(data.Pa16C))
+    //id for each point is the corresponding drug name
+    .elementIds(Object.keys(data.Pa16C))
     .x(function(id) {return data.Pa16C[id].avInh})
     .y(function(id) {return data.Pa14C[id].avInh})
-    //when point is clicked, change the global variable 
+    //when a point is clicked, change the global variable 
     //and update the dependant plot
     .on_click(function(id){
       selDrug = id;
       inhValues.update();
     })
-    //place chart in a container with id = "scatter"
+    //place chart in the container with id = "scatter"
     .place("#scatter");
 
   //create the first layer of the chart
@@ -174,8 +178,8 @@ Try to play with <tt>width</tt> and <tt>height</tt> properties of a scatter plot
       return data.Pa16C[selDrug]["D" + (k + 1)];
     })
     .colour( "blue" );
-  //to add layer to an existing chart one should pass the
-  //chart as a second argument to 
+  //to add a layer to the existing chart one should pass the
+  //chart as a second argument to initialising function
   lc.scatter("Pa14C", inhValues)
     .nelements( 5 )
     .x( function( k ) {return k} )
@@ -187,7 +191,7 @@ Try to play with <tt>width</tt> and <tt>height</tt> properties of a scatter plot
 
   inhValues.colour("green")
     .update();
-  //note that only points from second layer
+  //note that only points from the second layer
   //changed their colour
   //try changing properties of different layers with these code samples
   
@@ -199,22 +203,27 @@ Try to play with <tt>width</tt> and <tt>height</tt> properties of a scatter plot
   //if no IDs are passed to chart.select_layers()
   //all the layers are selected
 </pre>
-<p>For more detailed information on layers in the <tt>linked-charts</tt> library, check this tutorial.</p>
+<p>For more detailed information on layers in the <em>linked-charts</em> library, check <a href="../tutorials/layers.html">this</a> tutorial.</p>
 <h2 id="for-developers">For developers</h2>
-<p>Not only charts, but also some additional elements in the <tt>linked-charts</tt> library such as legend or navigation panel heavily rely on properties. So if you want to add your own chart to the library, we highly encourage you to stick to this pattern.</p>
-<p>All the objects in the library are decendants from the <tt>base</tt> class, and because of that they all have <tt>add_property</tt> metthod, which can be called like this</p>
+<p>Not only charts, but also some additional elements in the <em>linked-charts</em> library such as the <a href="../pages/api.html#legend"><code>legend</code></a> or the instrument <a href="../pages/api.html#panel"><code>panel</code></a> heavily rely on properties. So if you want to add your own chart to the library, we highly encourage you to stick to this pattern.</p>
+<p>All the objects in the library are decendants from the <a href="../pages/api.html#base"><code>base</code></a> class, and because of that they all have the <a href="../pages/api.html#base_add_property"><code>add_property</code></a> method that can be called in the following way</p>
 <pre class="tiy" runnable="false">chart.add_property("property1", defaultValue1)
   .add_property("property2", function() {return defaultValue2})
   .add_property("property3");
 </pre>
-<p>This will automatically generate a setter and a getter to the object <tt>chart</tt>.</p>
-<p>Sometimes setting one property may influence another property. For example, if <tt>dataIds</tt> is set, then number of points (<tt>nelements</tt> property) is defined as length of the array returns by the <tt>dataIds</tt> getter. But the user may not want to set all the IDs and instead define only the number of points. In this case <tt>dataIds</tt> is set to <tt>[0, 1, 2, ..., n]</tt>.</p>
-<p>In such cases "__override__" mode of a setter may be handy. For example</p>
-<pre class="tiy" runnable="false">chart.dataIds("__override__", "nelements", function(){
-  return chart.dataIds().lenght;
-}) 
+<p>This will automatically add a setter and a getter to the object <code>chart</code>.</p>
+<p>Sometimes setting one property may influence another property. For example, if <a href="../pages/api.html#layer_elementIds"><code>elementIds</code></a> is set, then the number of points (the <a href="../pages/api.html#layer_nelements"><code>nelements</code></a> property) is defined as length of the array returned by the <a href="../pages/api.html#layer_elementIds"><code>elementIds</code></a> getter. But the user may not want to set all the IDs and instead define only the number of points. In this case <a href="../pages/api.html#layer_elementIds"><code>elementIds</code></a> is set to <code>[0, 1, 2, ..., n]</code>.</p>
+<p>In such cases the <a href="../pages/api.html#base_wrapSetter"><code>wrapSetter</code></a> method may be handy. For example</p>
+<pre class="tiy" runnable="false">chart.wrapSetter("elementIds", function(oldSetter){
+  return function() {
+    chart.get_nelements = function(){
+      return oldSetter().length;
+    };
+    return oldSetter.apply(chart, arguments);
+  }
+});
 </pre>
-<p>This means that each time the <tt>dataIds</tt> setter is called, <tt>nelements</tt> property will be set to the function that is a third argument.</p>
+<p>This means that each time the <a href="../pages/api.html#layer_elementIds"><code>elementIds</code></a> setter is replaced with a new one that on each call first redefined the <a href="../pages/api.html#layer_nelements"><code>nelements</code></a> getter and only after that performs its usual actions.</p>
 </div>
 <div class="tocContainer" id="toc"></div>
 <script src="../src/codeMirror/codemirror.js"></script>

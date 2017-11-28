@@ -4,12 +4,16 @@ var pages = {
 	types:{
 		heatmap: "Heatmaps",
 		scatter: "Scatter plots",
-		lines: "Lines"
+		lines: "Lines",
+		barchart: "Barcharts",
+		beeswarm: "Beeswarm",
+		table: "Tables"
 	},
 	tutorials: {
-		properties: "Properties in the Linked-charts",
+		properties: "Properties",
 		types: "Types of charts",
-		legends: "Legends"
+		legends: "Legends",
+		layers: "Layers"
 	},
 	examples: {
 		simpleExample: "A very simple example",
