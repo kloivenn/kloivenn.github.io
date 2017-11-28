@@ -7,13 +7,13 @@
 <script src="../src/navTop.js"></script>
 <div class="contentContainer" id="content"><h1 id="heatmaps">Heatmaps</h1>
 <h2 id="minimal-requirements">Minimal requirements</h2>
-<p>There are only three required properties to generate a heatmap. They are <a href="../pages/api.html#barchart_value"><code>value</code></a>, <a href="nrows">nrows</a> and <a href="ncols">ncols</a>. The latter two set number of rows and columns of the heatmap and thus are expected to be integer numbers. <a href="../pages/api.html#barchart_value"><code>value</code></a> should be a function that takes a row ID and a column ID and returns a specific cell value. In most cases these values are numbers, but other options are also possible. Check this example for more details.</p>
-<p>When <tt>nrows</tt> or <tt>ncols</tt> are set, the respective set of IDs is defined as an array of non-negative consequtive numbers. Another option is to set these IDs manually by <tt>rowIds</tt> or <tt>colIds</tt> properties. Both of them expect to get an array of IDs of all rows or columns in the heatmap.</p>
-<p>The difference in these two approaches is only in the IDs that will be passed to cell-specific properties such as <tt>value</tt>. The two following lines are completely equivalent to each other.</p>
+<p>There are only three required properties to generate a heatmap. They are <a href="../pages/api.html#heatmap_value"><code>value</code></a>, <a href="../pages/api.html#heatmap_nrows"><code>nrows</code></a> and <a href="../pages/api.html#heatmap_ncols"><code>ncols</code></a>. The latter two set number of rows and columns of the heatmap and thus are expected to be integer numbers. <a href="../pages/api.html#barchart_value"><code>value</code></a> should be a function that takes a row ID and a column ID and returns a specific cell value. In most cases these values are numbers, but other options are also possible. Check <a href="../examples/twoChannelsHeatmap.html">this</a> example for more details.</p>
+<p>When <a href="../pages/api.html#heatmap_nrows"><code>nrows</code></a> or <a href="../pages/api.html#heatmap_ncols"><code>ncols</code></a> are set, the respective set of IDs is defined as an array of non-negative consequtive numbers. Another option is to set these IDs manually by <a href="../pages/api.html#heatmap_rowIds"><code>rowIds</code></a> or <a href="../pages/api.html#heatmap_colIds"><code>colIds</code></a> properties. Both of them expect to get an array of IDs of all rows or columns in the heatmap.</p>
+<p>The difference in these two approaches is only in the IDs that will be passed to cell-specific properties such as <a href="../pages/api.html#heatmap_value"><code>value</code></a>. The two following lines are completely equivalent to each other.</p>
 <pre class="tiy" runnable="false">heatmap.nrows(10);
 heatmap.rowIds([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
 </pre>
-<p>Yet <tt>rowIds</tt> and <tt>colIds</tt> allow to set IDs to something different from numbers, which may be useful when your data are stored as an object rather than an array.</p>
+<p>Yet <a href="../pages/api.html#heatmap_rowIds"><code>rowIds</code></a> and <a href="../pages/api.html#heatmap_colIds"><code>colIds</code></a> allow to set IDs to something different from numbers, which may be useful when your data are stored as an object rather than an array.</p>
 Have a look at this example. Here, we have correlation values between gene expression and drug scores.
 <pre class="tiy" fitheight="true" fitwidth="true" tiy-preload="../src/linked-charts.min.js;../src/data/inputdata_simple.js;../src/linked-charts.css">d3.select("body")
   .append("table")
@@ -38,7 +38,7 @@ var heatmap_ids = lc.heatmap()
   })
   .place("#object");
 </pre>
-The main difference between the two heatmaps lies in the structure of their data objects. <tt>corMatrix</tt> is a usual <tt>n x m</tt> data matrix with no lables. <tt>corObject</tt> looks like this:
+The main difference between the two heatmaps lies in the structure of their data objects. <code>corMatrix</code> is a usual <code>n x m</code> data matrix with no lables. <code>corObject</code> looks like this:
 <pre class="tiy" runnable="false">{gene1: {
   drug1: v11,
   drug2: v12,
@@ -49,8 +49,8 @@ The main difference between the two heatmaps lies in the structure of their data
   ...
 }...}
 </pre>
-<p>So it&apos;s easier to use keys instead of indices to access values in this object.</p>
-<p>One can also notice that in the first heatmap (to the left) there are no meaningful labels, since by default IDs are used as labels. If you want to have there something else, use <tt>rowLabel</tt> and <tt>colLabel</tt> properties. Both of them should be functions that get row or column ID and return a corresponding label.</p>
+<p>So it&apos;s easier to use keys (such as gene and drug names) instead of indices to access values in this object.</p>
+<p>One can also notice that in the first heatmap (to the left) there are no meaningful labels, since by default the IDs are used as labels. If you want to have there something else, use <a href="../pages/api.html#heatmap_rowLabel"><code>rowLabel</code></a> and <a href="../pages/api.html#heatmap_colLabel"><code>colLabel</code></a> properties. Both of them should be functions that get row or column ID and return a corresponding label. Unlike IDs, labels don&apos;t need to be unique.</p>
 Try to add this lines to the example above
 <pre class="tiy" runnable="false">heatmap_numbers
   .rowLabel(function(row) {
@@ -58,18 +58,20 @@ Try to add this lines to the example above
   })
   .colLabel(function(col) {
     return drugNames[col];
-  });
+  })
+  .updateLabelText();
 </pre>
 Of course, you can also change labels for the other heatmap as well
 <pre class="tiy" runnable="false">  heatmap_ids
     .colLabel(function(colId) {
       return colId.toUpperCase();
-    });
+    })
+    .updateLabelText();
 </pre>
 <h2 id="colour">Colour</h2>
-<p>Like for all other charts in the library, the most basic and direct way to define colour of cells is via <tt>colour</tt> property. This property takes value (usually, returned by <tt>value</tt> property) and supposed to return colours. If you decide to set this property, the way how you want to transform IDs into colours is completely up to you. Yet, setting <tt>colour</tt> property always overrides any other in-built ways of colour manipulation, and so we recomend not to use it unless in some special cases.</p>
-<p>Generally, one would use <tt>palette</tt> and <tt>colourDomain</tt> properties to set an appropriate colour scheme. <tt>colourDomain</tt> defines the values range on which we want to stretch the palette. For example, for correlation heatmap a good choice would be <tt>[-1, 1]</tt>. By default <tt>colourDomain</tt> returns the range of values of all the cells. <tt>palette</tt> is a functions that transforms values from <tt>[0, 1]</tt> into colours. It was desined to utilise sequential scales from d3 library, but can be any function that follows abovementioned condition.</p>
-<p>The combination of these two properties results in a colour scale that takes values from <tt>colourDomain</tt> and returns colours. The scale is stored as <tt>chart.colourScale</tt> (this is not a property!) and by default is accessed via the <tt>colour</tt> property.</p>
+<p>Like for all other charts in the library, the most basic and direct way to define colour of cells of the heatmap is via <a href="../pages/api.html#heatmap_colour"><code>colour</code></a> property. This property takes value (usually, returned by <a href="../pages/api.html#heatmap_value"><code>value</code></a> property) and supposed to return colours. If you decide to set this property, the way how you want to transform IDs into colours is completely up to you. Yet, setting <a href="../pages/api.html#heatmap_colour"><code>colour</code></a> property always overrides any other in-built ways of colour manipulation, and so we recomend not to use it unless for some special cases.</p>
+<p>Generally, one would use <a href="../pages/api.html#heatmap_palette"><code>palette</code></a> and <a href="../pages/api.html#heatmap_colourDomain"><code>colourDomain</code></a> properties to set an appropriate colour scheme. <a href="../pages/api.html#heatmap_colourDomain"><code>colourDomain</code></a> defines the range of the values on which we want to stretch the palette. For example, for correlation heatmap a good choice would be <code>[-1, 1]</code>. By default, <a href="../pages/api.html#heatmap_colourDomain"><code>colourDomain</code></a> returns the range of the values of all the cells. <a href="../pages/api.html#heatmap_palette"><code>palette</code></a> is a functions that transforms values from <code>[0, 1]</code> into colours. It was desined to utilise sequential scales from d3 library, but can be any function that follows the abovementioned condition.</p>
+<p>The combination of these two properties results in a colour scale that takes values from <a href="../pages/api.html#heatmap_colourDomain"><code>colourDomain</code></a> and returns colours. The scale is stored as <a href="../pages/api.html#heatmap_colourScale"><code>colourScale</code></a> (this is not a property!) and by default is accessed via the <a href="../pages/api.html#heatmap_colour"><code>colour</code></a> property.</p>
 <p>Here is an exaple to put it all together.</p>
 <pre class="tiy" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/data/inputdata_simple.js;../src/linked-charts.css">var heatmap = lc.heatmap()
   .rowIds(geneNames)
@@ -88,25 +90,27 @@ You can experiment with this, or try to set colour property like this
   .colour(function(val){
     return this.colourScale(val/2);
   })
+  .updateCellColour();
 </pre>
 or
 <pre class="tiy" runnable="false">heatmap
   .colour(function(val) {
     return val &gt; 0 ? "red" : "blue";
   })
+  .updateCellColour();
 </pre>
-<p>Note that in first case we are still using the default colour scale and therefore <tt>colourDomain</tt> and <tt>palette</tt> properties still have an effect on the heatmap&apos;s appearance. But if colour is set like in the second example, other colour properties will be ineffective.</p>
+<p>Note, that in the first case we are still using the default colour scale and therefore <a href="../pages/api.html#heatmap_colourDomain"><code>colourDomain</code></a> and <a href="../pages/api.html#heatmap_palette"><code>palette</code></a> properties still have an effect on the heatmap&apos;s appearance. But if colour is set like in the second example, other colour properties will be ineffective.</p>
 <h2 id="clustering-and-dendograms">Clustering and dendograms</h2>
 <p>You can always cluster rows or colums of the heatmap by clicking the corresponding buttons on the instrument panel. Another option is writing</p>
 <pre class="tiy" runnable="false">heatmap
   .cluster("Row")
   .cluster("Col");
 </pre>
-<p>Note that <tt>cluster</tt> is not a prperty, but rather a method that can take either "Row" or "Col" argument and will throw an error if any other argument is passed.</p>
-<p>There are also some properties that will help you to customise the clustering.</p>
-<p><tt>showDendogramRow</tt> and <tt>showDendogramCol</tt> define wether or not to show the dendogram and are expected to return boolean values. Even is this properties are set to <tt>false</tt> rows or columns still can be clustered. Just no dendogram will be displayed.</p>
-<p><tt>clusterRowMetric</tt> and <tt>clusterColMetric</tt> are used to calculate distance between rows and columns for clustering. By default Euclidean distance is used, but user can provide any other fucntion for these properties that will take two vectors of the same lengt and return numeric value.</p>
-<p>Now let&apos;s summarize this with an example. We will use correlation distance to cluster rows and columns and disable one of the dendograms.</p>
+<p>Note that <a href="../pages/api.html#heatmap_cluster"><code>cluster</code></a> is not a property, but a method that can take either "Row" or "Col" argument and will throw an error if any other argument is passed.</p>
+<p>There are also some other properties that will help you to customise the clustering.</p>
+<p><a href="../pages/api.html#heatmap_showDendogramRow"><code>showDendogramRow</code></a> and <a href="../pages/api.html#heatmap_showDendogramCol"><code>showDendogramCol</code></a> define wether or not to show the dendogram and are expected to return boolean values. Even if these properties are set to <code>false</code> rows or columns still can be clustered. Just no dendogram will be displayed.</p>
+<p><a href="../pages/api.html#heatmap_clusterRowMetric"><code>clusterRowMetric</code></a> and <a href="../pages/api.html#heatmap_clusterColMetric"><code>clusterColMetric</code></a> are used to calculate distance between rows and columns for clustering. By default, the Euclidean distance is used, but user can provide any other fucntion for these properties that will take two vectors of the same length and return a numeric value.</p>
+<p>Now let&apos;s summarize this with an example. We will use the correlation distance to cluster rows and columns and disable one of the dendograms.</p>
 <pre class="tiy" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/data/inputdata_simple.js;../src/linked-charts.css">var heatmap = lc.heatmap()
   .rowIds(geneNames)
   .colIds(drugNames)
@@ -126,19 +130,30 @@ or
 </pre>
 <p>As you can see, when dendogram is added to the heatmap, labels are moved to the bottom or to the right. Yet the default margin size is too small so now you can see only the first letter of each row label. Add this to the example code to change the margin size</p>
 <pre class="tiy" runnable="false">heatmap
-  .set_margin({right: 100})
+  .set_margins({right: 100})
+  .updateSize();
 </pre>
-<p>It doesn&apos;t matter in which order you define properties. But <tt>cluster</tt> is not a property. It&apos;s a method that performs clusterisation, when called. So if you use it, make sure that by that time you&apos;ve already set all the required prperties. For example try to put <tt>cluster</tt> before distance metric is changed and see what happens.</p>
-<p>By the way, try to click on any branch of a dendogram. Then rows or columns will be reclustered, using only the selected cluster as features.</p>
+<p>It doesn&apos;t matter in which order you define properties. But <a href="../pages/api.html#heatmap_cluster"><code>cluster</code></a> is not a property. It&apos;s a method that performs clusterisation, when called. So if you use it, make sure that by that time you&apos;ve already set all the required prperties. For example try to put <a href="../pages/api.html#heatmap_cluster"><code>cluster</code></a> before distance metric is changed and see what happens.</p>
+<p>By the way, try to click on any branch of the dendogram. Then rows or columns will be reclustered, using only the selected cluster as features.</p>
 <h2 id="update">Update</h2>
-<p>To change anything in the heatmap, you need to update it. There is an <tt>update</tt> method that will just redraw all the elements of the heatmap. But if you know that only some of the heatmap&apos;s elements have been changed since last update, you may want to update only them for the sake of performance time. So the <tt>update</tt> function actually consists of several modules each responsible for a certain type of changes. These partial updates can be called independently if necessary. The most important ones are <tt>updateSize</tt> - changes the size of the chart. Internally calls <tt>updateLabelPosition</tt>. <tt>updateLabels</tt> - adds or removes row and column labels. Internally calls <tt>updateCells</tt>. <tt>updateCells</tt> - adds or removes cells. <tt>updateLabelPosition</tt> - changes the size and location of the row and column labels. Internally calls <tt>updateCellPosition</tt> <tt>updateCellPosition</tt> - changes the size and location of all the cells. <tt>updateLabelText</tt> - changes the text of row and column labels. <tt>updateCellColour</tt> - changes the colour of all the cells. <tt>updateCanvas</tt> - if the heatmap is working in the "canvas" mode, this function will redraw the canvas.</p>
-Unlike SVG Canvas can not be changed partially. Even if you need to change colour of a single cell, the entire canvas has to be redrawn. Thus, if you are working with canvas, <tt>updateCells</tt>, <tt>updateCellPosition</tt> and <tt>updateCellColour</tt> will call <tt>updateCanvas</tt>. So if you make such a chain of updates
+<p>To change anything in the heatmap, you need to update it. There is an <a href="../pages/api.html#chart_update"><code>update</code></a> method that will just redraw all the elements of the heatmap. But if you know that only some of the heatmap&apos;s elements have been changed since the last update, you may want to change only them for the sake of performance time. So the <a href="../pages/api.html#chart_update"><code>update</code></a> function actually consists of several modules each responsible for a certain type of changes. These partial updates can be called independently if necessary. The most important ones are</p>
+<ul>
+<li><p><a href="../pages/api.html#chart_updateSize"><code>updateSize</code></a> - changes the size of the chart. Internally calls <a href="../pages/api.html#heatmap_updateLabelPosition"><code>updateLabelPosition</code></a>.</p></li>
+<li><p><a href="../pages/api.html#heatmap_updateLabels"><code>updateLabels</code></a> - adds or removes row and column labels. Internally calls <a href="../pages/api.html#heatmap_updateCells"><code>updateCells</code></a>.</p></li>
+<li><p><a href="../pages/api.html#heatmap_updateCells"><code>updateCells</code></a> - adds or removes cells.</p></li>
+<li><p><a href="../pages/api.html#heatmap_updateLabelPosition"><code>updateLabelPosition</code></a> - changes the size and location of the row and column labels. Internally calls <a href="../pages/api.html#heatmap_updateCellPosition"><code>updateCellPosition</code></a></p></li>
+<li><p><a href="../pages/api.html#heatmap_updateCellPosition"><code>updateCellPosition</code></a> - changes the size and location of all the cells.</p></li>
+<li><p><a href="../pages/api.html#heatmap_updateLabelText"><code>updateLabelText</code></a> - changes the text of row and column labels.</p></li>
+<li><p><a href="../pages/api.html#heatmap_updateCellColour"><code>updateCellColour</code></a> - changes the colour of all the cells.</p></li>
+<li><p><a href="../pages/api.html#heatmap_updateCanvas"><code>updateCanvas</code></a> - if the heatmap is working in the "canvas" <a href="../pages/api.html#heatmap_mode"><code>mode</code></a>, this function will redraw the canvas.</p></li>
+</ul>
+Unlike SVG, Canvas can not be changed partially. Even if you need to change colour of a single cell, the entire canvas has to be redrawn. Thus, if you are working with canvas, <a href="../pages/api.html#heatmap_updateCells"><code>updateCells</code></a>, <a href="../pages/api.html#heatmap_updateCellPosition"><code>updateCellPosition</code></a> and <a href="../pages/api.html#heatmap_updateCellColour"><code>updateCellColour</code></a> will call <a href="../pages/api.html#heatmap_updateCanvas"><code>updateCanvas</code></a>. So if you make such a chain of updates
 <pre class="tiy" runnable="false">heatmap
   .updateCells()
   .updateCellPosition()
   .updateCellColour();
 </pre>
-canvas will be updated three times. So that not to lose time for this, you can indicate that all of these updates are part of single chain and canvas should be updated only once
+canvas will be updated three times. So that not to lose time for this, you can indicate that all of these updates are a part of a single chain and canvas should be updated only once
 <pre class="tiy" runnable="false">heatmap.updateStarted = true;
 heatmap
   .updateCells()
@@ -146,7 +161,7 @@ heatmap
   .updateCellColour();
 heatmap.updateStarted = false;
 </pre>
-<p>You can find the full list of heatmap&apos;s properties and methods here.</p>
+<p>You can find the full list of heatmap&apos;s properties and methods <a href="../pages/api.html#heatmap"><code>here</code></a>.</p>
 </div>
 <div class="tocContainer" id="toc"></div>
 <script src="../src/codeMirror/codemirror.js"></script>
