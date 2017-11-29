@@ -13,7 +13,8 @@ var pages = {
 		properties: "Properties",
 		types: "Types of charts",
 		legends: "Legends",
-		layers: "Layers"
+		layers: "Layers",
+		data: "Data input"
 	},
 	examples: {
 		simpleExample: "A very simple example",
