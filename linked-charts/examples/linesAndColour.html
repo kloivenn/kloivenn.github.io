@@ -1,0 +1,500 @@
+<html><head>
+<title></title>
+<script src="../src/linked-charts.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../src/linked-charts.css">
+<link rel="stylesheet" type="text/css" href="../src/default.css">
+<link rel="stylesheet" href="../src/prism.css">
+<script src="../src/prism.js"></script>
+</head>
+
+<body>
+<script src="../src/navTop.js"></script>
+<div class="contentContainer">
+	<div class="description">
+<h1>Lines and Colour</h1>
+<p>This is one of the series of examples, where we step by step introduce new chart properties for the
+same set of charts.</p>
+<p>Here, we show how to draw line plots. Let&apos;s add a diogonal line to the upper scatter plot and fitted curves
+for both drugs to the bottom one. We also use colour to indicate the samples, where curvefitting wasn&apos;t succesfull.
+Red dots on the correlation scatterplots show cell lines with bad fitting for at least one of the two selected drugs.</p>
+<p>The data used here are generated in a drug-screening experiment. 50 drugs at 5 different concentrations 
+were tested against 21 pancreatic cancer cell lines. The heatmap shows drug-drug correlation. Like in the 
+previous example, a click on a cell of the heatmap reveals the underlying statistics by demonstrating on 
+the scatter plot (right upper corner) the values of avarage inhibition for all tested cell lines and the two
+selected drugs. By clicking on a data point one can select a cell line, and thus change the third plot 
+(right bottom corner) that demonstrates individual inhibition percent values for the two selected drugs and 
+the selected cell line.</p>
+</div>
+	<script class="input" src="../src/data/inputdata.js"></script>
+	<div class="layout"><table><tbody><tr>  <td id="heatmap" valign="top"></td>  <td id="scatterplot" valign="top"></td></tr></tbody></table></div>
+	<script class="code">inputData = lc.separateBy(inputData, ["screen", "Drug", "CellLine"]);
+var drugs = Object.keys(inputData.RTG),
+  cellLines = Object.keys(inputData.RTG[drugs[0]]);
+var selDrugs = [drugs[0], drugs[1]],
+  selCellLine = cellLines[0];
+var heatmap = lc.heatmap()
+  .rowIds( drugs )
+  .colIds( drugs )
+  .colourDomain( [ -1, 1 ] )
+  .palette( d3.interpolateRdBu )
+  .margins({top: 50, left: 50, right: 100, bottom: 100})
+  .value( function( rowId, colId ) {
+    var rowValues = cellLines.map(function(e) {
+        return inputData.RTG[rowId][e].avInh;
+      }),
+      colValues = cellLines.map(function(e) {
+        return inputData.RTG[colId][e].avInh;
+      });
+    return lc.pearsonCorr( rowValues, colValues );
+   })
+  .cluster( "Row" )
+  .cluster( "Col" )
+  .on_click( function( rowId, colId ) {
+     selDrugs = [rowId, colId]
+     scatterplot.update();
+     curveFit.update();
+  })
+  .place( "#heatmap" );
+var get_curve = function( drug, cellLine, x ){
+  var max = inputData.RTG[drug][cellLine].max,
+    min = inputData.RTG[drug][cellLine].min,
+    IC50 = inputData.RTG[drug][cellLine].IC50,
+    slope = inputData.RTG[drug][cellLine].Slope,
+    minConc = inputData.RTG[drug][cellLine].minConc;
+  return min + (max - min)/ 
+    (1 + Math.pow(10, -(x - Math.log10(IC50/minConc)) * slope));
+}
+var scatterplot = lc.scatter()
+  .width( 300 )
+  .height( 300 )
+  .elementIds( cellLines )
+  .x( function( k ) { return inputData.RTG[selDrugs[0]][k].avInh } )
+  .y( function( k ) { return inputData.RTG[selDrugs[1]][k].avInh } )
+  .on_click( function( k ) {
+    selCellLine = k;
+    curveFit.update();
+  })
+  .aspectRatio( 1 )
+  .colourValue( function ( k ) {
+    var res = 0;
+    for( var x = 0; x < 5; x++ )
+      for( var l = 0; l < 2; l++ )
+        res += Math.pow( get_curve( selDrugs[l], k, x ) - 
+                    inputData.RTG[selDrugs[l]][k]["D" + (x + 1)], 2 );
+    res = Math.sqrt( res );
+    return res;
+  })
+  .palette( ["green", "yellow","red"] )
+  .colourDomain([0, 30]);
+lc.xLine("line", scatterplot)
+  .lineFun( function( x ){
+    return x;
+  })
+  .place( "#scatterplot" );
+var curveFit = lc.scatter( "points" )
+  .width( 300 )
+  .height( 200 )
+  .nelements( 10 )
+  .x( function( k ) {
+    return k % 5;
+  } )
+  .y( function( k ) {
+    var ind = Math.floor( k / 5 );
+    return inputData.RTG[selDrugs[ind]][selCellLine]["D" + (k % 5 + 1)];
+  })
+  .colour( function( k ) {
+    return k > 4 ? "red" : "blue";
+  } );
+lc.xLine("lines", curveFit)
+  .nelements(2)
+  .lineFun( function( x, k ) {
+    return get_curve( selDrugs[k], selCellLine, x );
+  })
+  .colour(function( k ){
+    return k == 0 ? "blue" : "red";
+  })
+  .place( "#scatterplot" );
+</script>
+	<h3>The code for the example</h3>
+	<p>A user of our framework can create apps with very little code. Bellow we show the part of
+	the code that hasn&apos;t been explained in previous examples. You can find the complete code
+	at the bottom of the page.</p>
+	<table><tbody><tr><td valign="top">
+		<pre class="example"><x-expl id="skip"></x-expl><code>...</code>
+<x-expl id=""></x-expl><code class="language-javascript"></code>
+<x-expl id="heatmap"></x-expl><code class="language-javascript">var heatmap = lc.heatmap()</code>
+<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="heatmap"></x-expl><code class="language-javascript">  .place( "#heatmap" );</code>
+<x-expl id=""></x-expl><code class="language-javascript"></code>
+<x-expl id="get_curve"></x-expl><code class="language-javascript">var get_curve = function( drug, cellLine, x ){</code>
+<x-expl id="get_curve"></x-expl><code class="language-javascript">  var max = inputData.RTG[drug][cellLine].max,</code>
+<x-expl id="get_curve"></x-expl><code class="language-javascript">    min = inputData.RTG[drug][cellLine].min,</code>
+<x-expl id="get_curve"></x-expl><code class="language-javascript">    IC50 = inputData.RTG[drug][cellLine].IC50,</code>
+<x-expl id="get_curve"></x-expl><code class="language-javascript">    slope = inputData.RTG[drug][cellLine].Slope,</code>
+<x-expl id="get_curve"></x-expl><code class="language-javascript">    minConc = inputData.RTG[drug][cellLine].minConc;</code>
+<x-expl id=""></x-expl><code class="language-javascript"></code>
+<x-expl id="get_curve"></x-expl><code class="language-javascript">  return min + (max - min)/ </code>
+<x-expl id="get_curve"></x-expl><code class="language-javascript">    (1 + Math.pow(10, -(x - Math.log10(IC50/minConc)) * slope));</code>
+<x-expl id="get_curve"></x-expl><code class="language-javascript">}</code>
+<x-expl id=""></x-expl><code class="language-javascript"></code>
+<x-expl id="scatter"></x-expl><code class="language-javascript">var scatterplot = lc.scatter()</code>
+<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="aspectRatio"></x-expl><code class="language-javascript">  .aspectRatio( 1 )</code>
+<x-expl id="colourValue"></x-expl><code class="language-javascript">  .colourValue( function ( k ) {</code>
+<x-expl id="colourValue"></x-expl><code class="language-javascript">    var res = 0;</code>
+<x-expl id="colourValue"></x-expl><code class="language-javascript">    for( var x = 0; x &lt; 5; x++ )</code>
+<x-expl id="colourValue"></x-expl><code class="language-javascript">      for( var l = 0; l &lt; 2; l++ )</code>
+<x-expl id="colourValue"></x-expl><code class="language-javascript">        res += Math.pow( get_curve( selDrugs[l], k, x ) - </code>
+<x-expl id="colourValue"></x-expl><code class="language-javascript">                    inputData.RTG[selDrugs[l]][k]["D" + (x + 1)], 2 );</code>
+<x-expl id="colourValue"></x-expl><code class="language-javascript">    res = Math.sqrt( res );</code>
+<x-expl id="colourValue"></x-expl><code class="language-javascript">    return res;</code>
+<x-expl id="colourValue"></x-expl><code class="language-javascript">  })</code>
+<x-expl id="palette"></x-expl><code class="language-javascript">  .palette( ["green", "yellow","red"] )</code>
+<x-expl id="colourRange"></x-expl><code class="language-javascript">  .colourDomain([0, 30]);</code>
+<x-expl id="line1"></x-expl><code class="language-javascript">lc.xLine("line", scatterplot)</code>
+<x-expl id="lineFun1"></x-expl><code class="language-javascript">  .lineFun( function( x ){</code>
+<x-expl id="lineFun1"></x-expl><code class="language-javascript">    return x;</code>
+<x-expl id="lineFun1"></x-expl><code class="language-javascript">  })</code>
+<x-expl id="place"></x-expl><code class="language-javascript">  .place( "#scatterplot" );</code>
+<x-expl id=""></x-expl><code class="language-javascript"></code>
+<x-expl id="scatter"></x-expl><code class="language-javascript">var curveFit = lc.scatter( "points" )</code>
+<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="npoints2"></x-expl><code class="language-javascript">  .nelements( 10 )</code>
+<x-expl id="xy"></x-expl><code class="language-javascript">  .x( function( k ) {</code>
+<x-expl id="xy"></x-expl><code class="language-javascript">    return k % 5;</code>
+<x-expl id="xy"></x-expl><code class="language-javascript">  } )</code>
+<x-expl id="xy"></x-expl><code class="language-javascript">  .y( function( k ) {</code>
+<x-expl id="xy"></x-expl><code class="language-javascript">    var ind = Math.floor( k / 5 );</code>
+<x-expl id="xy"></x-expl><code class="language-javascript">    return inputData.RTG[selDrugs[ind]][selCellLine]["D" + (k % 5 + 1)];</code>
+<x-expl id="xy"></x-expl><code class="language-javascript">  })</code>
+<x-expl id="colour1"></x-expl><code class="language-javascript">  .colour( function( k ) {</code>
+<x-expl id="colour1"></x-expl><code class="language-javascript">    return k &gt; 4 ? "red" : "blue";</code>
+<x-expl id="colour1"></x-expl><code class="language-javascript">  } );</code>
+<x-expl id="line2"></x-expl><code class="language-javascript">lc.xLine("lines", curveFit)</code>
+<x-expl id="npoints3"></x-expl><code class="language-javascript">  .nelements(2)</code>
+<x-expl id="lineFun2"></x-expl><code class="language-javascript">  .lineFun( function( x, k ) {</code>
+<x-expl id="lineFun2"></x-expl><code class="language-javascript">    return get_curve( selDrugs[k], selCellLine, x );</code>
+<x-expl id="lineFun2"></x-expl><code class="language-javascript">  })</code>
+<x-expl id="colour2"></x-expl><code class="language-javascript">  .colour(function( k ){</code>
+<x-expl id="colour2"></x-expl><code class="language-javascript">    return k == 0 ? "blue" : "red";</code>
+<x-expl id="colour2"></x-expl><code class="language-javascript">  })</code>
+<x-expl id="place"></x-expl><code class="language-javascript">  .place( "#scatterplot" );</code>
+<x-expl id="skip"></x-expl><code>...</code>
+</pre>
+	</td>
+	<td valign="top" style="padding-left:20px" class="comments">
+
+		<style>
+		div.expl {
+   		display: none;
+   		position: absolute;
+   		background: #ddf;
+   		padding: 10px;
+		}
+		</style>
+
+		<p style="background:#f0fff0; padding:10px" id="bubble">
+			<i>Click on all the yellow bubbles 
+			(<img height="10pt" src="../src/img/bubble_yellow.svg">),
+			going from top to bottom, to see explanations of the code.</i>
+		</p>
+		<br>
+	
+<div class="expl" id="skip">
+<p>Some lines of code, that have been already described in the previous examples, were omitted 
+for the sake of simplicity. At the bottom of the page you can find the complete code.</p>
+</div>
+
+<div class="expl" id="heatmap">
+<p>The <a href="../pages/api.html#heatmap"><code>heatmap</code></a> is set exactly as it was done in the previous example. So here, all its properties were omitted
+for the sake of simplisity</p>
+</div>
+
+<div class="expl" id="get_curve">
+<p>In this dataset for each sample we have all the parameters of the fitted sigmoid curve: the lower asymptote 
+(<code>min</code>), the upper asymptote (<code>max</code>), the growth rate (<code>slope</code>) and the inflection point
+(<code>IC50</code>). Using these parameters, here we define the <code>get_curve</code> function that returns 
+the value of the fitted curve at 
+point <code>x</code>. All drugs were tested at five different concentrations, each 10 times
+higher than the previous one. On the scatter plot x-values are numbers from 0 to 4, which correspond to log10 of each 
+concentration divided by minimal tested concentration.</p>
+</div>
+
+<div class="expl" id="scatter">
+<p>Now both scatter plots are parts of charts that have several layers. Note, that setting an ID for a layer is 
+optional. For instance, the ID of scatter plot layer on the first plot will be automatically set to <code>layer0</code></p>
+</div>
+
+<div class="expl" id="aspectRatio">
+<p>Here, we fix the aspect ratio for x and y axes to 1.</p>
+</div>
+
+<div class="expl" id="colourValue">
+<p>Besides defining colours for each point directly (using <a href="../pages/api.html#layer_colour"><code>colour</code></a> property), one can set colours by providing a 
+value for each data point, so that points with the same colour value will have the same colour. Numeric colour values will 
+generate a continuous colour scale, while strings will define a categorical colour scale.</p>
+<p>Here, for each point we calculate the squared root of sum of squared residuals for the selected cell line and both selected 
+drug and use this value to define colours.</p>
+</div>
+
+<div class="expl" id="palette">
+<p>The default set of colours for a continuous colour scale is <a href="https://github.com/d3/d3-scale-chromatic#schemeSpectral">
+<code>d3.schemeSpectral</code></a>, which goes from red to blue through 
+yellow. You can change that, setting the <a href="../pages/api.html#layer_palette"><code>palette</code></a> property to any other 
+<a href="https://github.com/d3/d3-scale-chromatic">d3.interpolator</a> or any <a href="https://github.com/d3/d3-scale">d3.scale</a>
+that will transform some numeric range or a set of strings into a set of
+colours. Another option is to provide this property with an array of colours as it is shown here. This array will be used as
+a range for the <a href="../pages/api.html#layer_colourScale"><code>colourScale</code></a>. 
+We want "bad" examples to be coloured red, "nice" to be green, suspicious - yellow.</p>
+</div>
+
+<div class="expl" id="colourRange">
+<p>By default the domain of the <a href="../pages/api.html#layer_colourScale"><code>colourScale</code></a> is defined as the range that encompasses all the colour values 
+of the data points. So 
+even if for a certain pair of drugs there is no badly fitted samples, some of the dots still will be coloured red. To address this 
+we can manually defined the domain that will be fixed for all drugs. Now all the points with colour values close to zero 
+will be green, while all with values around 30 and higher - red.</p>
+</div>
+
+<div class="expl" id="line1">
+<p><a href="../pages/api.html#xLine"><code>xLine</code></a> is another basic type of plots that are implemented in the <tt>linked-charts</tt> library. It can display one 
+or several lines, defined as <i>y = f(x)</i> functions. Scatter plots and lines can not be put on one layer, so if you want 
+to have them both on one chart, you need create several layers.</p>
+<p>Here, we add a diagonal line to the plot.</p>
+</div>
+
+<div class="expl" id="line2">
+<p><a href="../pages/api.html#xLine"><code>xLine</code></a> is another basic type of plots that are implemented in the <tt>linked-charts</tt> library. It can display one 
+or several lines, defined as <i>y = f(x)</i> functions. Scatter plots and lines can not be put on one layer, so if you want 
+to have them both on one chart, you need create several layers.</p>
+<p>Here, we add add fitted curves for both drugs to the plot.</p>
+</div>
+
+<div class="expl" id="lineFun1">
+<p>Each line in <a href="../pages/api.html#xLine"><code>xLine</code></a> charts should be defined as <i>y = f(x)</i> function. This is done by setting <a href="lineFun
+property. This should be a function with two arguements: the first one is an x value, the second is an ID of the line.
+The function should return the corresponding y value.">lineFun
+property. This should be a function with two arguements: the first one is an x value, the second is an ID of the line.
+The function should return the corresponding y value.</a></p><a href="
+Here, we have only one line y = x and thus the second argument is omitted.
+">
+<p>Here, we have only one line <i>y = x</i> and thus the second argument is omitted.</p>
+</a></div><a href="
+
+">
+
+</a><div class="expl" id="place"><a href="
+">
+</a><p><a href="The ">The </a><a href="../pages/api.html#chart_place"><code>place</code></a> function inserts the object into the web page. The argument is a CSS selector,
+here selecting the table elements that were marked with <code>id</code> attributes as the places to
+take up the charts.</p>
+<p>Each plot is placed into a separate <code>div</code> element, so one can place several charts into one 
+element. Here, both scatterplots are placed into a single table cell.</p>
+<p>Here, <a href="../pages/api.html#chart_place"><code>place</code></a> is used after all the layers are defined. This is the recomended way to do it. Another option
+is to use the <a href="placeLayer">placeLayer</a> method for each layer added after <a href="../pages/api.html#chart_place"><code>place</code></a> has been 
+called. Note, that calling <a href="../pages/api.html#chart_place"><code>place</code></a> function twice will result in creating multiple instances.</p>
+</div>
+
+<div class="expl" id="npoints2">
+<p>Here, we want to make the same scatter with individual values of inhibition for both selected drugs and all the 
+tested concentrations as in the previous example, but putting all the points on a single layer. So the number of points
+for each case will be 10.</p>
+</div>
+
+<div class="expl" id="npoints3">
+<p>Number of lines is set by the same property as number of points in scatter plots. And in the same manner, instead 
+of setting the number of lines, one can define a set of all IDs via <a href="../pages/api.html#layer_elementIds"><code>elementIds</code></a> property.</p>
+<p>Here, we add two curves (for both selected drugs) sumultaniously.</p>
+</div>
+
+<div class="expl" id="xy">
+<p>In the previous example, points, corresponding to each drug, were added separately, using two layers. Here, we show,
+how to do it in one layer. Now we have 10 points with IDs from 0 to 9. The first five (with IDs from 0 to 4) correspond 
+to the first selected drug, while the second five - to the second selected drug. So we use remainder from devision of 
+the index <code>k</code> by 5 as x value, and the floored value of <code>k / 5</code> as an indicator, which of the 
+two selected drugs we are looking at.</p>
+</div>
+
+<div class="expl" id="colour1">
+<p>In the previous example we used the <a href="../pages/api.html#layer_colour"><code>colour</code></a> property to set one colour for all the points in the 
+layer. Otherwise, the <a href="../pages/api.html#layer_colour"><code>colour</code></a> property can be defined by a callback function that takes an ID of the point  
+returns colour (as name, RGB or HEX value). Note, that setting colours directly via <a href="../pages/api.html#layer_colour"><code>colour</code></a> option overrides 
+<a href="../pages/api.html#layer_colourValue"><code>colourValue</code></a> and <a href="../pages/api.html#layer_palette"><code>palette</code></a> properties.</p>
+<p>Here, if the ID <code>k</code> is greater than 4, the correspoding dot will be red, otherwise - blue.</p>
+</div>
+
+<div class="expl" id="lineFun2">
+<p>Each line in <a href="../pages/api.html#xLine"><code>xLine</code></a> charts should be defined as <i>y = f(x)</i> function. This is done by setting <a href="lineFun
+property. This should be a function with two arguements: the first one is an x value, the second is an ID of the line.
+The function should return the corresponding y value.">lineFun
+property. This should be a function with two arguements: the first one is an x value, the second is an ID of the line.
+The function should return the corresponding y value.</a></p><a href="
+Here, we use the previously defined function get_curve and use the current values of the global variables
+selDrugs and selCellLine to show the right curves.
+">
+<p>Here, we use the previously defined function <code>get_curve</code> and use the current values of the global variables
+<code>selDrugs</code> and <code>selCellLine</code> to show the right curves.</p>
+</a></div><a href="
+
+
+Here, we just make the first line blue and the other - red.
+
+">
+
+<div class="expl" id="colour2">
+<p>Here, we just make the first line blue and the other - red.</p>
+</div>
+</a></td></tr>
+	</tbody></table>
+
+	<div class="fullCode off"><pre><code style="font-size: 16px !important;">Show/hide full code</code></pre></div>
+	<div class="fullCode on hidden">
+		<pre class="fullCode"><code>Show/hide full code</code>
+<code></code>
+<code class="language-html">&lt;script src="linked-charts.min.js"&gt;&lt;/script&gt; </code>
+<code class="language-html">&lt;link rel="stylesheet" type="text/css" href="linked-charts.css"&gt; </code>
+<code class="language-html">&lt;script&gt;</code>
+<code class="language-javascript">  inputData = [{"CellLine":"Pa16C","Drug":"Galunisertib","minConc":1, ...}, ... ];</code>
+<code class="language-html">&lt;/script&gt;</code>
+<code class="language-html">&lt;table&gt;&lt;tr&gt;</code>
+<code class="language-html">  &lt;td id="heatmap" valign="top"&gt;&lt;/td&gt;</code>
+<code class="language-html">  &lt;td id="scatterplot" valign="top"&gt;&lt;/td&gt;</code>
+<code class="language-html">&lt;/tr&gt;&lt;/table&gt;</code>
+<code class="language-html">&lt;script&gt;</code>
+<code class="language-javascript">inputData = lc.separateBy(inputData, ["screen", "Drug", "CellLine"]);</code>
+<code class="language-javascript">var drugs = Object.keys(inputData.RTG),</code>
+<code class="language-javascript">  cellLines = Object.keys(inputData.RTG[drugs[0]]);</code>
+<code class="language-javascript">var selDrugs = [drugs[0], drugs[1]],</code>
+<code class="language-javascript">  selCellLine = cellLines[0];</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">var heatmap = lc.heatmap()</code>
+<code class="language-javascript">  .rowIds( drugs )</code>
+<code class="language-javascript">  .colIds( drugs )</code>
+<code class="language-javascript">  .colourDomain( [ -1, 1 ] )</code>
+<code class="language-javascript">  .palette( d3.interpolateRdBu )</code>
+<code class="language-javascript">  .margins({top: 50, left: 50, right: 100, bottom: 100})</code>
+<code class="language-javascript">  .value( function( rowId, colId ) {</code>
+<code class="language-javascript">    var rowValues = cellLines.map(function(e) {</code>
+<code class="language-javascript">        return inputData.RTG[rowId][e].avInh;</code>
+<code class="language-javascript">      }),</code>
+<code class="language-javascript">      colValues = cellLines.map(function(e) {</code>
+<code class="language-javascript">        return inputData.RTG[colId][e].avInh;</code>
+<code class="language-javascript">      });</code>
+<code class="language-javascript">    return lc.pearsonCorr( rowValues, colValues );</code>
+<code class="language-javascript">   })</code>
+<code class="language-javascript">  .cluster( "Row" )</code>
+<code class="language-javascript">  .cluster( "Col" )</code>
+<code class="language-javascript">  .on_click( function( rowId, colId ) {</code>
+<code class="language-javascript">     selDrugs = [rowId, colId]</code>
+<code class="language-javascript">     scatterplot.update();</code>
+<code class="language-javascript">     curveFit.update();</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .place( "#heatmap" );</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">var get_curve = function( drug, cellLine, x ){</code>
+<code class="language-javascript">  var max = inputData.RTG[drug][cellLine].max,</code>
+<code class="language-javascript">    min = inputData.RTG[drug][cellLine].min,</code>
+<code class="language-javascript">    IC50 = inputData.RTG[drug][cellLine].IC50,</code>
+<code class="language-javascript">    slope = inputData.RTG[drug][cellLine].Slope,</code>
+<code class="language-javascript">    minConc = inputData.RTG[drug][cellLine].minConc;</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">  return min + (max - min)/ </code>
+<code class="language-javascript">    (1 + Math.pow(10, -(x - Math.log10(IC50/minConc)) * slope));</code>
+<code class="language-javascript">}</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">var scatterplot = lc.scatter()</code>
+<code class="language-javascript">  .width( 300 )</code>
+<code class="language-javascript">  .height( 300 )</code>
+<code class="language-javascript">  .elementIds( cellLines )</code>
+<code class="language-javascript">  .x( function( k ) { return inputData.RTG[selDrugs[0]][k].avInh } )</code>
+<code class="language-javascript">  .y( function( k ) { return inputData.RTG[selDrugs[1]][k].avInh } )</code>
+<code class="language-javascript">  .on_click( function( k ) {</code>
+<code class="language-javascript">    selCellLine = k;</code>
+<code class="language-javascript">    curveFit.update();</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .aspectRatio( 1 )</code>
+<code class="language-javascript">  .colourValue( function ( k ) {</code>
+<code class="language-javascript">    var res = 0;</code>
+<code class="language-javascript">    for( var x = 0; x &lt; 5; x++ )</code>
+<code class="language-javascript">      for( var l = 0; l &lt; 2; l++ )</code>
+<code class="language-javascript">        res += Math.pow( get_curve( selDrugs[l], k, x ) - </code>
+<code class="language-javascript">                    inputData.RTG[selDrugs[l]][k]["D" + (x + 1)], 2 );</code>
+<code class="language-javascript">    res = Math.sqrt( res );</code>
+<code class="language-javascript">    return res;</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .palette( ["green", "yellow","red"] )</code>
+<code class="language-javascript">  .colourDomain([0, 30]);</code>
+<code class="language-javascript">lc.xLine("line", scatterplot)</code>
+<code class="language-javascript">  .lineFun( function( x ){</code>
+<code class="language-javascript">    return x;</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .place( "#scatterplot" );</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">var curveFit = lc.scatter( "points" )</code>
+<code class="language-javascript">  .width( 300 )</code>
+<code class="language-javascript">  .height( 200 )</code>
+<code class="language-javascript">  .nelements( 10 )</code>
+<code class="language-javascript">  .x( function( k ) {</code>
+<code class="language-javascript">    return k % 5;</code>
+<code class="language-javascript">  } )</code>
+<code class="language-javascript">  .y( function( k ) {</code>
+<code class="language-javascript">    var ind = Math.floor( k / 5 );</code>
+<code class="language-javascript">    return inputData.RTG[selDrugs[ind]][selCellLine]["D" + (k % 5 + 1)];</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .colour( function( k ) {</code>
+<code class="language-javascript">    return k &gt; 4 ? "red" : "blue";</code>
+<code class="language-javascript">  } );</code>
+<code class="language-javascript">lc.xLine("lines", curveFit)</code>
+<code class="language-javascript">  .nelements(2)</code>
+<code class="language-javascript">  .lineFun( function( x, k ) {</code>
+<code class="language-javascript">    return get_curve( selDrugs[k], selCellLine, x );</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .colour(function( k ){</code>
+<code class="language-javascript">    return k == 0 ? "blue" : "red";</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .place( "#scatterplot" );</code>
+<code class="language-html">&lt;/script&gt;</code>
+</pre>
+	</div>
+
+	<script>
+	d3.select("head")
+		.select("title")
+			.text(d3.select(".description")
+							.select("h1").text());
+
+	d3.selectAll( "x-expl" )
+	  .append( "img" )
+	    .attr( "height", "10pt" )
+	    .attr( "class", "bubble_icon" )
+	    .attr( "src", "../src/img/bubble_yellow.svg" )
+	    .style( "padding-right", "15px")
+	    .on( "click", function() {
+	      d3.selectAll( "div.expl" )
+	        .style( "display", "none" );
+	      d3.selectAll( "img.bubble_icon" )
+	        .attr( "src", "../src/img/bubble_yellow.svg")
+	      var tagId = d3.select(this.parentNode).attr("id");
+	      d3.select( "div.expl#" + tagId )
+	        .style( "display", "block" )
+	        .style("width", d3.select("#bubble").node().getBoundingClientRect().width)
+	      d3.selectAll( "x-expl#" + tagId ).select("img.bubble_icon")
+	        .attr( "src", "../src/img/bubble_red.svg")
+	    });
+
+	d3.select("div.fullCode.off")
+		.on("click", function() {
+			d3.select(this).classed("hidden", true);
+			d3.select("div.fullCode.on").classed("hidden", false);
+		});
+	d3.select("div.fullCode.on")
+		.on("click", function() {
+			d3.select(this).classed("hidden", true);
+			d3.select("div.fullCode.off").classed("hidden", false);
+		})
+
+	</script>
+
+</div>
+
+</body></html>
