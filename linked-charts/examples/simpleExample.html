@@ -40,52 +40,54 @@ point representing one sample.</p>
 data element is a prototypical use case of <i>linked-charts</i>.</p>
 </div>
 	<script class="input" src="../src/data/inputdata_simple.js"></script>
-	<div class="layout"><table><tbody><tr><td id="heatmap" valign="top"></td><td id="scatterplot" valign="top"></td></tr></tbody></table></div>
+	<div class="layout"><table><tbody><tr>  <td id="heatmap" valign="top"></td>  <td id="scatterplot" valign="top"></td></tr></tbody></table></div>
 	<script class="code">var selGene = 0;
 var selDrug = 0;
 var scatterplot = lc.scatter()
-.x( function( k ) { return geneExprs[selGene][k] } )
-.y( function( k ) { return drugScores[selDrug][k] } )
-.place("#scatterplot");
+  .x( function( k ) { return geneExprs[selGene][k] } )
+  .y( function( k ) { return drugScores[selDrug][k] } )
+  .place("#scatterplot");
 var heatmap = lc.heatmap()
-.nrows( geneNames.length )
-.ncols( drugNames.length )
-.height( 650 )
-.width( 400 )
-.colourDomain( [ -1, 1 ] )
-.palette( d3.interpolateRdBu )
-.value( function( row, col ) {
-return lc.pearsonCorr( geneExprs[row], drugScores[col] )
-} )
-.rowLabel( function(row) {
-return geneNames[row]
-} )
-.colLabel( function(col) {
-return drugNames[col]
-} )
-.on_click( function( rowId, colId ) {
-selGene = rowId;
-selDrug = colId;
-scatterplot.update();
-})
-.place( "#heatmap")
+  .nrows( geneNames.length )
+  .ncols( drugNames.length )
+  .height( 650 )
+  .width( 400 )
+  .colourDomain( [ -1, 1 ] )
+  .palette( d3.interpolateRdBu )
+  .value( function( row, col ) {
+     return lc.pearsonCorr( geneExprs[row], drugScores[col] )
+   } )
+  .rowLabel( function(row) {
+     return geneNames[row]
+   } )
+  .colLabel( function(col) {
+     return drugNames[col]
+   } )
+  .on_click( function( rowId, colId ) {
+     selGene = rowId;
+     selDrug = colId;
+     scatterplot.update();
+  })
+  .place( "#heatmap")
 </script>
 	<h3>The code for the example</h3>
-	<p>A user of our framework can create apps with very little code. The following is the complete code needed to create the app above, with comments.</p>
+	<p>A user of our framework can create apps with very little code. Bellow we show the part of
+	the code that hasn&apos;t been explained in previous examples. You can find the complete code
+	at the bottom of the page.</p>
 	<table><tbody><tr><td valign="top">
 		<pre class="example"><x-expl id="loadlib"></x-expl><code class="language-html">&lt;script src="linked-charts.min.js"&gt;&lt;/script&gt; </code>
 <x-expl id="loadlib"></x-expl><code class="language-html">&lt;link rel="stylesheet" type="text/css" href="linked-charts.css"&gt; </code>
 <x-expl id=""></x-expl><code class="language-javascript"></code>
 <x-expl id="inputdata"></x-expl><code class="language-html">&lt;script&gt;</code>
-<x-expl id="labelVectors"></x-expl><code class="language-javascript">geneNames = [ "CD248", "CA6", ... , "PDGFB" ]</code>
-<x-expl id="matrices"></x-expl><code class="language-javascript">geneExprs = [ [ 4.3119, 3.1594, ... , 3.516] , [ ... ], ... ]</code>
-<x-expl id="labelVectors"></x-expl><code class="language-javascript">drugNames = [ "Irinotecan", "Topotecan", ..., "Valrubicin" ]</code>
-<x-expl id="matrices"></x-expl><code class="language-javascript">drugScores = [ [ 3.2, 0.1, 0, 4.6, ... ], [ ... ], ... ]</code>
+<x-expl id="labelVectors"></x-expl><code class="language-javascript">  geneNames = [ "CD248", "CA6", ... , "PDGFB" ]</code>
+<x-expl id="matrices"></x-expl><code class="language-javascript">  geneExprs = [ [ 4.3119, 3.1594, ... , 3.516] , [ ... ], ... ]</code>
+<x-expl id="labelVectors"></x-expl><code class="language-javascript">  drugNames = [ "Irinotecan", "Topotecan", ..., "Valrubicin" ]</code>
+<x-expl id="matrices"></x-expl><code class="language-javascript">  drugScores = [ [ 3.2, 0.1, 0, 4.6, ... ], [ ... ], ... ]</code>
 <x-expl id="inputdata"></x-expl><code class="language-html">&lt;/script&gt;</code>
 <x-expl id=""></x-expl><code class="language-javascript"></code>
 <x-expl id="table"></x-expl><code class="language-html">&lt;table&gt;&lt;tr&gt;</code>
-<x-expl id="table"></x-expl><code class="language-html">&lt;td id="heatmap" valign="top"&gt;&lt;/td&gt;</code>
-<x-expl id="table"></x-expl><code class="language-html">&lt;td id="scatterplot" valign="top"&gt;&lt;/td&gt;</code>
+<x-expl id="table"></x-expl><code class="language-html">  &lt;td id="heatmap" valign="top"&gt;&lt;/td&gt;</code>
+<x-expl id="table"></x-expl><code class="language-html">  &lt;td id="scatterplot" valign="top"&gt;&lt;/td&gt;</code>
 <x-expl id="table"></x-expl><code class="language-html">&lt;/tr&gt;&lt;/table&gt;</code>
 <x-expl id=""></x-expl><code class="language-javascript"></code>
 <x-expl id="mainscript"></x-expl><code class="language-html">&lt;script&gt;</code>
@@ -94,32 +96,32 @@ scatterplot.update();
 <x-expl id="vars"></x-expl><code class="language-javascript">var selDrug = 0;</code>
 <x-expl id=""></x-expl><code class="language-javascript"></code>
 <x-expl id="scatter1"></x-expl><code class="language-javascript">var scatterplot = lc.scatter()</code>
-<x-expl id="xy"></x-expl><code class="language-javascript">.x( function( k ) { return geneExprs[selGene][k] } )</code>
-<x-expl id="xy"></x-expl><code class="language-javascript">.y( function( k ) { return drugScores[selDrug][k] } )</code>
-<x-expl id="place"></x-expl><code class="language-javascript">.place("#scatterplot");</code>
+<x-expl id="xy"></x-expl><code class="language-javascript">  .x( function( k ) { return geneExprs[selGene][k] } )</code>
+<x-expl id="xy"></x-expl><code class="language-javascript">  .y( function( k ) { return drugScores[selDrug][k] } )</code>
+<x-expl id="place"></x-expl><code class="language-javascript">  .place("#scatterplot");</code>
 <x-expl id=""></x-expl><code class="language-javascript"></code>
 <x-expl id="heatmap1"></x-expl><code class="language-javascript">var heatmap = lc.heatmap()</code>
-<x-expl id="hm_prop"></x-expl><code class="language-javascript">.nrows( geneNames.length )</code>
-<x-expl id="hm_prop"></x-expl><code class="language-javascript">.ncols( drugNames.length )</code>
-<x-expl id="hm_prop"></x-expl><code class="language-javascript">.height( 650 )</code>
-<x-expl id="hm_prop"></x-expl><code class="language-javascript">.width( 400 )</code>
-<x-expl id="hm_col"></x-expl><code class="language-javascript">.colourDomain( [ -1, 1 ] )</code>
-<x-expl id="hm_col"></x-expl><code class="language-javascript">.palette( d3.interpolateRdBu )</code>
-<x-expl id="hm_value"></x-expl><code class="language-javascript">.value( function( row, col ) {</code>
-<x-expl id="hm_value"></x-expl><code class="language-javascript">return lc.pearsonCorr( geneExprs[row], drugScores[col] )</code>
-<x-expl id="hm_value"></x-expl><code class="language-javascript">} )</code>
-<x-expl id="rowcolnames"></x-expl><code class="language-javascript">.rowLabel( function(row) {</code>
-<x-expl id="rowcolnames"></x-expl><code class="language-javascript">return geneNames[row]</code>
-<x-expl id="rowcolnames"></x-expl><code class="language-javascript">} )</code>
-<x-expl id="rowcolnames"></x-expl><code class="language-javascript">.colLabel( function(col) {</code>
-<x-expl id="rowcolnames"></x-expl><code class="language-javascript">return drugNames[col]</code>
-<x-expl id="rowcolnames"></x-expl><code class="language-javascript">} )</code>
-<x-expl id="click"></x-expl><code class="language-javascript">.on_click( function( rowId, colId ) {</code>
-<x-expl id="click"></x-expl><code class="language-javascript">selGene = rowId;</code>
-<x-expl id="click"></x-expl><code class="language-javascript">selDrug = colId;</code>
-<x-expl id="click"></x-expl><code class="language-javascript">scatterplot.update();</code>
-<x-expl id="click"></x-expl><code class="language-javascript">})</code>
-<x-expl id="place"></x-expl><code class="language-javascript">.place( "#heatmap")</code>
+<x-expl id="hm_prop"></x-expl><code class="language-javascript">  .nrows( geneNames.length )</code>
+<x-expl id="hm_prop"></x-expl><code class="language-javascript">  .ncols( drugNames.length )</code>
+<x-expl id="hm_prop"></x-expl><code class="language-javascript">  .height( 650 )</code>
+<x-expl id="hm_prop"></x-expl><code class="language-javascript">  .width( 400 )</code>
+<x-expl id="hm_col"></x-expl><code class="language-javascript">  .colourDomain( [ -1, 1 ] )</code>
+<x-expl id="hm_col"></x-expl><code class="language-javascript">  .palette( d3.interpolateRdBu )</code>
+<x-expl id="hm_value"></x-expl><code class="language-javascript">  .value( function( row, col ) {</code>
+<x-expl id="hm_value"></x-expl><code class="language-javascript">     return lc.pearsonCorr( geneExprs[row], drugScores[col] )</code>
+<x-expl id="hm_value"></x-expl><code class="language-javascript">   } )</code>
+<x-expl id="rowcolnames"></x-expl><code class="language-javascript">  .rowLabel( function(row) {</code>
+<x-expl id="rowcolnames"></x-expl><code class="language-javascript">     return geneNames[row]</code>
+<x-expl id="rowcolnames"></x-expl><code class="language-javascript">   } )</code>
+<x-expl id="rowcolnames"></x-expl><code class="language-javascript">  .colLabel( function(col) {</code>
+<x-expl id="rowcolnames"></x-expl><code class="language-javascript">     return drugNames[col]</code>
+<x-expl id="rowcolnames"></x-expl><code class="language-javascript">   } )</code>
+<x-expl id="click"></x-expl><code class="language-javascript">  .on_click( function( rowId, colId ) {</code>
+<x-expl id="click"></x-expl><code class="language-javascript">     selGene = rowId;</code>
+<x-expl id="click"></x-expl><code class="language-javascript">     selDrug = colId;</code>
+<x-expl id="click"></x-expl><code class="language-javascript">     scatterplot.update();</code>
+<x-expl id="click"></x-expl><code class="language-javascript">  })</code>
+<x-expl id="place"></x-expl><code class="language-javascript">  .place( "#heatmap")</code>
 <x-expl id="mainscript"></x-expl><code class="language-html">&lt;/script&gt;</code>
 </pre>
 	</td>
@@ -255,6 +257,61 @@ data or appearance of a plot changed and the plot has to be re-rendered.</p>
 </td></tr>
 	</tbody></table>
 
+	<div class="fullCode off"><pre><code style="font-size: 16px !important;">Show/hide full code</code></pre></div>
+	<div class="fullCode on hidden">
+		<pre class="fullCode"><code>Show/hide full code</code>
+<code></code>
+<code class="language-html">&lt;script src="linked-charts.min.js"&gt;&lt;/script&gt; </code>
+<code class="language-html">&lt;link rel="stylesheet" type="text/css" href="linked-charts.css"&gt; </code>
+<code class="language-javascript"></code>
+<code class="language-html">&lt;script&gt;</code>
+<code class="language-javascript">  geneNames = [ "CD248", "CA6", ... , "PDGFB" ]</code>
+<code class="language-javascript">  geneExprs = [ [ 4.3119, 3.1594, ... , 3.516] , [ ... ], ... ]</code>
+<code class="language-javascript">  drugNames = [ "Irinotecan", "Topotecan", ..., "Valrubicin" ]</code>
+<code class="language-javascript">  drugScores = [ [ 3.2, 0.1, 0, 4.6, ... ], [ ... ], ... ]</code>
+<code class="language-html">&lt;/script&gt;</code>
+<code class="language-javascript"></code>
+<code class="language-html">&lt;table&gt;&lt;tr&gt;</code>
+<code class="language-html">  &lt;td id="heatmap" valign="top"&gt;&lt;/td&gt;</code>
+<code class="language-html">  &lt;td id="scatterplot" valign="top"&gt;&lt;/td&gt;</code>
+<code class="language-html">&lt;/tr&gt;&lt;/table&gt;</code>
+<code class="language-javascript"></code>
+<code class="language-html">&lt;script&gt;</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">var selGene = 0;</code>
+<code class="language-javascript">var selDrug = 0;</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">var scatterplot = lc.scatter()</code>
+<code class="language-javascript">  .x( function( k ) { return geneExprs[selGene][k] } )</code>
+<code class="language-javascript">  .y( function( k ) { return drugScores[selDrug][k] } )</code>
+<code class="language-javascript">  .place("#scatterplot");</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">var heatmap = lc.heatmap()</code>
+<code class="language-javascript">  .nrows( geneNames.length )</code>
+<code class="language-javascript">  .ncols( drugNames.length )</code>
+<code class="language-javascript">  .height( 650 )</code>
+<code class="language-javascript">  .width( 400 )</code>
+<code class="language-javascript">  .colourDomain( [ -1, 1 ] )</code>
+<code class="language-javascript">  .palette( d3.interpolateRdBu )</code>
+<code class="language-javascript">  .value( function( row, col ) {</code>
+<code class="language-javascript">     return lc.pearsonCorr( geneExprs[row], drugScores[col] )</code>
+<code class="language-javascript">   } )</code>
+<code class="language-javascript">  .rowLabel( function(row) {</code>
+<code class="language-javascript">     return geneNames[row]</code>
+<code class="language-javascript">   } )</code>
+<code class="language-javascript">  .colLabel( function(col) {</code>
+<code class="language-javascript">     return drugNames[col]</code>
+<code class="language-javascript">   } )</code>
+<code class="language-javascript">  .on_click( function( rowId, colId ) {</code>
+<code class="language-javascript">     selGene = rowId;</code>
+<code class="language-javascript">     selDrug = colId;</code>
+<code class="language-javascript">     scatterplot.update();</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .place( "#heatmap")</code>
+<code class="language-html">&lt;/script&gt;</code>
+</pre>
+	</div>
+
 	<script>
 	d3.select("head")
 		.select("title")
@@ -263,22 +320,34 @@ data or appearance of a plot changed and the plot has to be re-rendered.</p>
 
 	d3.selectAll( "x-expl" )
 	  .append( "img" )
-	      .attr( "height", "10pt" )
-	      .attr( "class", "bubble_icon" )
-	      .attr( "src", "../src/img/bubble_yellow.svg" )
-	      .style( "padding-right", "15px")
-	      .on( "click", function() {
-	      	  d3.selectAll( "div.expl" )
-	      	     .style( "display", "none" );
-	          d3.selectAll( "img.bubble_icon" )
-	             .attr( "src", "../src/img/bubble_yellow.svg")
-	      	  var tagId = d3.select(this.parentNode).attr("id");
-	      	  d3.select( "div.expl#" + tagId )
-	      	     .style( "display", "block" )
-	      	     .style("width", d3.select("#bubble").node().getBoundingClientRect().width)
-	          d3.selectAll( "x-expl#" + tagId ).select("img.bubble_icon")
-	             .attr( "src", "../src/img/bubble_red.svg")
-	       })
+	    .attr( "height", "10pt" )
+	    .attr( "class", "bubble_icon" )
+	    .attr( "src", "../src/img/bubble_yellow.svg" )
+	    .style( "padding-right", "15px")
+	    .on( "click", function() {
+	      d3.selectAll( "div.expl" )
+	        .style( "display", "none" );
+	      d3.selectAll( "img.bubble_icon" )
+	        .attr( "src", "../src/img/bubble_yellow.svg")
+	      var tagId = d3.select(this.parentNode).attr("id");
+	      d3.select( "div.expl#" + tagId )
+	        .style( "display", "block" )
+	        .style("width", d3.select("#bubble").node().getBoundingClientRect().width)
+	      d3.selectAll( "x-expl#" + tagId ).select("img.bubble_icon")
+	        .attr( "src", "../src/img/bubble_red.svg")
+	    });
+
+	d3.select("div.fullCode.off")
+		.on("click", function() {
+			d3.select(this).classed("hidden", true);
+			d3.select("div.fullCode.on").classed("hidden", false);
+		});
+	d3.select("div.fullCode.on")
+		.on("click", function() {
+			d3.select(this).classed("hidden", true);
+			d3.select("div.fullCode.off").classed("hidden", false);
+		})
+
 	</script>
 
 </div>
