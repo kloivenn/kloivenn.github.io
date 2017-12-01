@@ -50,7 +50,7 @@ var heatmap = lc.heatmap()
   .cluster( "Row" )
   .cluster( "Col" )
   .on_click( function( rowId, colId ) {
-     selDrugs = [rowId, colId]
+     selDrugs = [rowId, colId];
      scatterplot.update();
      curveFit.update();
   })
@@ -121,7 +121,6 @@ lc.xLine("lines", curveFit)
 	at the bottom of the page.</p>
 	<table><tbody><tr><td valign="top">
 		<pre class="example"><x-expl id="skip"></x-expl><code>...</code>
-<x-expl id=""></x-expl><code class="language-javascript"></code>
 <x-expl id="heatmap"></x-expl><code class="language-javascript">var heatmap = lc.heatmap()</code>
 <x-expl id="skip"></x-expl><code>...</code>
 <x-expl id="heatmap"></x-expl><code class="language-javascript">  .place( "#heatmap" );</code>
@@ -353,17 +352,21 @@ Here, we just make the first line blue and the other - red.
 <code></code>
 <code class="language-html">&lt;script src="linked-charts.min.js"&gt;&lt;/script&gt; </code>
 <code class="language-html">&lt;link rel="stylesheet" type="text/css" href="linked-charts.css"&gt; </code>
+<code class="language-javascript"></code>
 <code class="language-html">&lt;script&gt;</code>
 <code class="language-javascript">  inputData = [{"CellLine":"Pa16C","Drug":"Galunisertib","minConc":1, ...}, ... ];</code>
 <code class="language-html">&lt;/script&gt;</code>
+<code class="language-javascript"></code>
 <code class="language-html">&lt;table&gt;&lt;tr&gt;</code>
 <code class="language-html">  &lt;td id="heatmap" valign="top"&gt;&lt;/td&gt;</code>
 <code class="language-html">  &lt;td id="scatterplot" valign="top"&gt;&lt;/td&gt;</code>
 <code class="language-html">&lt;/tr&gt;&lt;/table&gt;</code>
+<code class="language-javascript"></code>
 <code class="language-html">&lt;script&gt;</code>
 <code class="language-javascript">inputData = lc.separateBy(inputData, ["screen", "Drug", "CellLine"]);</code>
 <code class="language-javascript">var drugs = Object.keys(inputData.RTG),</code>
 <code class="language-javascript">  cellLines = Object.keys(inputData.RTG[drugs[0]]);</code>
+<code class="language-javascript"></code>
 <code class="language-javascript">var selDrugs = [drugs[0], drugs[1]],</code>
 <code class="language-javascript">  selCellLine = cellLines[0];</code>
 <code class="language-javascript"></code>
@@ -385,7 +388,7 @@ Here, we just make the first line blue and the other - red.
 <code class="language-javascript">  .cluster( "Row" )</code>
 <code class="language-javascript">  .cluster( "Col" )</code>
 <code class="language-javascript">  .on_click( function( rowId, colId ) {</code>
-<code class="language-javascript">     selDrugs = [rowId, colId]</code>
+<code class="language-javascript">     selDrugs = [rowId, colId];</code>
 <code class="language-javascript">     scatterplot.update();</code>
 <code class="language-javascript">     curveFit.update();</code>
 <code class="language-javascript">  })</code>
