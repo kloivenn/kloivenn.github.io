@@ -36,6 +36,7 @@ var heatmap = lc.heatmap()
   .rowIds( drugs )
   .colIds( drugs )
   .colourDomain( [ -1, 1 ] )
+  .margins({top: 50, left: 50, right: 100, bottom: 100})
   .value( function( rowId, colId ) {
     var rowValues = cellLines.map(function(e) {
         return inputData.RTG[rowId][e].avInh;
@@ -319,6 +320,7 @@ with the corresponding layer and is automatically removed, when the layer is rem
 <code class="language-javascript">  .rowIds( drugs )</code>
 <code class="language-javascript">  .colIds( drugs )</code>
 <code class="language-javascript">  .colourDomain( [ -1, 1 ] )</code>
+<code class="language-javascript">  .margins({top: 50, left: 50, right: 100, bottom: 100})</code>
 <code class="language-javascript">  .value( function( rowId, colId ) {</code>
 <code class="language-javascript">    var rowValues = cellLines.map(function(e) {</code>
 <code class="language-javascript">        return inputData.RTG[rowId][e].avInh;</code>

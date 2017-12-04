@@ -1,0 +1,511 @@
+<html><head>
+<title></title>
+<script src="../src/linked-charts.min.js"></script>
+<link rel="stylesheet" type="text/css" href="../src/linked-charts.css">
+<link rel="stylesheet" type="text/css" href="../src/default.css">
+<link rel="stylesheet" href="../src/prism.css">
+<script src="../src/prism.js"></script>
+</head>
+
+<body>
+<script src="../src/navTop.js"></script>
+<div class="contentContainer">
+	<div class="description">
+<h1>Adding a colour slider</h1>
+<p>This is the last of the series of examples, where we step by step introduce new chart properties for the
+same set of charts.</p>
+<p>Here, we replace the default static <a href="../pages/api.html#legend"><code>legend</code></a> with an interactive one. A <a href="../pages/api.html#colourSlider"><code>colourSlider</code></a>
+is a special type of chart that transforms any given colour scale with a sigmoind function, alloeing the user to change its slope and midpoint. As a result, it allows to change contrast,
+domain and the midpoint of ther colour scale.</p>
+<p>The data used here are generated in a drug-screening experiment. 50 drugs at 5 different concentrations 
+were tested against 21 pancreatic cancer cell lines. The heatmap shows drug-drug correlation. Like in the 
+previous example, a click on a cell of the heatmap reveals the underlying statistics by demonstrating on 
+the scatter plot (right upper corner) the values of avarage inhibition for all tested cell lines and the two
+selected drugs. By clicking on a data point one can select a cell line, and thus change the third plot 
+(right bottom corner) that demonstrates individual inhibition percent values for the two selected drugs and 
+the selected cell line.</p>
+</div>
+	<script class="input" src="../src/data/inputdata.js"></script>
+	<div class="layout"><table><tbody><tr>  <td id="heatmap" valign="top"></td>  <td id="scatterplot" valign="top"></td></tr></tbody></table></div>
+	<script class="code">inputData = lc.separateBy(inputData, ["screen", "Drug", "CellLine"]);
+var drugs = Object.keys(inputData.RTG),
+  cellLines = Object.keys(inputData.RTG[drugs[0]]);
+var selDrugs = [drugs[0], drugs[1]],
+  selCellLine = cellLines[0];
+var heatmap = lc.heatmap()
+  .rowIds( drugs )
+  .colIds( drugs )
+  .title( "Drug-drug correlation" )
+  .colourDomain( [ -1, 1 ] )
+  .margins({top: 50, left: 50, right: 100, bottom: 100})
+  .palette( function( val ) { return d3.interpolateRdBu( 1 - val ); } )
+  .value( function( rowId, colId ) {  
+    var rowValues = cellLines.map(function( e ) {
+        return inputData.RTG[rowId][e].avInh;
+      }),
+      colValues = cellLines.map(function( e ) {
+        return inputData.RTG[colId][e].avInh;
+      });
+    return lc.pearsonCorr( rowValues, colValues ); 
+   })
+  .on_click( function( rowId, colId ) {
+     selDrugs = [rowId, colId]
+     scatterplot.update();
+     curveFit.update();
+  })
+  .cluster( "Row" )
+  .cluster( "Col" )
+  .showLegend( false )
+  .place( "#heatmap" );
+var heatmapSlider = lc.colourSlider()
+	.straightColourScale( heatmap.colourScale )
+	.on_change(function(){
+		heatmap.updateCellColour();
+	})
+  .place( "#heatmap" );
+heatmap.colour( function( val ){
+	return heatmapSlider.colourScale( val );
+} );
+var get_curve = function( drug, cellLine, x ){
+  var max = inputData.RTG[drug][cellLine].max,
+    min = inputData.RTG[drug][cellLine].min,
+    IC50 = inputData.RTG[drug][cellLine].IC50,
+    slope = inputData.RTG[drug][cellLine].Slope,
+    minConc = inputData.RTG[drug][cellLine].minConc;
+  return min + ( max - min )/ 
+    (1 + Math.pow( 10, - ( x - Math.log10( IC50/minConc ) ) * slope));
+}
+var scatterplot = lc.scatter()
+  .width( 300 )
+  .height( 300 )
+  .elementIds( cellLines )
+  .x( function( k ) { return inputData.RTG[selDrugs[0]][k].avInh } )
+  .y( function( k ) { return inputData.RTG[selDrugs[1]][k].avInh } )
+  .axisTitleX( function() {return selDrugs[0]} )
+  .axisTitleY( function() {return selDrugs[1]} )
+  .title( "Average inhibition" )
+  .domainX( [-10, 50] )
+  .domainY( [-10, 50] )
+  .palette( ["green", "yellow","red"] )
+  .colourValue( function( k ) { 
+    var res = 0;
+    for( var x = 0; x < 5; x++ )
+      for( var l = 0; l < 2; l++ )
+        res += Math.pow( get_curve( selDrugs[l], k, x ) - 
+                    inputData.RTG[selDrugs[l]][k]["D" + (x + 1)], 2 ); 
+    res = Math.sqrt( res );
+    return res;
+  })
+  .colourDomain( [ 0, 30 ] ) 
+  .on_click( function( k ) {
+    selCellLine = k; 
+    curveFit.update();
+  })
+  .showLegend( false );
+lc.xLine( "line", scatterplot )
+  .lineFun( function( x ){ 
+    return x;
+  })
+  .place( "#scatterplot" );
+var layer = scatterplot.get_layer( "layer0" );
+var scatterSlider = lc.colourSlider()
+	.width( 300 )
+	.height( 110 )
+	.set_margins( {top: 50} )
+	.title( "Total curvefitting error" )
+	.straightColourScale( layer.colourScale )
+	.on_change( function(){
+		layer.updateElementStyle();
+	} )
+  .place( "#scatterplot" );
+layer.colour(function( id ){ 
+	return scatterSlider.colourScale( layer.get_colourValue( id ) );
+});
+var curveFit = lc.scatter( "points" )
+  .width( 300 )
+  .height( 200 )
+  .nelements( 10 )
+  .title( function() {return selCellLine;} )
+  .axisTitleX( "Drug concentration" )
+  .axisTitleY( "Inhibition" )
+  .domainY( [-25, 100] )
+  .ticksX( function() {
+    var ticks = [d3.range( 5 ), 
+      d3.range( 5 ).map( function( e ) {
+        return inputData.RTG[selDrugs[0]][selCellLine].minConc * 
+                Math.pow( 10, e )
+      } ),
+      d3.range( 5 ).map( function( e ) {
+        return inputData.RTG[selDrugs[1]][selCellLine].minConc * 
+                Math.pow( 10, e )
+      })];
+    ticks.colour = ["blue", "red"];
+    return ticks;
+  })
+  .x( function( k ) {
+    return k % 5;
+  } )
+  .y( function( k ) {
+    var ind = Math.floor( k / 5 );
+    return inputData.RTG[selDrugs[ind]][selCellLine]["D" + (k % 5 + 1)];
+  })
+  .colour( function( k ) {
+    return k > 4 ? "red" : "blue";
+  } );
+lc.xLine( "lines", curveFit )
+  .nelements( 2 )
+  .lineFun( function( x, k ) {
+    return get_curve( selDrugs[k], selCellLine, x );
+  })
+  .colour(function( k ){
+    return k == 0 ? "blue" : "red";
+  })
+  .place( "#scatterplot" );
+curveFit.legend.add_block(function() {return [selDrugs, ["blue", "red"]];},
+                      "colour", "Drugs");
+</script>
+	<h3>The code for the example</h3>
+	<p>A user of our framework can create apps with very little code. Bellow we show the part of
+	the code that hasn&apos;t been explained in previous examples. You can find the complete code
+	at the bottom of the page.</p>
+	<table><tbody><tr><td valign="top">
+		<pre class="example"><x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="scatter"></x-expl><code class="language-javascript">var heatmap = lc.heatmap()</code>
+<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="showLegend"></x-expl><code class="language-javascript">  .showLegend( false )</code>
+<x-expl id="scatter"></x-expl><code class="language-javascript">  .place( "#heatmap" );</code>
+<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="colourSlider"></x-expl><code class="language-javascript">var heatmapSlider = lc.colourSlider()</code>
+<x-expl id="straightColorScale"></x-expl><code class="language-javascript">	.straightColourScale( heatmap.colourScale )</code>
+<x-expl id="on_change"></x-expl><code class="language-javascript">	.on_change(function(){</code>
+<x-expl id="on_change"></x-expl><code class="language-javascript">		heatmap.updateCellColour();</code>
+<x-expl id="on_change"></x-expl><code class="language-javascript">	})</code>
+<x-expl id="colourSlider"></x-expl><code class="language-javascript">  .place( "#heatmap" );</code>
+<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="colour"></x-expl><code class="language-javascript">heatmap.colour( function( val ){</code>
+<x-expl id="colour"></x-expl><code class="language-javascript">	return heatmapSlider.colourScale( val );</code>
+<x-expl id="colour"></x-expl><code class="language-javascript">} );</code>
+<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="scatter"></x-expl><code class="language-javascript">var scatterplot = lc.scatter()</code>
+<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="showLegend"></x-expl><code class="language-javascript">  .showLegend( false );</code>
+<x-expl id="scatter"></x-expl><code class="language-javascript">lc.xLine( "line", scatterplot )</code>
+<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="scatter"></x-expl><code class="language-javascript">  .place( "#scatterplot" );</code>
+<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="layer"></x-expl><code class="language-javascript">var layer = scatterplot.get_layer( "layer0" );</code>
+<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="colourSlider"></x-expl><code class="language-javascript">var scatterSlider = lc.colourSlider()</code>
+<x-expl id="sizeAndMargins"></x-expl><code class="language-javascript">	.width( 300 )</code>
+<x-expl id="sizeAndMargins"></x-expl><code class="language-javascript">	.height( 110 )</code>
+<x-expl id="sizeAndMargins"></x-expl><code class="language-javascript">	.set_margins( {top: 50} )</code>
+<x-expl id="title"></x-expl><code class="language-javascript">	.title( "Total curvefitting error" )</code>
+<x-expl id="straightColorScale"></x-expl><code class="language-javascript">	.straightColourScale( layer.colourScale )</code>
+<x-expl id="on_change"></x-expl><code class="language-javascript">	.on_change( function(){</code>
+<x-expl id="on_change"></x-expl><code class="language-javascript">		layer.updateElementStyle();</code>
+<x-expl id="on_change"></x-expl><code class="language-javascript">	} )</code>
+<x-expl id="colourSlider"></x-expl><code class="language-javascript">  .place( "#scatterplot" );</code>
+<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="colour"></x-expl><code class="language-javascript">layer.colour(function( id ){ </code>
+<x-expl id="colour"></x-expl><code class="language-javascript">	return scatterSlider.colourScale( layer.get_colourValue( id ) );</code>
+<x-expl id="colour"></x-expl><code class="language-javascript">});</code>
+<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="scatter"></x-expl><code class="language-javascript">var curveFit = lc.scatter( "points" )</code>
+<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="scatter"></x-expl><code class="language-javascript">lc.xLine( "lines", curveFit )</code>
+<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id="scatter"></x-expl><code class="language-javascript">  .place( "#scatterplot" );</code>
+<x-expl id="skip"></x-expl><code>...</code>
+</pre>
+	</td>
+	<td valign="top" style="padding-left:20px" class="comments">
+
+		<style>
+		div.expl {
+   		display: none;
+   		position: absolute;
+   		background: #ddf;
+   		padding: 10px;
+		}
+		</style>
+
+		<p style="background:#f0fff0; padding:10px" id="bubble">
+			<i>Click on all the yellow bubbles 
+			(<img height="10pt" src="../src/img/bubble_yellow.svg">),
+			going from top to bottom, to see explanations of the code.</i>
+		</p>
+		<br>
+	
+<div class="expl" id="skip">
+<p>Some lines of code, that have been already described in the previous examples, were omitted 
+for the sake of simplicity. At the bottom of the page you can find the complete code.</p>
+</div>
+
+<div class="expl" id="scatter">
+<p>In this example all of the charts are defined almost the same way as in the previous example.
+So here, we concentrate on ther colour sliders, and omit most of the properties of all other charts. The full code you can find at the bottom of the page.</p>
+</div>
+
+<div class="expl" id="showLegend">
+<p>Since we are going to use colour slider instead of the default legend, we would like to not to have both. The default 
+legend can be turned off by setting <a href="../pages/api.html#chart_showLegend"><code>showLegend</code></a> property to <code>false</code>.</p>
+</div>
+
+<div class="expl" id="colourSlider">
+<p>A <a href="../pages/api.html#colourSlider"><code>colourSlider</code></a> is another type of basic types of charts implemented in the <i>linked-charts</i> library. 
+It&apos;s not a selfsuficient chart, but it can be linked to any continuous colour scale of any of the plots to allow an easy and 
+interactive way of changing the contrast and the midpoint of the scale.</p>
+<p>Here, we intialize and place colour sliders that will be linked to both of our colour scales - of the heatmap and of the scatter plot.</p>
+</div>
+
+<div class="expl" id="straightColorScale">
+<p>Here, we define the colour scale that a colour slider will then modify. In both cases here, we use the default colour scales 
+that were internaly initialized for the plots from user-set <a href="../pages/api.html#layer_palette"><code>palette</code></a> and <a href="../pages/api.html#layer_colourDomain"><code>colourDomain</code></a> properties.
+In such a case any change of these properties will also affect the slider. The default scales are 
+stored as <a href="../pages/api.html#layer_colourScale"><code>colourScale</code></a> for all the plots and layers. Another option 
+is to use here 
+any other unrelated colour scale, since the colours for the plot will be in any case picked from a transformed by the 
+<a href="../pages/api.html#colourSlider"><code>colourSlider</code></a> scale.</p>
+</div>
+
+<div class="expl" id="on_change">
+<p>By setting the <a href="../pages/api.html#colourSlider_on_change"><code>on_change</code></a> property the user defines, what should happen if one of the pointers of a colour slider has been 
+moved. Here, we would like to have colours of all the cells or points (or other elements) changed. The most obvious way for that 
+to use the <a href="../pages/api.html#chart_update"><code>update</code></a> function. But in this case we know for sure that it&apos;s only the colour that can change. So we 
+don&apos;t need all the chart elements to be recalculated and rerendered, since with larger charts this may take a considerable amount of 
+time.  Here, we use the <a href="../pages/api.html#heatmap_updateCellColour"><code>updateCellColour</code></a> method for the heatmap and the <a href="../pages/api.html#layer_updateElementStyle"><code>updateElementStyle</code></a> method for the scatter plot.</p>
+</div>
+
+<div class="expl" id="colour">
+<p>Here, we connect our plots with colour sliders by resetting the <a href="../pages/api.html#layer_colour"><code>colour</code></a> property. By default, the <a href="../pages/api.html#layer_colour"><code>colour</code></a> is defined
+using the <a href="../pages/api.html#layer_colourScale"><code>colourScale</code></a>, but in this case we want to use the transformed by the <a href="../pages/api.html#colourSlider"><code>colourSlider</code></a> scale. So here we redefine
+the <a href="../pages/api.html#layer_colour"><code>colour</code></a> property, using another colour scale instead. This step can&apos;t be done before the <a href="../pages/api.html#colourSlider"><code>colourSlider</code></a> is defined 
+(and we can&apos;t set the <a href="../pages/api.html#colourSlider_straightColourScale"><code>straightColourScale</code></a> property of the <a href="../pages/api.html#colourSlider"><code>colourSlider</code></a> before the corresponding chart is defined),
+so we need to make this change of property after the chart is already initialised.</p>
+</div>
+
+<div class="expl" id="layer">
+<p>Here, we save the first layer of the <code>scatterplot</code> as a separate variable for
+the easy access to its properties and methods in the next few lines.</p>
+</div>
+
+<div class="expl" id="sizeAndMargins">
+<p>Here, we change size and margins of the colour slider to make it fit nicely in the layout.</p>
+</div>
+
+<div class="expl" id="title">
+<p>As other charts, the <a href="../pages/api.html#colourSlider"><code>colourSlider</code></a> has the <a href="../pages/api.html#chart_title"><code>title</code></a> property that 
+allows to set the main title.</p>
+</div>
+</td></tr>
+	</tbody></table>
+
+	<div class="fullCode off"><pre><code style="font-size: 16px !important;">Show/hide full code</code></pre></div>
+	<div class="fullCode on hidden">
+		<pre class="fullCode"><code>Show/hide full code</code>
+<code></code>
+<code class="language-html">&lt;script src="linked-charts.min.js"&gt;&lt;/script&gt; </code>
+<code class="language-html">&lt;link rel="stylesheet" type="text/css" href="linked-charts.css"&gt; </code>
+<code class="language-javascript"></code>
+<code class="language-html">&lt;script&gt;</code>
+<code class="language-javascript">  inputData = [{"CellLine":"Pa16C","Drug":"Galunisertib","minConc":1, ...}, ... ];</code>
+<code class="language-html">&lt;/script&gt;</code>
+<code class="language-javascript"></code>
+<code class="language-html">&lt;table&gt;&lt;tr&gt;</code>
+<code class="language-html">  &lt;td id="heatmap" valign="top"&gt;&lt;/td&gt;</code>
+<code class="language-html">  &lt;td id="scatterplot" valign="top"&gt;&lt;/td&gt;</code>
+<code class="language-html">&lt;/tr&gt;&lt;/table&gt;</code>
+<code class="language-javascript"></code>
+<code class="language-html">&lt;script&gt;</code>
+<code class="language-javascript">inputData = lc.separateBy(inputData, ["screen", "Drug", "CellLine"]);</code>
+<code class="language-javascript">var drugs = Object.keys(inputData.RTG),</code>
+<code class="language-javascript">  cellLines = Object.keys(inputData.RTG[drugs[0]]);</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">var selDrugs = [drugs[0], drugs[1]],</code>
+<code class="language-javascript">  selCellLine = cellLines[0];</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">var heatmap = lc.heatmap()</code>
+<code class="language-javascript">  .rowIds( drugs )</code>
+<code class="language-javascript">  .colIds( drugs )</code>
+<code class="language-javascript">  .title( "Drug-drug correlation" )</code>
+<code class="language-javascript">  .colourDomain( [ -1, 1 ] )</code>
+<code class="language-javascript">  .margins({top: 50, left: 50, right: 100, bottom: 100})</code>
+<code class="language-javascript">  .palette( function( val ) { return d3.interpolateRdBu( 1 - val ); } )</code>
+<code class="language-javascript">  .value( function( rowId, colId ) {  </code>
+<code class="language-javascript">    var rowValues = cellLines.map(function( e ) {</code>
+<code class="language-javascript">        return inputData.RTG[rowId][e].avInh;</code>
+<code class="language-javascript">      }),</code>
+<code class="language-javascript">      colValues = cellLines.map(function( e ) {</code>
+<code class="language-javascript">        return inputData.RTG[colId][e].avInh;</code>
+<code class="language-javascript">      });</code>
+<code class="language-javascript">    return lc.pearsonCorr( rowValues, colValues ); </code>
+<code class="language-javascript">   })</code>
+<code class="language-javascript">  .on_click( function( rowId, colId ) {</code>
+<code class="language-javascript">     selDrugs = [rowId, colId]</code>
+<code class="language-javascript">     scatterplot.update();</code>
+<code class="language-javascript">     curveFit.update();</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .cluster( "Row" )</code>
+<code class="language-javascript">  .cluster( "Col" )</code>
+<code class="language-javascript">  .showLegend( false )</code>
+<code class="language-javascript">  .place( "#heatmap" );</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">var heatmapSlider = lc.colourSlider()</code>
+<code class="language-javascript">	.straightColourScale( heatmap.colourScale )</code>
+<code class="language-javascript">	.on_change(function(){</code>
+<code class="language-javascript">		heatmap.updateCellColour();</code>
+<code class="language-javascript">	})</code>
+<code class="language-javascript">  .place( "#heatmap" );</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">heatmap.colour( function( val ){</code>
+<code class="language-javascript">	return heatmapSlider.colourScale( val );</code>
+<code class="language-javascript">} );</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">var get_curve = function( drug, cellLine, x ){</code>
+<code class="language-javascript">  var max = inputData.RTG[drug][cellLine].max,</code>
+<code class="language-javascript">    min = inputData.RTG[drug][cellLine].min,</code>
+<code class="language-javascript">    IC50 = inputData.RTG[drug][cellLine].IC50,</code>
+<code class="language-javascript">    slope = inputData.RTG[drug][cellLine].Slope,</code>
+<code class="language-javascript">    minConc = inputData.RTG[drug][cellLine].minConc;</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">  return min + ( max - min )/ </code>
+<code class="language-javascript">    (1 + Math.pow( 10, - ( x - Math.log10( IC50/minConc ) ) * slope));</code>
+<code class="language-javascript">}</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">var scatterplot = lc.scatter()</code>
+<code class="language-javascript">  .width( 300 )</code>
+<code class="language-javascript">  .height( 300 )</code>
+<code class="language-javascript">  .elementIds( cellLines )</code>
+<code class="language-javascript">  .x( function( k ) { return inputData.RTG[selDrugs[0]][k].avInh } )</code>
+<code class="language-javascript">  .y( function( k ) { return inputData.RTG[selDrugs[1]][k].avInh } )</code>
+<code class="language-javascript">  .axisTitleX( function() {return selDrugs[0]} )</code>
+<code class="language-javascript">  .axisTitleY( function() {return selDrugs[1]} )</code>
+<code class="language-javascript">  .title( "Average inhibition" )</code>
+<code class="language-javascript">  .domainX( [-10, 50] )</code>
+<code class="language-javascript">  .domainY( [-10, 50] )</code>
+<code class="language-javascript">  .palette( ["green", "yellow","red"] )</code>
+<code class="language-javascript">  .colourValue( function( k ) { </code>
+<code class="language-javascript">    var res = 0;</code>
+<code class="language-javascript">    for( var x = 0; x &lt; 5; x++ )</code>
+<code class="language-javascript">      for( var l = 0; l &lt; 2; l++ )</code>
+<code class="language-javascript">        res += Math.pow( get_curve( selDrugs[l], k, x ) - </code>
+<code class="language-javascript">                    inputData.RTG[selDrugs[l]][k]["D" + (x + 1)], 2 ); </code>
+<code class="language-javascript">    res = Math.sqrt( res );</code>
+<code class="language-javascript">    return res;</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .colourDomain( [ 0, 30 ] ) </code>
+<code class="language-javascript">  .on_click( function( k ) {</code>
+<code class="language-javascript">    selCellLine = k; </code>
+<code class="language-javascript">    curveFit.update();</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .showLegend( false );</code>
+<code class="language-javascript">lc.xLine( "line", scatterplot )</code>
+<code class="language-javascript">  .lineFun( function( x ){ </code>
+<code class="language-javascript">    return x;</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .place( "#scatterplot" );</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">var layer = scatterplot.get_layer( "layer0" );</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">var scatterSlider = lc.colourSlider()</code>
+<code class="language-javascript">	.width( 300 )</code>
+<code class="language-javascript">	.height( 110 )</code>
+<code class="language-javascript">	.set_margins( {top: 50} )</code>
+<code class="language-javascript">	.title( "Total curvefitting error" )</code>
+<code class="language-javascript">	.straightColourScale( layer.colourScale )</code>
+<code class="language-javascript">	.on_change( function(){</code>
+<code class="language-javascript">		layer.updateElementStyle();</code>
+<code class="language-javascript">	} )</code>
+<code class="language-javascript">  .place( "#scatterplot" );</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">layer.colour(function( id ){ </code>
+<code class="language-javascript">	return scatterSlider.colourScale( layer.get_colourValue( id ) );</code>
+<code class="language-javascript">});</code>
+<code class="language-javascript"></code>
+<code class="language-javascript">var curveFit = lc.scatter( "points" )</code>
+<code class="language-javascript">  .width( 300 )</code>
+<code class="language-javascript">  .height( 200 )</code>
+<code class="language-javascript">  .nelements( 10 )</code>
+<code class="language-javascript">  .title( function() {return selCellLine;} )</code>
+<code class="language-javascript">  .axisTitleX( "Drug concentration" )</code>
+<code class="language-javascript">  .axisTitleY( "Inhibition" )</code>
+<code class="language-javascript">  .domainY( [-25, 100] )</code>
+<code class="language-javascript">  .ticksX( function() {</code>
+<code class="language-javascript">    var ticks = [d3.range( 5 ), </code>
+<code class="language-javascript">      d3.range( 5 ).map( function( e ) {</code>
+<code class="language-javascript">        return inputData.RTG[selDrugs[0]][selCellLine].minConc * </code>
+<code class="language-javascript">                Math.pow( 10, e )</code>
+<code class="language-javascript">      } ),</code>
+<code class="language-javascript">      d3.range( 5 ).map( function( e ) {</code>
+<code class="language-javascript">        return inputData.RTG[selDrugs[1]][selCellLine].minConc * </code>
+<code class="language-javascript">                Math.pow( 10, e )</code>
+<code class="language-javascript">      })];</code>
+<code class="language-javascript">    ticks.colour = ["blue", "red"];</code>
+<code class="language-javascript">    return ticks;</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .x( function( k ) {</code>
+<code class="language-javascript">    return k % 5;</code>
+<code class="language-javascript">  } )</code>
+<code class="language-javascript">  .y( function( k ) {</code>
+<code class="language-javascript">    var ind = Math.floor( k / 5 );</code>
+<code class="language-javascript">    return inputData.RTG[selDrugs[ind]][selCellLine]["D" + (k % 5 + 1)];</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .colour( function( k ) {</code>
+<code class="language-javascript">    return k &gt; 4 ? "red" : "blue";</code>
+<code class="language-javascript">  } );</code>
+<code class="language-javascript">lc.xLine( "lines", curveFit )</code>
+<code class="language-javascript">  .nelements( 2 )</code>
+<code class="language-javascript">  .lineFun( function( x, k ) {</code>
+<code class="language-javascript">    return get_curve( selDrugs[k], selCellLine, x );</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .colour(function( k ){</code>
+<code class="language-javascript">    return k == 0 ? "blue" : "red";</code>
+<code class="language-javascript">  })</code>
+<code class="language-javascript">  .place( "#scatterplot" );</code>
+<code class="language-javascript">curveFit.legend.add_block(function() {return [selDrugs, ["blue", "red"]];},</code>
+<code class="language-javascript">                      "colour", "Drugs");</code>
+<code class="language-html">&lt;/script&gt;</code>
+</pre>
+	</div>
+
+	<script>
+	d3.select("head")
+		.select("title")
+			.text(d3.select(".description")
+							.select("h1").text());
+
+	d3.selectAll( "x-expl" )
+	  .append( "img" )
+	    .attr( "height", "10pt" )
+	    .attr( "class", "bubble_icon" )
+	    .attr( "src", "../src/img/bubble_yellow.svg" )
+	    .style( "padding-right", "15px")
+	    .on( "click", function() {
+	      d3.selectAll( "div.expl" )
+	        .style( "display", "none" );
+	      d3.selectAll( "img.bubble_icon" )
+	        .attr( "src", "../src/img/bubble_yellow.svg")
+	      var tagId = d3.select(this.parentNode).attr("id");
+	      d3.select( "div.expl#" + tagId )
+	        .style( "display", "block" )
+	        .style("width", d3.select("#bubble").node().getBoundingClientRect().width)
+	      d3.selectAll( "x-expl#" + tagId ).select("img.bubble_icon")
+	        .attr( "src", "../src/img/bubble_red.svg")
+	    });
+
+	d3.select("div.fullCode.off")
+		.on("click", function() {
+			d3.select(this).classed("hidden", true);
+			d3.select("div.fullCode.on").classed("hidden", false);
+		});
+	d3.select("div.fullCode.on")
+		.on("click", function() {
+			d3.select(this).classed("hidden", true);
+			d3.select("div.fullCode.off").classed("hidden", false);
+		})
+
+	</script>
+
+</div>
+
+</body></html>
