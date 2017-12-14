@@ -22,7 +22,9 @@ var pages = {
 		linesAndColour: "Lines and Colour",
 		labelsAndLegend: "Labels and Legend",
 		colourSlider: "Adding an interactive colour slider",
-		twoChannelsHeatmap: "A heatmap with two colour channels"
+		twoChannelsHeatmap: "A heatmap with two colour channels",
+		markPoints: "Correlation values for only the selected points",
+		newType: "Defining a new layer type"
 	}
 }
 

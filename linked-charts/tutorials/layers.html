@@ -206,7 +206,80 @@ Here is an example of this function for scatter plots.
 } 
 </pre></li>
 </ul>
-<p>Now, lets make an example of</p>
+<p>Now, let&apos;s make an example of a new layer type. Each data element in this plot will be a rectangle with user defined <code>upper</code> and <code>lower</code> boundaries and equal widths. Here, to make things simple, we will use meaningless, artificially generated data, but a use case for such a plot and a more detailed example you can find <a href="../examples/newType.html">here</a>.</p>
+<pre class="tiy" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/linked-charts.css">//create a chart with axes and add an empty layer
+var plot = lc.axesChart()
+  .add_layer("layer");
+//save this layer to a variable
+var layer = plot.activeLayer();
+
+//update elements is defined almost exactly as in most implemented
+//types of layers
+layer.updateElements = function(){
+  var sel = layer.g.selectAll( ".data_element" )
+    .data( layer.elementIds(), function(d) {return d;} );
+  sel.exit()
+    .remove();  
+    sel.enter().append( "rect" )
+    .attr( "class", "data_element" )
+    .merge(sel)
+      .attr("id", function(d) {
+        return "p" + (layer.id + "_" + d).replace(/[ .]/g,"_");
+      })
+      .on( "click", layer.get_on_click )
+      .on( "mouseover", layer.get_elementMouseOver )
+      .on( "mouseout", layer.get_elementMouseOut );
+}
+
+//here we define height, width and position of a left-upper 
+//corner for each rectangle
+layer.updateElementPosition = function(){
+  layer.g.selectAll(".data_element")
+    //we assume that all the IDs are just numbers
+    //therefore left-upper corner&apos;s coordinates are defined
+    //as [id, upper_value]
+    .attr("x", function(d) {return layer.chart.axes.scale_x(d)})
+    .attr("y", function(d) {
+      return layer.chart.axes.scale_y(layer.get_upper(d));
+    })
+    //width of each rectangle is 1 in the chart&apos;s coordinate system
+    .attr("width", function() {
+      return layer.chart.axes.scale_x(1) - layer.chart.axes.scale_x(0);
+    })
+    //height is defined as difference between lower and upper side
+    .attr("height", function(d) {
+      return Math.abs(layer.chart.axes.scale_y(layer.get_lower(d)) - 
+                      layer.chart.axes.scale_y(layer.get_upper(d)));
+    });
+}
+
+//let&apos;s for now just allow our rectangles to be of different colour
+layer.updateElementStyle = function() {
+  layer.resetColourScale();
+  layer.g.selectAll(".data_element")
+     .attr("fill", function(d) {return layer.get_colour(d)})
+}
+
+//add some new properties
+layer
+  .add_property("lower", function(k) {
+    return Math.log(k + 1) - Math.random();
+  })
+  .add_property("upper", function(k) {
+    return Math.log(k + 1) + Math.random();
+  });
+//this will allow to user layer&apos;s properties using only the chart object
+plot.syncProperties(layer);
+
+//now we set other properties and place the chart
+plot
+  .nelements(15)
+  .layerDomainX([0, 15])
+  .layerDomainY([-1, 5])
+  .colourValue(function(k) {return k})
+  .place();
+</pre>
+<p>By the way, in this test examples random numbers are generated on each update call. So don&apos;t be surprised that the plot changes each time you use any interactivity.</p>
 </div>
 <div class="tocContainer" id="toc"></div>
 <script src="../src/codeMirror/codemirror.js"></script>
