@@ -6,11 +6,11 @@
 <body>
 <script src="../src/navTop.js"></script>
 <div class="contentContainer" id="content"><h1 id="layers">Layers</h1>
-<p>Some charts in the <em>linked-charts</em> library allow the user to put several plots on top of each other. These plots are called layers and can be of the same or of different types. All the layers use the same chart as basis and therefore have the same size (<a href="../pages/api.html#chart_width"><code>width</code></a> and <a href="../pages/api.html#chart_height"><code>height</code></a>), <a href="../pages/api.html#chart_margins"><code>margins</code></a>, will be zoomed in or out together and updated at the same time (unless a layer-specific update method is used). Yet, each layer has its own properties, such as <a href="../pages/api.html#layer_nelements"><code>nelements</code></a>, <a href="../pages/api.html#layer_colour"><code>colour</code></a>, <a href="../pages/api.html#scatter_size"><code>size</code></a> that can doesn&apos;t influence one another and need to be defined independently.</p>
+<p>Some charts in the <em>linked-charts</em> library allow the user to put several plots on top of each other. These plots are called layers and can be of the same or of different types. All the layers use the same chart as basis and therefore have the same size (<a href="../pages/api.html#chart_width"><code>width</code></a> and <a href="../pages/api.html#chart_height"><code>height</code></a>), <a href="../pages/api.html#chart_margins"><code>margins</code></a>, will be zoomed in or out together and updated at the same time (unless a layer-specific update method is used). Yet, each layer has its own properties, such as <a href="../pages/api.html#layer_nelements"><code>nelements</code></a>, <a href="../pages/api.html#layer_colour"><code>colour</code></a>, <a href="../pages/api.html#scatter_size"><code>size</code></a> that doesn&apos;t influence one another and need to be defined independently.</p>
 <p>In the current implementation of the <em>linked-charts</em> library only the charts with X and Y axes (<a href="../pages/api.html#scatter"><code>scatter</code></a>, <a href="../pages/api.html#beeswarm"><code>beeswarm</code></a>, <a href="../pages/api.html#xLine"><code>xLine</code></a>, <a href="../pages/api.html#yLine"><code>yLine</code></a>, <a href="../pages/api.html#parametricCurve"><code>parametricCurve</code></a>, <a href="../pages/api.html#barchart"><code>barchart</code></a>) can have multiple layers.</p>
 <p>In this tutorial we will explain how to use layers. The last section is for more advanced users and will tell you, how to define your own layer type.</p>
 <h2 id="add-or-remove-a-layer">Add or remove a layer</h2>
-<p>Actually, even if you have just started with the <em>linked-charts</em> library and tried only the most basic examples, you probably already know, how to generate a chart with layers, since all the functions that initialise <a href="../pages/api.html#axesChart"><code>charts with axes</code></a> in fact create an empty <a href="../pages/api.html#layerChart"><code>layerChart</code></a> and add a layer to it. All these functions have two optional arguments: the first one defines an ID for the new layer and the other is a chart which this layer will be added to. If the second one is undefined, a new chart is created. Thus, all you need to do, to add a layer to an existing chart is to define that second argument.</p>
+<p>Actually, even if you have just started with the <em>linked-charts</em> library and tried only the most basic examples, you probably already know, how to generate a chart with layers, since all the functions that initialise <a href="../pages/api.html#axesChart"><code>charts with axes</code></a> in fact create an empty <a href="../pages/api.html#axesChart"><code>axesChart</code></a> and add a layer to it. All these functions have two optional arguments: the first one defines an ID for the new layer and the other is a chart which this layer will be added to. If the second one is undefined, a new chart is created. Thus, all you need to do, to add a layer to an existing chart is to define that second argument.</p>
 <p>Let&apos;s have a look at a simple example.</p>
 <pre class="tiy" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/linked-charts.css">var plot = lc.scatter()
   .nelements(10)
@@ -32,10 +32,10 @@ lc.xLine("line", plot)
   .lineFun(function(t) {return t})
   .place_layer("line");
 </pre>
-<p>To remove layer one can just use the <a href="../pages/api.html#layerChart_remove_layer"><code>remove_layer</code></a> method. It requires an ID of the layer as an argument.</p>
-<p>Another way of adding and removing layers, which is usefull, when you have too many layers to add all of them manually or don&apos;t know beforehand, how many layers you need, you can find in the section <a href="#Multiple_layers_selection">Multiple layers selection</a>.</p>
+<p>To remove a layer one can just use the <a href="../pages/api.html#layerChart_remove_layer"><code>remove_layer</code></a> method. It requires an ID of the layer as an argument.</p>
+<p>Another way of adding and removing layers, which is usefull, when you have too many layers to add all of them manually or don&apos;t know beforehand, how many layers you need, you can find in the section <a href="#Multiple-layers-selection">Multiple layers selection</a>.</p>
 <h2 id="layers-and-properties">Layers and properties</h2>
-<p>Each layer has its own properties and changing properties and the most straightforwad way to set them is first to get a <a href="../pages/api.html#layer"><code>layer</code></a> object via <a href="../pages/api.html#layerChart_get_layer"><code>get_layer</code></a> method and only then to set its properties. It looks like this</p>
+<p>Each layer has its own properties and the most straightforwad way to set them is first to get a <a href="../pages/api.html#layer"><code>layer</code></a> object via <a href="../pages/api.html#layerChart_get_layer"><code>get_layer</code></a> method and only then to set its properties. It looks like this</p>
 <pre class="tiy" runnable="false">chart.get_layer(layerID).property(newValue);
 </pre>
 <p>One may find it really annoying, especially since property setters always return chart object <em>(not layers!)</em>. Therefore in the <em>linked-charts</em> library we made it possible to access layer properties directly from the chart object.</p>
@@ -68,17 +68,17 @@ plot.dasharray(5)
     .opacity(0.5)
     .update();
 </pre>
-<pre class="tiy" runnable="false">plot.activeLayer(get_layer("scatter"))
+<pre class="tiy" runnable="false">plot.activeLayer(plot.get_layer("scatter"))
     .colour("blue")
     .opacity(0.5)
     .update();
 </pre>
 <p>As you can see, in the first example the line remained the active layer and its <a href="../pages/api.html#layer_opacity"><code>opacity</code></a> property has been changed, but in the second one it was set for the triangles.</p>
-<p>Besides properties, there are also layer-specific methods: <a href="../pages/api.html#layer_updateElements"><code>updateElements</code></a>, <a href="../pages/api.html#layer_updateElementStyle"><code>updateElementStyle</code></a> and <a href="../pages/api.html#layer_updateElementPosition"><code>updateElementPosition</code></a> and they follow the same logic as properties.</p>
+<p>Besides properties, there are also layer-specific methods: <a href="../pages/api.html#layer_updateElements"><code>updateElements</code></a>, <a href="../pages/api.html#layer_updateElementStyle"><code>updateElementStyle</code></a> and <a href="../pages/api.html#layer_updateElementPosition"><code>updateElementPosition</code></a>. They follow the same logic as properties.</p>
 <h2 id="multiple-layers-selection">Multiple layers selection</h2>
-<p>If you don&apos;t want to define and then customize each of the layers separatly, you can manipulate several layers at the same time. First of all, to add or remove multiple layers at once, one can just set the <a href="../pages/api.html#layerChart_layerIds"><code>layerIds</code></a> property. It takes an array of IDs of all the layers you want to have at the current moment. New empty layers will be added and all those, that are no longer required, will be removed. Along with this property goes the <a href="../pages/api.html#layerChart_layerType"><code>layerType</code></a> property, since if a type of the new layer is not defined, an empty layer is created, which is of no use unless you want to define your own type of plot.</p>
+<p>If you don&apos;t want to define and then customize each of the layers separately, you can manipulate several layers at the same time. First of all, to add or remove multiple layers at once, one can just set the <a href="../pages/api.html#layerChart_layerIds"><code>layerIds</code></a> property. It takes an array of IDs of all the layers you want to have at the current moment. New empty layers will be added and all those, that are no longer required, will be removed. Along with this property goes the <a href="../pages/api.html#layerChart_layerType"><code>layerType</code></a> property, since if a type of the new layer is not defined, an empty layer is created, which is of no use unless you want to define your own type of plot.</p>
 <p>Setting these two properties you can quickly create any number of layers, but all of them are empty. Now, you can manually go through each of them and fill them with data. Or you can use the <a href="../pages/api.html#layerChart_select_layers"><code>select_layers</code></a> method and modify several of them at once.</p>
-<p><a href="select_layer">select_layer</a> takes as an optional argument an array of IDs of the layers you want to modify. If no array is provided, all existing layers are selected. The returned layer selection is similar to a <a href="../pages/api.html#chart"><code>chart</code></a> object with two main differences:</p>
+<p><a href="../pages/api.html#layerChart_select_layers"><code>select_layers</code></a> takes as an optional argument an array of IDs of the layers you want to modify. If no array is provided, all existing layers are selected. The returned layer selection is similar to a <a href="../pages/api.html#chart"><code>chart</code></a> object with two main differences:</p>
 <ul>
 <li><p>Only layer-specific properties can be accessed using a layer selection. You can&apos;t set <a href="../pages/api.html#dendogram_width"><code>width</code></a>, <a href="../pages/api.html#dendogram_height"><code>height</code></a>, <a href="../pages/api.html#legend_title"><code>title</code></a>, <a href="../pages/api.html#axesChart_domainX"><code>domainX</code></a>, etc.</p></li>
 <li><p>Any callback function that you use to set a property will get a layer ID as it&apos;s first argument.</p></li>
@@ -138,11 +138,11 @@ lc.xLine("cos", plot)
     .domainY([-1, 1])
     .place();
 </pre>
-<p>Now the sinus function is only displayed for x values from 2 to 3, while the cosinus is shown for all x values. Try to remove lines, setting the chart&apos;s domains to see what happens. By the way, if all the layers have undefined domains for some axis, the <code>[0, 1]</code> range is used as a default domain.</p>
+<p>Now the cosinus function is only displayed for x values from 2 to 3, while the sinus is shown for all x values. Try to remove lines, setting the chart&apos;s domains to see what happens. By the way, if all the layers have undefined domains for some axis, the <code>[0, 1]</code> range is used as a default domain.</p>
 <h2 id="layer-structure">Layer structure</h2>
 <p>Each layer inherits from the <a href="../pages/api.html#layer"><code>layerBase</code></a> object that already has some predefined functionality, most common for different type of layers. And, which is more important, this common layer ancestor defines structure that is used to link chart and its layers. All individual aspects of any layer are described by few functions, which means that one can easily add new types of layers by defining or modifying these functions.</p>
-<p>It&apos;s completely up to the user, how to define this methods, as long as they perform the actions, they are expected to do. Yet, the <em>linked-charts</em> library is heavily based on the <a href="https://d3js.org/">d3</a> library and therefore to understand the further examples that are taken from the <em>linked-charts</em> source code one needs at least some understanding of the <a href="https://d3js.org/">d3</a> library. Specifically, selections and the idea of data binding. <a href="https://square.github.io/intro-to-d3/data-binding/">This</a> tutorial may be of some use.</p>
-<p>The required ones are:</p>
+<p>It&apos;s completely up to the user, how to define this methods, as long as they perform the actions, they are expected to do. Yet, the <em>linked-charts</em> library is heavily based on the <a href="https://d3js.org/">d3</a> library and therefore to understand the further examples that are taken from the <em>linked-charts</em> source code one needs at least some understanding of the <a href="https://d3js.org/">d3</a> library. Specifically, selections and the idea of data binding are important. <a href="https://square.github.io/intro-to-d3/data-binding/">This</a> tutorial may be of some use.</p>
+<p>The following functions are required for any layer:</p>
 <ul>
 <li><a href="../pages/api.html#layer_updateElements"><code>updateElements</code></a> - this function adds or removes elements of the plot to fit the current data. Generally, this function binds data, contained in the <a href="../pages/api.html#layer_elementIds"><code>elementIds</code></a> property to the selection of the elements, and then defines attributes of <a href="https://github.com/d3/d3-selection#selection_enter">enter</a> and <a href="https://github.com/d3/d3-selection#selection_enter">exit</a> selections. Here, how it has been done for scatter plots.
 <pre class="tiy" runnable="false">//bind data to the selection
@@ -156,12 +156,14 @@ sel.enter().append( "path" )
   .attr( "class", "data_element" )
 //update all the elements  
   .merge(sel)
-.attr("id", function(d) {return "p" + (layer.id + "_" + d).replace(/[ .]/g,"_");})
+.attr("id", function(d) {
+  return "p" + (layer.id + "_" + d).replace(/[ .]/g,"_");
+})
 .on( "click", layer.get_on_click )
 .on( "mouseover", layer.get_elementMouseOver )
 .on( "mouseout", layer.get_elementMouseOut );
 </pre>
-<p>There are two important things here. Firstly, all the elements of a chart (dots, lines, bars, cells) have class <code>data_element</code>. Secondly, each of them has an ID that is defined as <code>pLayerID_elementID</code>. Since spaces and dots are allowed in our internal IDs, but not in IDs of HTML elements, we replace them with underscores. In the <em>linked-charts</em> library this replacement always goes one way (we don&apos;t try to recover internal IDs from the corresponding attribute), such a transformation is reasonable.</p></li>
+<p>There are two important things here. Firstly, all the elements of a chart (dots, lines, bars, cells) have class <code>data_element</code>. Secondly, each of them has an ID that is defined as <code>pLayerID_elementID</code>. Since spaces and dots are allowed in our internal IDs, but not in IDs of HTML elements, we replace them with underscores. Since in the <em>linked-charts</em> library this replacement always goes one way (we don&apos;t try to recover internal IDs from the corresponding attribute), such a transformation is reasonable.</p></li>
 <li><a href="../pages/api.html#layer_updateElementPosition"><code>updateElementPosition</code></a> - this function moves elements to their current positions, using the already defined scales that are stored in <code>layer.chart.axes.scale_x</code> and <code>layer.chart.axes.scale_y</code>. The most simple example of such a function is
 <pre class="tiy" runnable="false">layer.g.selectAll(".data_element")
 .attr("x", function(d) {
@@ -213,7 +215,7 @@ var plot = lc.axesChart()
 //save this layer to a variable
 var layer = plot.activeLayer();
 
-//update elements is defined almost exactly as in most implemented
+//updateElements is defined almost exactly as in most implemented
 //types of layers
 layer.updateElements = function(){
   var sel = layer.g.selectAll( ".data_element" )
