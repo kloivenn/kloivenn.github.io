@@ -191,7 +191,7 @@ curveFit.legend.add_block(function() {return [selDrugs, ["blue", "red"]];},
 <x-expl id="get_marked"></x-expl><code class="language-javascript">        .filter( function( e ) { return e[0] == "layer0"} )</code>
 <x-expl id="get_marked"></x-expl><code class="language-javascript">        .map( function( e ) { return e[1] } );</code>
 <x-expl id="ifempty"></x-expl><code class="language-javascript">    if( selCL.length &lt; 2 ) selCL = cellLines;</code>
-<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id=""></x-expl><code class="language-javascript"></code>
 <x-expl id="calcValues"></x-expl><code class="language-javascript">    var rowValues = selCL.map(function( e ) {</code>
 <x-expl id="calcValues"></x-expl><code class="language-javascript">        return inputData.RTG[rowId][e].avInh;</code>
 <x-expl id="calcValues"></x-expl><code class="language-javascript">      }),</code>
@@ -202,7 +202,7 @@ curveFit.legend.add_block(function() {return [selDrugs, ["blue", "red"]];},
 <x-expl id="value"></x-expl><code class="language-javascript">   })</code>
 <x-expl id="skip"></x-expl><code>...</code>
 <x-expl id="scatter"></x-expl><code class="language-javascript">  .place( "#heatmap" );</code>
-<x-expl id="skip"></x-expl><code>...</code>
+<x-expl id=""></x-expl><code class="language-javascript"></code>
 <x-expl id="scatter"></x-expl><code class="language-javascript">var heatmapSlider = lc.colourSlider()</code>
 <x-expl id="skip"></x-expl><code>...</code>
 <x-expl id="scatter"></x-expl><code class="language-javascript">  .place( "#heatmap" );</code>
@@ -252,6 +252,11 @@ for the sake of simplicity. At the bottom of the page you can find the complete 
 <div class="expl" id="scatter">
 <p>In this example all of the charts are defined almost the same way as in the previous example.
 So here, we omit most of the properties of all other charts. The full code you can find at the bottom of the page.</p>
+</div>
+
+<div class="expl" id="value">
+<p>Here, our callback function that returns values for each cell will now use information from another chart 
+(the correlation scatter plot). In this case the both charts can depending on each other.</p>
 </div>
 
 <div class="expl" id="get_marked">

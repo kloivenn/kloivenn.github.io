@@ -6,8 +6,124 @@
 <body>
 <script src="../src/navTop.js"></script>
 <div class="contentContainer" id="content"><h1 id="lines">Lines</h1>
-<h2 id="sorry">Sorry,</h2>
-<p>This page is not yet ready. Please, try again later.</p>
+<h2 id="minimal-requirements">Minimal requirements</h2>
+<p>It&apos;s very simple to create a line in the <em>linked-charts</em> library. There is only one required property <a href="../pages/api.html#line_lineFun"><code>lineFun</code></a> that defines a function of the line. So the simplest example can look like this.</p>
+<pre class="tiy" width="100%" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/linked-charts.css">var line = lc.xLine()
+    .lineFun(function(x) {return Math.sin(x);})
+  .place();
+</pre>
+<p>As you can see, the plot is rendered in the range from 0 to 1 for both axes. These are the default values if scale domaines are not defined. But if you zoom out (use instrument panel for this), you&apos;ll see that the line is actually defined for all x values. You can use the <a href="../pages/api.html#layer_layerDomainX"><code>layerDomainX</code></a> property to change the range of values for which your function is defined and <a href="../pages/api.html#axesChart_domainX"><code>domainX</code></a> and <a href="../pages/api.html#axesChart_domainY"><code>domainY</code></a> to change the original domains of both scales. More about domains you can find in <a href="#Domains">this</a> section.</p>
+<h2 id="types-of-lines">Types of lines</h2>
+<p>All the lines in the <em>linked-charts</em> library are defined as functions that can have different form. These forms are implemented in different types of lines. The currently available are <em>y = f(x)</em> (<a href="../pages/api.html#xLine"><code>xLine</code></a>), <em>x = f(y)</em> (<a href="../pages/api.html#yLine"><code>yLine</code></a>), <em>x = f(t) and y = g(t)</em> (<a href="../pages/api.html#parametricCurve"><code>parametricCurve</code></a>).</p>
+<h3 id="xline">xLine</h3>
+<p><a href="../pages/api.html#xLine"><code>xLine</code></a> charts can display functions, defined in the form <em>y = f(x)</em>. This function should be defined on the entire range of <a href="../pages/api.html#layer_layerDomainX"><code>layerDomainX</code></a> or for any real X value if this property is not defined. These lines can have only one y value for each x value and therefore you can&apos;t draw, for example, a circle with one line.</p>
+<p>Here is a plot of the <em>y = sin(x)</em> function.</p>
+<pre class="tiy" width="100%" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/linked-charts.css">var line = lc.xLine()
+    .lineFun(function(x) {return Math.sin(x);})
+    .domainX([0, 7])
+    .domainY([-1.5, 1.5])
+  .place();
+</pre>
+<h3 id="yline">yLine</h3>
+<p><a href="../pages/api.html#yLine"><code>yLine</code></a> charts can display functions, defined in the form <em>x = f(y)</em>. This function should be defined on the entire range of <a href="../pages/api.html#layer_layerDomainY"><code>layerDomainY</code></a> or for any real Y value if this property is not defined. These lines can have only one x value for each y value and therefore you can&apos;t draw, for example, a circle with one line.</p>
+<p>Here is a plot of the <em>x = sin(y)</em> function.</p>
+<pre class="tiy" width="100%" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/linked-charts.css">var line = lc.yLine()
+    .lineFun(function(x) {return Math.sin(x);})
+    .domainX([-1.5, 1.5])
+    .domainY([0, 7])
+  .place();
+</pre>
+<h3 id="parametric-curve">Parametric Curve</h3>
+<p>Parametric curve is defined in the form <em>x = f(t), y = g(t)</em>. Unlike the previous two, it doesn&apos;t have the <a href="../pages/api.html#line_lineFun"><code>lineFun</code></a> property and utilises <a href="../pages/api.html#parametricCurve_xFunction"><code>xFunction</code></a> and <a href="../pages/api.html#parametricCurve_yFunction"><code>yFunction</code></a> instead. Both of these functions need to be defined inside <a href="paramRange">paramRange</a>, yet here you have more control on possible values of the parameter and so the functions may not necessary be defined for all the values from this range. See the <a href="#Connected-points">next</a> section for more details.</p>
+<p>Using this type of charts, you can make lines of any shapes as soon as don&apos;t have any gaps and are finite.</p>
+<p>Unlike <a href="../pages/api.html#xLine"><code>xLine</code></a> and <a href="../pages/api.html#yLine"><code>yLine</code></a>, <a href="../pages/api.html#parametricCurve"><code>parametricCurve</code></a> has a predefined way of estimating <a href="../pages/api.html#layer_layerDomainX"><code>layerDomainX</code></a> and <a href="../pages/api.html#layer_layerDomainY"><code>layerDomainY</code></a>, which are by default set to fit the entire line. Of course, this can be changed by the user, but for <a href="../pages/api.html#parametricCurve"><code>parametricCurve</code></a> these properties influence only the original domains of the chart&apos;s axes, not the range for which the line is defined.</p>
+<p>Let&apos;s make some spirals.</p>
+<pre class="tiy" width="100%" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/linked-charts.css">var line = lc.parametricCurve()
+    .xFunction(function(t) {return t * Math.sin(t * 10)})
+    .yFunction(function(t) {return t * Math.cos(t * 10)})
+  .place();
+</pre>
+<h4 id="connected-points">Connected points</h4>
+<p>Sometimes you don&apos;t have the function, but just want to connect some dots. Currently, in the <em>linked-charts</em> library there are no special types of lines for this task, but you can use [parametricCurve] and make your functions defined only for some certain values inside <a href="paramRange">paramRange</a>, by setting a specific number of steps (<a href="../pages/api.html#line_nsteps"><code>nsteps</code></a>).</p>
+<p>For examle, you can set the <a href="paramRange">paramRange</a> to <code>[0, n-1]</code> and number of steps to <code>n</code>. Then you can define <a href="../pages/api.html#parametricCurve_xFunction"><code>xFunction</code></a> and <a href="../pages/api.html#parametricCurve_yFunction"><code>yFunction</code></a> only for integer values from <em>0</em> to <em>n-1</em> and just ennumerate the dots, you want to connect.</p>
+<p>Note that because of machine errors, values of the parameter may be not exactly integer and should be rounded.</p>
+<pre class="tiy" width="100%" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/linked-charts.css">var x = [], y = [];
+//generate some random set of 20 points
+for(var i = 0; i &lt; 20; i++){
+    x.push(Math.random());
+    y.push(Math.random())
+}
+
+var line = lc.parametricCurve()
+    .xFunction(function(t) {return x[Math.round(t)];})
+    .yFunction(function(t) {return y[Math.round(t)];})
+    .paramRange([0, 19])
+    .nsteps(20)
+  .place();
+
+//let&apos;s add also the points
+lc.scatter("points", line)
+    .x(function(k) {return x[k]})
+    .y(function(k) {return y[k]});
+
+line.place_layer("points")
+</pre>
+<p>In this example we made a chart with two layers. One for lines and the other one for dots. You can find more information about layers <a href="../tutorials/layers.html">here</a> and about scatter plots <a href="scatter.html">here</a>.</p>
+<h2 id="multiple-lines">Multiple lines</h2>
+<p>Any line chart can have any number of lines. Each line has its own ID which is passed to <a href="../pages/api.html#line_lineFun"><code>lineFun</code></a>, <a href="../pages/api.html#parametricCurve_xFunction"><code>xFunction</code></a> or <a href="yFucntion">yFucntion</a> as a second argument. You can initialize several lines by setting the <a href="../pages/api.html#layer_nelements"><code>nelements</code></a> property (the default value is 1) or by providing an array of all the IDs via the <a href="../pages/api.html#layer_elementIds"><code>elementIds</code></a> property. If <a href="../pages/api.html#layer_nelements"><code>nelements</code></a> is set to <code>n</code>, then the IDs of the lines are integer numbers from <em>0</em> to <em>n - 1</em>.</p>
+<pre class="tiy" width="100%" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/linked-charts.css">var line = lc.xLine()
+    .nelements(5)
+    .lineFun(function(x, k) {return x * (k + 1);})
+    .domainX([0, 4])
+    .domainY([0, 4])
+  .place();
+</pre>
+<h2 id="styles">Styles</h2>
+<p>In the <em>linked-charts</em> library you can change <a href="../pages/api.html#layer_colour"><code>colour</code></a>, <a href="../pages/api.html#layer_opacity"><code>opacity</code></a>, <a href="../pages/api.html#line_lineWidth"><code>lineWidth</code></a> and dashing pattern (<a href="../pages/api.html#line_dasharray"><code>dasharray</code></a>) for each line in the chart. Each of these properties can be set for all the lines or for each of them separately via a callback function that gets a line ID as an argument.</p>
+<pre class="tiy" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/linked-charts.css">var param = lc.parametricCurve()
+  .nelements(3)
+  .xFunction(function(t, d) {
+    return Math.cos(t) + d;
+  })
+  .yFunction(function(t, d){
+    return Math.sin(t);
+  })
+  .colourValue(function(d) {return d.toString()})
+  .lineWidth(function(d) {return d;})
+  .dasharray(function(d) {return d;})
+  .paramRange([0, 2 * Math.PI])
+  .place();
+</pre>
+<p>Besides the <a href="../pages/api.html#layer_colour"><code>colour</code></a> property, there is also <a href="../pages/api.html#layer_colourValue"><code>colourValue</code></a> that in some cases can be more useful. The difference between the two is the followint. <a href="../pages/api.html#layer_colour"><code>colour</code></a> is supposed to return coulour in any interpretable by CSS format. It can be name, hexademical codes, RGB format (<code>rgb(255, 0, 0)</code>), but no random numbers or strings. The values of this property will be directly assigned to the <a href="https://www.w3schools.com/graphics/svg_stroking.asp">stroke</a> attribute of the lines. <a href="../pages/api.html#layer_colourValue"><code>colourValue</code></a> accepts anything. It internally transforms its value - strings or numbers - into a colour scale that can be both continuous or categorical. You can change the <a href="../pages/api.html#layer_palette"><code>palette</code></a> for this scale by setting a correspoding property.</p>
+<p><a href="../pages/api.html#line_lineWidth"><code>lineWidth</code></a> is just a number that defined the width of each line.</p>
+<p><a href="../pages/api.html#line_dasharray"><code>dasharray</code></a> is a sting or number that should be valid for <a href="https://developer.mozilla.org/en/docs/Web/SVG/Attribute/stroke-dasharray">stroke-dasharray</a> attribute.</p>
+<pre class="tiy" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/linked-charts.css">var plot = lc.xLine()
+    .lineFun(function(x) {return Math.sin(x)})
+    .layerDomainY([0, 10])
+    .colour("red");
+
+lc.xLine("cos", plot)
+    .lineFun(function(x) {return Math.cos(x)})
+    .layerDomainX([2, 3])
+    .colour("blue")
+    .domainX([0, 5])
+    .domainY([-1, 1])
+    .place();
+</pre>
+<p>Feel free to play with chart&apos;s and layers&apos; domains in this example.</p>
+<h2 id="domains">Domains</h2>
+<p>First of all, you need to understand that each line chart is actually a layer (possibly, one of several layers) of a chart. Therefore, there is a distinction between <a href="../pages/api.html#axesChart_domainX"><code>domainX</code></a> or <a href="../pages/api.html#axesChart_domainY"><code>domainY</code></a> and <a href="../pages/api.html#layer_layerDomainX"><code>layerDomainX</code></a> or <a href="../pages/api.html#layer_layerDomainY"><code>layerDomainY</code></a> properties. The first ones define what domains will be actually used for the both scales, when the chart is rendered. The latter ones just used for default estimating of those scales. For <a href="../pages/api.html#xLine"><code>xLine</code></a> and <a href="../pages/api.html#yLine"><code>yLine</code></a> <a href="../pages/api.html#layer_layerDomainX"><code>layerDomainX</code></a> and <a href="../pages/api.html#layer_layerDomainY"><code>layerDomainY</code></a> respectively has also another role. The lines are defined only in this range and the line will not be displayed outside of it.</p>
+<p>You can read more about layers and their properties <a href="../tutorials/layers.html">here</a>.</p>
+<p>For domains the general rule is the following: by default layer domains are estimated so that to fit all the data of the layer and chart domains fit all the layer domains. If domains of all the layers are undefined, <code>[0, 1]</code> range is used as a domain. The only two types of charts that don&apos;t have a default way of domain estimation are <a href="../pages/api.html#xLine"><code>xLine</code></a> and <a href="../pages/api.html#yLine"><code>yLine</code></a>. But if, for example, <a href="../pages/api.html#layer_layerDomainX"><code>layerDomainX</code></a> is defined for <a href="../pages/api.html#xLine"><code>xLine</code></a>, <a href="../pages/api.html#layer_layerDomainY"><code>layerDomainY</code></a> can be estimated automatically.</p>
+<h2 id="update">Update</h2>
+<p>For any changes, you&apos;ve added to the chart, to have an effect, you need first to update the chart. Each chart in the <em>linked-charts</em> library has an <a href="../pages/api.html#chart_update"><code>update</code></a> method, which recalculates and updates all the elements of the chart. But if you know that only some of them have been changed since the last update, you may want to change only these ones for the sake of performance time. So the <a href="../pages/api.html#chart_update"><code>update</code></a> method actually consists of several modules, each responsible for a certain type of changes. These partial updates can be called independently if necessary. The most important ones are</p>
+<ul>
+<li><p><a href="../pages/api.html#chart_updateSize"><code>updateSize</code></a> - changes the size of the chart. Internally calls <a href="../pages/api.html#axesChart_updateAxes"><code>updateAxes</code></a>.</p></li>
+<li><p><a href="../pages/api.html#axesChart_updateAxes"><code>updateAxes</code></a> - recalculates the domains and updates both axes. Internally calls <a href="../pages/api.html#layer_updateElementPosition"><code>updateElementPosition</code></a>.</p></li>
+<li><p><a href="../pages/api.html#layer_updateElements"><code>updateElements</code></a> - adds or removes elements to fit the current data.</p></li>
+<li><p><a href="../pages/api.html#layer_updateElementPosition"><code>updateElementPosition</code></a> - updates the position of all the points of the chart.</p></li>
+<li><p><a href="../pages/api.html#layer_updateElementStyle"><code>updateElementStyle</code></a> - updates colour, shape, size, etc. of all the points.</p></li>
+</ul>
 </div>
 <div class="tocContainer" id="toc"></div>
 <script src="../src/codeMirror/codemirror.js"></script>
