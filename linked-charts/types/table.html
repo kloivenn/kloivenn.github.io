@@ -6,8 +6,29 @@
 <body>
 <script src="../src/navTop.js"></script>
 <div class="contentContainer" id="content"><h1 id="tables">Tables</h1>
-<h2 id="sorry">Sorry,</h2>
-<p>This page is not yet ready. Please, try again later.</p>
+<p>The most simple type of charts, tables are designed to show content of any given JavaScript oject (it can correctly display only properties with string or numeric values). The resulting table has two columns: one contains names of the properties and the other holds their values. This type of charts has only one property (<a href="../pages/api.html#table_record"><code>record</code></a>) that gets an object to display (besides some standart ones like <a href="../pages/api.html#chart_width"><code>width</code></a> and <a href="../pages/api.html#dendogram_height"><code>height</code></a>). It doesn&apos;t have any interactivity and is generally use, for example, to show some information about the clicked cell or point.</p>
+<pre class="tiy" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/data/inputdata.js;../src/linked-charts.css">d3.select("body").append("p")
+    .text("Enter number form 0 to " + (inputData.length - 1));
+d3.select("body")
+    .append("input")
+        .attr("type", "text")
+        .attr("id", "index")
+        .attr("value", 0)
+        .attr("onchange", "update();");
+
+//-----Precode end-----
+var ind = 0;
+
+var update = function() {
+    console
+    ind = document.getElementById("index").value;
+    table.update();
+}
+
+var table = lc.table()
+  .record(function() {return inputData[ind];})
+  .place();
+</pre>
 </div>
 <div class="tocContainer" id="toc"></div>
 <script src="../src/codeMirror/codemirror.js"></script>

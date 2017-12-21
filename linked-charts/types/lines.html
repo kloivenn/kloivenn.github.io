@@ -45,7 +45,7 @@
 </pre>
 <h4 id="connected-points">Connected points</h4>
 <p>Sometimes you don&apos;t have the function, but just want to connect some dots. Currently, in the <em>linked-charts</em> library there are no special types of lines for this task, but you can use [parametricCurve] and make your functions defined only for some certain values inside <a href="paramRange">paramRange</a>, by setting a specific number of steps (<a href="../pages/api.html#line_nsteps"><code>nsteps</code></a>).</p>
-<p>For examle, you can set the <a href="paramRange">paramRange</a> to <code>[0, n-1]</code> and number of steps to <code>n</code>. Then you can define <a href="../pages/api.html#parametricCurve_xFunction"><code>xFunction</code></a> and <a href="../pages/api.html#parametricCurve_yFunction"><code>yFunction</code></a> only for integer values from <em>0</em> to <em>n-1</em> and just ennumerate the dots, you want to connect.</p>
+<p>For examle, you can set the <a href="paramRange">paramRange</a> to <code>[0, n]</code> and number of steps to <code>n</code>. Then you can define <a href="../pages/api.html#parametricCurve_xFunction"><code>xFunction</code></a> and <a href="../pages/api.html#parametricCurve_yFunction"><code>yFunction</code></a> only for integer values from <em>0</em> to <em>n-1</em> and just ennumerate the dots, you want to connect.</p>
 <p>Note that because of machine errors, values of the parameter may be not exactly integer and should be rounded.</p>
 <pre class="tiy" width="100%" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/linked-charts.css">var x = [], y = [];
 //generate some random set of 20 points
@@ -57,7 +57,7 @@ for(var i = 0; i &lt; 20; i++){
 var line = lc.parametricCurve()
     .xFunction(function(t) {return x[Math.round(t)];})
     .yFunction(function(t) {return y[Math.round(t)];})
-    .paramRange([0, 19])
+    .paramRange([0, 20])
     .nsteps(20)
   .place();
 
