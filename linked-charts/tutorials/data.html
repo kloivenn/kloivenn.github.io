@@ -6,8 +6,192 @@
 <body>
 <script src="../src/navTop.js"></script>
 <div class="contentContainer" id="content"><h1 id="data-input">Data input</h1>
-<h2 id="sorry">Sorry,</h2>
-<p>This page is not yet ready. Please, try again later.</p>
+<p>To work with the <em>linked-charts</em> library you firt need to get your data as one or several JavaScript variables. There are no specifict requirements for the data format, provided that you know how to get or calculate each of the requested values. The main trick is to make your web page see the data, and here we describe several ways of doing it.</p>
+<h2 id="importing-data">Importing data</h2>
+<p>The problem of reading in data is important not only for the <em>linked-charts</em> library, but also for any JavaScript applications, made for visualising or processing big data sets. Here, we will show examples of the approaches, that we consider to be the best ones, but clearly you can use any other tutorial like, for example <a href="http://learnjsdata.com/read_data.html">this</a> one. It doesn&apos;t matter, how you got your data in for the <em>linked-charts</em>.</p>
+<h3 id="insert-data-in-the-code">Insert data in the code</h3>
+The easiest, but may be not the most beatufil way, is just to convert your data into <a href="#JSON">JSON</a> format and then copy-paste the result into your code like this
+<pre class="tiy" runnable="false">var data = PASTE_YOUR_DATA_HERE;
+</pre>
+<p>After that you can alredy access the <code>data</code> variable as an ordinary JavaScript object (check <a href="../examples/simpleExample.html">this</a> example).</p>
+<p>This approach is the most simple, but requires from you to make the convertion and copy-pasting each time, your data changes. It also overburdens your code with data. Yet it&apos;s the best option if you want your plots to be on one self-suffcient page that is easy to send, can work without any Internet connection and doesn&apos;t depend on any external files.</p>
+<p>It is also possible to insert content of a CSV file inside your code, but this will still require some processing as described <a href="#CSV">bellow</a> and you will need to mind the quotation marks, since all your data will be at first treated as a single string.</p>
+<p>If you don&apos;t mind having several files, you can also have the data inside a .js file that is linked to your page.</p>
+<h3 id="reading-from-url">Reading from URL</h3>
+<p>JavaScript also have functionality to read external files, if they are located on some server. Some nice ways to do that are offered by the <a href="https://d3js.org/">d3</a> library. <a href="https://github.com/d3/d3-request">d3-request</a> module includes functions to load and parse <a href="https://github.com/d3/d3-request#html">HTML</a>, <a href="https://github.com/d3/d3-request#json">JSON</a>, <a href="https://github.com/d3/d3-request#tsv">TSV</a>, <a href="https://github.com/d3/d3-request#xml">XML</a> and <a href="https://github.com/d3/d3-request#text">plain text</a> files. It also has some in-built functionality to parse <a href="https://github.com/d3/d3-dsv#csvParse">CSV</a> and any other <a href="https://github.com/d3/d3-dsv#dsvFormat">delimiter-separated</a> files.</p>
+<p>We won&apos;t go deep into the ways of using these functions, since it is is already described on the d3 web-page. Instead we will just show and explain examples of generating a plot for the Iris dataset, reading the data from an external <a href="../src/data/iris.json">JSON</a> file and a <a href="../src/data/iris.csv">CSV</a> file.</p>
+<pre class="tiy" height="500" tiy-preload="../src/linked-charts.min.js;../src/linked-charts.css">d3.json("https://kloivenn.github.io/linked-charts/src/data/iris.json",
+  function(data){
+    var scatterplot = lc.scatter()
+      .x(function(k) {return data[k].sepalLength})
+      .y(function(k) {return data[k].petalLength})
+      .size(function(k) {return data[k].sepalWidth * 2})
+      .colourValue(function(k) {return data[k].petalWidth})
+      .symbolValue(function(k) {return data[k].species})
+      .place();
+  }
+);
+</pre>
+<p>You probably have already noticed the main difference from our usual way of generating linked charts. All the code is now inside a callback function that is an argument of <code>d3.json</code>. The reason for this is that file reading in JavaScript is asynchronous. The browser starts reading the file and immediately goes on executing further code. So if you try to create a plot after calling <code>d3.json</code>, your data may be not loade by the time the plot is rendered and you&apos;ll get an error. The callback fucntion, from the other hand, is called only after the data is loaded.</p>
+<p>If you want, you don&apos;t need to keep put all your code inside the callback function. Just make sure that there you have all the methods that require the data being already loaded (such as <a href="../pages/api.html#chart_place"><code>place</code></a>, <a href="../pages/api.html#chart_update"><code>update</code></a>, <a href="../pages/api.html#heatmap_cluster"><code>cluster</code></a>).</p>
+<pre class="tiy" height="500" tiy-preload="../src/linked-charts.min.js;../src/linked-charts.css">var data;
+d3.text("https://kloivenn.github.io/linked-charts/src/data/iris.csv",
+  function(text){
+    data = d3.csvParse(text);
+    scatterplot.place();
+  }
+);
+
+var scatterplot = lc.scatter()
+  .x(function(k) {return +data[k].sepal_length})
+  .y(function(k) {return +data[k].petal_length})
+  .size(function(k) {return +data[k].sepal_width * 2})
+  .colourValue(function(k) {return +data[k].petal_width})
+  .symbolValue(function(k) {return data[k].species});   
+</pre>
+<p>Keep in mind, that <code>d3.csvParse</code> treat all the columns as strings and therefore one may need to convert them to numbers (note all the <code>+</code> when defining plot&apos;s properties). Other option is to convert all necessary values to numbers during parsing the following way:</p>
+<pre class="tiy" runnable="false">data = d3.csvParse(text, function(d){
+    return {
+      sepal_length: +d.sepal_length,
+      petal_length: +d.petal_length,
+      sepal_width: +d.sepal_width,
+      petal_width: +d.petal_width,
+      species: d.species
+  }
+);
+</pre>
+<p>Inside this function you can also rename columns, perform some simple calculations or save only necessary columns.</p>
+<h4 id="load-data-upon-request">Load data upon request</h4>
+<p>If you have your data stored in several big files, you can load them on request rather then getting all the data in when the page is loading. Let&apos;s imagine that we have three data sets <code><a href="../src/data/data1.json">data1.json</a></code>, <code><a href="../src/data/data2.json">data2.json</a></code> and <code><a href="../src/data/data3.json">data3.json</a></code>. For this simple example these are just sets of coordinates for a hundred points each.</p>
+<pre class="tiy" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/linked-charts.css">d3.select("body").append("div")
+  .attr("id", "scatter");
+var radio = d3.select("body").append("div");
+for(var i = 1; i &lt; 4; i++) {
+  radio.append("input")
+    .attr("type", "radio")
+    .attr("name", "data")
+    .attr("value", "data" + i)
+    .attr("id", "data" + i)
+    .attr("onchange", "loadData();");
+
+  radio.append("label")
+    .attr("for", "data" + i)
+    .text("Dataset " + i);
+}
+//-----Precode end-----
+var data = {};
+//this function will be called each time a radio button
+//state is changed
+var loadData = function() {
+  //get all radio buttons
+  var radios = document.getElementsByName("data");
+  //find which one is checked and save the name of
+  //the required file
+  var name;
+  for(var i = 0; i &lt; radios.length; i++)
+    if(radios[i].checked)
+      name = radios[i].value + ".json";
+  //read the file and update the scatter plot
+  d3.json("https://kloivenn.github.io/linked-charts/src/data/" + name,
+    function(d){
+      data = d;
+      scatter.update();
+    }
+  )
+}
+//define the scatter plot
+//Note that it&apos;s empty when placed since "data" is an empty object
+var scatter = lc.scatter()
+  .x(function(k) {return data[k][0];})
+  .y(function(k) {return data[k][1];})
+  .size(4)
+  .place("#scatter");
+</pre>
+<p>Yet, this approach doesn&apos;t allow you to read only a certain part of the file, it still can help to save time and memory, when it comes to very big data sets.</p>
+<h3 id="reading-from-a-local-file">Reading from a local file</h3>
+<p>For security reasons JavaScript cannot acess local files as freely, as the ones on some server. One way to deal with this problem is to create an input form for the user to load a data file manually. To this end, you can use the <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input">input</a> element of type <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file">file</a> in<br>
+combination with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/FileReader">FileReader</a> interface.</p>
+<p><code>FileReader</code> has a <a href="https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsText">readAsText</a> method and its output can be parsed by <a href="https://github.com/d3/d3-dsv#csvParse">d3.csvParse</a>, <a href="https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse">JSON.parse</a> or any other parser of your choice.</p>
+<p>For the next example download <a href="../src/data/iris.csv">this CSV file</a> and then open it using the provided form.</p>
+<pre class="tiy" fitheight="true" tiy-preload="../src/linked-charts.min.js;../src/linked-charts.css">//add an input form
+d3.select("body").append("input")
+  .attr("type", "file")
+  .attr("id", "file")
+  .attr("onchange", "loadData();");
+
+var data = {};
+//this function will be called each time a new file is selected
+function loadData() {
+//load the file as text
+  reader.readAsText(document.getElementById("file").files[0]);
+}
+//create a new FileReader
+var reader = new FileReader();
+//when the file is loaded, parse it and update the plot
+reader.onload = function() {
+  data = d3.csvParse(reader.result);
+  scatter.update()
+}
+
+var scatter = lc.scatter()
+  .x(function(k) {return +data[k].sepal_length})
+  .y(function(k) {return +data[k].petal_length})
+  .size(function(k) {return +data[k].sepal_width * 2})
+  .colourValue(function(k) {return +data[k].petal_width})
+  .symbolValue(function(k) {return data[k].species})
+  .place();
+</pre>
+<h2 id="input-formats">Input formats</h2>
+<p>The <em>linked-charts</em> library doesn&apos;t have any in-built format-converting functionality. It always assumes that you already have variables that contain your data and it doesn&apos;t really matter how you get them.</p>
+<p>Yet there are plenty of other libraries that can easily do the job with just few lines of code and therefore there is no point for us to rewrite what others have already done. In this section we will ennumerate some libraries and methods that can read and parse various data formats. You can find examples of their usage on the pages of these libraries/interfaces or on this page.</p>
+<p>Of course, you can also use any other library of your choosing. Anything that can read data in JavaScript arrays of objects works.</p>
+<h3 id="json">JSON</h3>
+<p>JSON (or JavaScript Object Notation) is closely related to JavaScript format of data. Generally, data in JSON format is a valid JavaScript array or object that you can just copy-paste into the code and assign to some variable. It can also be read as text and parsed afterwards.</p>
+<p>Various methods, both JavaScript native and implemented in external libraries, can read and/or parse JSON format. Some of them are: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse">JSON.parse</a>, <a href="https://github.com/d3/d3-request/blob/master/README.md#json">d3.json</a>, <a href="http://api.jquery.com/jquery.getjson/">jQuery.getJSON</a>, <a href="http://api.jquery.com/jquery.parsejson/">jQuery.parseJSON</a> and probably some other implementations.</p>
+<p>There are also quite a few tools to convert your data to JSON format. For example, <a href="https://cran.r-project.org/web/packages/jsonlite/index.html">jsonlite</a> R package can tranform lists, dataframes, matrices and arrays into JSON string.</p>
+<p>An example of reading data from a JSON file you can find in <a href="#Reading-from-URL">this</a> section.</p>
+<pre class="tiy" runnable="false" subscr="An example of data in JSON format">{
+  "firstName": "John",
+  "lastName": "Smith",
+  "isAlive": true,
+  "age": 27,
+  "address": {
+    "streetAddress": "21 2nd Street",
+    "city": "New York",
+    "state": "NY",
+    "postalCode": "10021-3100"
+  },
+  "phoneNumbers": [
+    {
+      "type": "home",
+      "number": "212 555-1234"
+    },
+    {
+      "type": "office",
+      "number": "646 555-4567"
+    },
+    {
+      "type": "mobile",
+      "number": "123 456-7890"
+    }
+  ],
+  "children": [],
+  "spouse": null
+}
+</pre>
+<h3 id="csv">CSV</h3>
+<p>CSV (or Comma-Separated Values) is a very common way to keep the data. It is a table with columns separated by comma and is generally parsed as an array of rows, where each row is converted into an object with column names as its properties.</p>
+<p>We recomend to use <a href="https://github.com/d3/d3-dsv#csvParse">d3.csvParse</a> to convert CSV-formatted data into JavaScript library. Another possible option is <a href="https://github.com/evanplaice/jquery-csv/">jquery-csv</a> library. For both of them you first need to read your file as text and only then parse it. This can be done by <a href="https://github.com/d3/d3-request/blob/master/README.md#text">d3.text</a> function (see the second example in <a href="#Reading-from-URL">this</a> section), by <a href="https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsText">FileReader.readAsText</a> method (see example in <a href="#Reading-from-a-local-file">this</a> section) or by <a href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest">XMLHttpRequest</a> class and its value <a href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseText">XMLHttpRequest.responseText</a>.</p>
+<p>D3 library also allows you to parse any other delimiter-separated files, using <a href="https://github.com/d3/d3-request/blob/master/README.md#tsv">d3.tsv</a> to read and parse tab-separated values or <a href="https://github.com/d3/d3-dsv/blob/master/README.md#dsvFormat">d3.dsvFormat</a> to parse any delimiter-separated values.</p>
+<p>In most cases, the ability to read and parse CSV (or other delimiter-separated files) is enough, since there exist dozens if not hundred converters from various formats to CSV and most of data analysis softfware provides a way to export data as CSV.</p>
+<p>Yet if you think you need to import something else without using CSV as an intermediate step, try to google for it. It may happen that someone has already wrote a JavaScript parser.</p>
+<h2 id="data-access-time-unfinished">Data access time (unfinished)</h2>
+<p>After the data is loaded there is still one thing you may need to take care. Keep in mind, that the plots in the <em>linked-charts</em> library will try to access each instance of the data multiple times during the update, so for performance sake you need to make sure, that it doesn&apos;t take too much time.</p>
+<p>There are two functions in the <em>linked-charts</em> library that can help you with that.</p>
+<h3 id="separateby">separateBy</h3>
+<p><code>separateBy</code> is a data transforming function that allows you to avoid exessive filtering.</p>
+<p>Imagine you have data in the <a href="https://en.wikipedia.org/wiki/Wide_and_narrow_data">narrow</a> format.</p>
+<h3 id="cache">cache</h3>
 </div>
 <div class="tocContainer" id="toc"></div>
 <script src="../src/codeMirror/codemirror.js"></script>
