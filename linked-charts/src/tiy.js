@@ -12,50 +12,63 @@ tiy.button_run = function( id ) {
     .style( "width", width + (width.includes("%") ? "" : "px"))
     .style( "height", height + (height.includes("%") ? "" : "px"))
     .attr( "frameBorder", "0" );
-  iframe = iframe.node();
-  var idocument = ( iframe.contentWindow || iframe.contentDocument ).document;
-  var ihead = d3.select( idocument.head );
-  var ibody = d3.select( idocument.body );
-  
-  var preload = d3.select( "textarea#" + id ).attr( "tiy-preload" ).split(";");
-  var i = 0;
-  while(i < preload.length){
-    if(preload[i].includes(".css")){
-      ihead.append("link")
-        .attr("rel", "stylesheet")
-        .attr("type", "text/css")
-        .attr("href", preload[i]);
-      preload.splice(i, 1);
-    } else
-      i++;
+
+  var addCode = function() {
+    var iframe = d3.select("div#" + id).select("iframe").node();
+    var idocument = ( iframe.contentWindow || iframe.contentDocument ).document;
+    var idocument = iframe.contentDocument;
+    var ihead = d3.select( idocument.head );
+    var ibody = d3.select( idocument.body );
+    ihead.append("meta")
+      .attr("charset", "utf-8");
+    var preload = d3.select( "textarea#" + id ).attr( "tiy-preload" ).split(";");
+    var i = 0;
+    while(i < preload.length){
+      if(preload[i].includes(".css")){
+        ihead.append("link")
+          .attr("rel", "stylesheet")
+          .attr("type", "text/css")
+          .attr("href", preload[i]);
+        preload.splice(i, 1);
+      } else
+        i++;
+    }
+    
+    var loaded = 0,
+      code = "\n" + tiy.mirrors[id].doc.getValue();
+
+
+    ihead.selectAll("script").data(preload)
+      .enter()
+        .append("script")
+          .attr("src", function(d){return d})
+          .on("load", function(){
+            loaded++;
+            if(loaded == preload.length){
+              ibody.append("script").text( tiy.precode[id] + code );
+              if(d3.select( "table#" + id ).select(".tiy-result").attr( "fitWidth" ) == "true")
+                d3.select(iframe)
+                  .style("width", ibody.node().scrollWidth + "px");
+              if(d3.select( "table#" + id ).select(".tiy-result").attr( "fitHeight" ) == "true")
+                d3.select(iframe)
+                  .style("height", ibody.node().scrollHeight + "px");
+            }
+          });
+
   }
-  
-  var loaded = 0,
-    code = "\n" + tiy.mirrors[id].doc.getValue();
 
+  if( typeof InstallTrigger !== 'undefined') 
+    //for Firefox
+    iframe.node().onload = addCode
+  else
+    addCode();
 
-  ihead.selectAll("script").data(preload)
-    .enter()
-      .append("script")
-        .attr("src", function(d){return d})
-        .on("load", function(){
-          loaded++;
-          if(loaded == preload.length){
-            ibody.append("script").text( tiy.precode[id] + code );
-            if(d3.select( "table#" + id ).select(".tiy-result").attr( "fitWidth" ) == "true")
-              d3.select(iframe)
-                .style("width", ibody.node().scrollWidth + "px");
-            if(d3.select( "table#" + id ).select(".tiy-result").attr( "fitHeight" ) == "true")
-              d3.select(iframe)
-                .style("height", ibody.node().scrollHeight + "px");
-          }
-        });
 
   if(d3.select( "textarea#" + id ).attr( "showCode" ) == "false")
      d3.select("table#"+id).selectAll("tr")
       .filter(function() {return !d3.select(this).classed("tiy-result") &&
                                   !d3.select(this).classed("tiy-text")})
-        .remove();
+        .classed("hidden", true);
 }
 
 tiy.button_reset = function( id ) {
