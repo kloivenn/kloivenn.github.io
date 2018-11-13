@@ -1,6 +1,7 @@
 <head>
 	<link rel="stylesheet" type="text/css" href="src/linked-charts.css">
-	<script type="text/javascript" src = "src/linked-charts.min.js"></script>
+	<script type="text/javascript" src = "src/linked-charts.js"></script>
+	<script type="text/javascript" src = "src/additional.js"></script>
 	<script type="text/javascript" src = "src/data.js"></script>
 </head>
 <body>
@@ -67,7 +68,7 @@
 			})
 			.colourDomain(["Not significant", "Sig. Reinforcement", "Sig. Compensation"])
 			.colourLegendTitle("")
-			.palette(["#aaa", "#55f", "#f55"])
+			.palette(["#aaa", "#00C3C3", "#B2303A"])
 			.size(function(i) {
 				return (this.get_colourValue(i) == "Not significant") ? 2 : 4;
 			})
@@ -98,7 +99,7 @@
 					return "Sig.C.";
 			})
 			.colourDomain(["none", "Sig.R.", "Sig.C."])
-			.palette(["#aaa", "#55f", "#f55"])
+			.palette(["#aaa", "#00C3C3", "#B2303A"])
 			.size(function(i) {
 				return (this.get_colourValue(i) == "none") ? 2 : 4;
 			})
@@ -150,7 +151,7 @@
 				else
 					return point - se;
 			})
-			.colour("red")
+			.colour("black")
 			.on_mouseover(function() {})
 			.place("#cross");
 
@@ -181,7 +182,7 @@
 				else
 					return point - se;
 			})			
-			.colour("red")
+			.colour("black")
 			.on_mouseover(function() {})
 			.place("#lfs");
 
@@ -214,21 +215,27 @@
 		d3.select("#ensembl").node().value = geneInfo[sp1][0][selGene];
 		d3.select("#geneName").node().value = geneInfo[sp1][1][selGene];
 
-		var expr = lc.beeswarm()
+		var expr = lc.scatter()
+			.elementIds(d3.range(sampleTable.tissue.length).filter(i => sampleTable.tissue[i] == tissue))
 			.width(800)
 			.height(350)
-			.symbolLegendTitle("")
-			.colourLegendTitle("Replica")
-			.x(i => sampleTable.species[i])
+			.set_margins({bottom: 90})
+			.symbolValue(i => sampleTable.species[i])
+			.symbolLegendTitle("Species")
+			.colourLegendTitle("")
+			.palette(["#998BBB", "#123456"])
+			.x(i => sampleTable.species[i] + "_" + sampleTable.rep[i])
 			.y(i => geneExpr[i][selGene])
+			.ticksRotateX(45)
 			.logScaleY(2)
 			.axisTitleY("FPKM")
-			.symbolValue(i => sampleTable.type[i])
-			.colourValue(i => sampleTable.rep[i])
+			.colourValue(i => sampleTable.type[i])
+			//.colourValue(i => sampleTable.rep[i])
 			.opacity(i => sampleTable.tissue[i] == tissue ? 1 : 0.2)
 			.label(i => sampleTable.sampleId[i])
 			.title(() => geneInfo[sp1][1][selGene])
-			.place("#expr")
+			.place("#expr");
+
 
 		var species = ["Human", "Mouse", "Macaque", "Opossum", "Platypus"];
 		var cols = ["Ensembl ID", "Gene name", "Chr."],
@@ -360,6 +367,7 @@
 			tissue = name;
 			if(cross) cross.update();
 			if(lfs) lfs.update();
+			if(expr) expr.update();
 		}
 	</script>
 </body>
