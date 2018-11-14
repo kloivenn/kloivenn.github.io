@@ -2,6 +2,7 @@
 	<link rel="stylesheet" type="text/css" href="src/linked-charts.css">
 	<script type="text/javascript" src = "src/linked-charts.min.js"></script>
 	<script type="text/javascript" src = "src/data.js"></script>
+	<title>TTI Browser</title>
 </head>
 <body>
 	Compare
@@ -235,10 +236,10 @@
 			.width(800)
 			.height(350)
 			.set_margins({bottom: 90})
-			.symbolValue(i => sampleTable.species[i])
 			.symbolLegendTitle("Species")
 			.colourLegendTitle("")
-			.palette(["#998BBB", "#123456"])
+			.symbolValue(i => sampleTable.species[i])
+			.palette(["#B991CD", "#123456"])
 			.x(i => sampleTable.species[i] + "_" + sampleTable.rep[i])
 			.y(i => geneExpr[i][selGene])
 			.ticksRotateX(45)
