@@ -1,10 +1,12 @@
 <head>
 	<link rel="stylesheet" type="text/css" href="src/linked-charts.css">
+	<link rel="stylesheet" type="text/css" href="src/style.css">
 	<script type="text/javascript" src = "src/linked-charts.min.js"></script>
 	<script type="text/javascript" src = "src/data.js"></script>
 	<title>TTI Browser</title>
 </head>
 <body>
+<div id="lists">
 	Compare
 	<select id = "sp1" onchange = "changeSp1(this.value);">
 		<option value = "Human">Human</option>
@@ -15,6 +17,7 @@
 	<select id = "sp2" onchange="changeSp2(this.value);"></select>
 	Tissue:
 	<select id = "tissue" onchange="changeTissue(this.value);"></select>
+</div>
 	<table>
 		<tr>
 			<td id = "cross"></td>
@@ -24,10 +27,12 @@
 	<table>
 		<tr>
 			<td>
-				Enter gene name: <input id = "geneName" type = "text" onchange = "searchGene(this.value);"> <br>
-				Enter Ensembl ID: <input id = "ensembl" type = "text" onchange = "searchEnsembl(this.value);">
-				<p id = "notFound" style="color: red; visibility: hidden;">Gene with this ID was not found.</p>
-				<table id = "info" border = 1></table>
+				<div id = "genes">
+				<p id = "notFound" style="color: red; visibility: hidden; text-align: center;">Gene with this ID was not found.</p>
+				<span>Enter gene name:</span> <input id = "geneName" type = "text" onchange = "searchGene(this.value);"> <br>
+				<span>Enter Ensembl ID:</span> <input id = "ensembl" type = "text" onchange = "searchEnsembl(this.value);">
+				<table id = "info"></table>
+				</div>
 			</td>
 			<td id = "expr"></td> 
 		</tr>
@@ -77,7 +82,7 @@
 			})
 			.domainX([-10, 10])
 			.domainY([-5, 5])
-			.axisTitleX("log2 fold change transcription")
+			.axisTitleX("log2-fold change transcription")
 			.axisTitleY("Translational Tuning Index")
 			.informText(i => "<b>" + geneInfo[sp1][1][i] + "</b><br>" +
 													"Chr: " + geneInfo[sp1][2][i] + "/" + geneInfo[sp2][2][i])
@@ -106,8 +111,8 @@
 			.opacity(function(i) {
 				return (this.get_colourValue(i) == "none") ? 0.5 : 0.75;
 			})
-			.axisTitleX("log2 fold change transcription")
-			.axisTitleY("log2 fold change translation")
+			.axisTitleX("log2-fold change transcription")
+			.axisTitleY("log2-fold change translation")
 			.informText(i => "<b>" + geneInfo[sp1][1][i] + "</b><br>" +
 													"Chr: " + geneInfo[sp1][2][i] + "/" + geneInfo[sp2][2][i])
 			.transitionDuration(0)
@@ -232,7 +237,7 @@
 		d3.select("#geneName").node().value = geneInfo[sp1][1][selGene];
 
 		var expr = lc.scatter()
-			.elementIds(d3.range(sampleTable.tissue.length).filter(i => sampleTable.tissue[i] == tissue))
+			.elementIds(() => d3.range(sampleTable.tissue.length).filter(i => sampleTable.tissue[i] == tissue))
 			.width(800)
 			.height(350)
 			.set_margins({bottom: 90})
@@ -247,7 +252,6 @@
 			.axisTitleY("FPKM")
 			.colourValue(i => sampleTable.type[i])
 			//.colourValue(i => sampleTable.rep[i])
-			.opacity(i => sampleTable.tissue[i] == tissue ? 1 : 0.2)
 			.label(i => sampleTable.sampleId[i])
 			.title(() => geneInfo[sp1][1][selGene])
 			.place("#expr");
@@ -288,7 +292,7 @@
 
 		function searchEnsembl(name) {
 			d3.select("#notFound")
-				.style("visibility", "hidden")			
+				.style("visibility", "hidden");			
 
 			var sp;
 			if(name.substring(0, 4) == "ENSG")
@@ -322,6 +326,9 @@
 		}
 
 		function searchGene(name) {
+			d3.select("#notFound")
+				.style("visibility", "hidden");			
+
 			var gene = -1, i = 0;
 			while(gene == -1 && i < species.length) {
 				gene = geneInfo[species[i]][1].indexOf(name);
@@ -385,5 +392,14 @@
 			if(lfs) lfs.update();
 			if(expr) expr.update();
 		}
+
+		expr.container.select("#legend")
+			.append("div")
+				.attr("class", "note")
+				.text("Note: the transcriptome and translatome data were normalized separately. " +
+					"Thus, expression level values can only be compared across samples from the same data type.")
+
+		d3.selectAll(".sample").selectAll("text")
+			.attr("dy", 3);
 	</script>
 </body>
