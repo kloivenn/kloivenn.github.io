@@ -130,6 +130,10 @@
 				var point = cross.get_layer("points").get_x(geneHover),
 					se = lfData[sp1][sp2][tissue][4][geneHover];
 				if(lc.isNaN(se)) se = cross.get_domainX()[1] - cross.get_domainX()[0];
+				if(lc.isNaN(point)) {
+					point = 0;
+					se = 0;
+				}
 
 				if(d == 1)
 					return point;
@@ -142,6 +146,10 @@
 				var point = cross.get_layer("points").get_y(geneHover),
 					se = lfData[sp1][sp2][tissue][3][geneHover];
 				if(lc.isNaN(se)) se = cross.get_domainY()[1] - cross.get_domainY()[0];
+				if(lc.isNaN(point)) {
+					point = 0;
+					se = 0;
+				}
 
 				if(d == 0)
 					return point;
@@ -161,6 +169,10 @@
 				var point = lfs.get_layer("points").get_x(geneHover),
 					se = lfData[sp1][sp2][tissue][4][geneHover];
 				if(lc.isNaN(se)) se = cross.get_domainX()[1] - cross.get_domainX()[0];
+				if(lc.isNaN(point)) {
+					point = 0;
+					se = 0;
+				}
 
 				if(d == 1)
 					return point;
@@ -173,6 +185,10 @@
 				var point = lfs.get_layer("points").get_y(geneHover),
 					se = lfData[sp1][sp2][tissue][5][geneHover];
 				if(lc.isNaN(se)) se = cross.get_domainY()[1] - cross.get_domainY()[0];
+				if(lc.isNaN(point)) {
+					point = 0;
+					se = 0;
+				}
 
 				if(d == 0)
 					return point;
@@ -215,7 +231,7 @@
 		d3.select("#geneName").node().value = geneInfo[sp1][1][selGene];
 
 		var expr = lc.scatter()
-			.elementIds(() => d3.range(sampleTable.tissue.length).filter(i => sampleTable.tissue[i] == tissue))
+			.elementIds(d3.range(sampleTable.tissue.length).filter(i => sampleTable.tissue[i] == tissue))
 			.width(800)
 			.height(350)
 			.set_margins({bottom: 90})
