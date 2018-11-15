@@ -40,6 +40,9 @@
 				<table id = "info"></table>
 				Search for this gene on <a target="_blank" rel="noopener noreferrer">GeneCards</a>.
 				</div>
+				<div class = "note1">
+					Note: this database currently covers 6,327 1:1 orthologs shared across all six species studied in Wang et al. 2018.
+			</div>
 			</td>
 			<td id = "expr"></td> 
 		</tr>
@@ -403,7 +406,19 @@
 
 		function changeTissue(name) {
 			tissue = name;
-			if(cross) cross.update();
+			if(cross) {
+				cross.update();
+				cross.container
+					.select("#legend")
+						.select("#error")
+							.select(".sample")
+								.append("line")
+									.attr("x1", 10)
+									.attr("x2", 10)
+									.attr("y1", 0)
+									.attr("y2", 20)
+									.attr("stroke", "black");
+			}
 			if(lfs) lfs.update();
 			if(expr) expr.update();
 		}
@@ -419,5 +434,15 @@
 
 		cross.legend.set_title({"error": ""});
 		cross.legend.add_block([["Standard error"], [0]], "dash", "error");
+						cross.container
+					.select("#legend")
+						.select("#error")
+							.select(".sample")
+								.append("line")
+									.attr("x1", 10)
+									.attr("x2", 10)
+									.attr("y1", 0)
+									.attr("y2", 20)
+									.attr("stroke", "black");
 	</script>
 </body>

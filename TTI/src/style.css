@@ -15,6 +15,15 @@
 	top: 250px;
 }
 
+.note1 {
+	width: 400px;
+	font-family: Quicksand, sans-serif;
+	color: #777;
+	font-size: 75%;
+	padding-top: 10px;
+	text-align: justify;
+}
+
 .tick text {
 	font-family: Quicksand, sans-serif;
 	font-size: 1.3em;
