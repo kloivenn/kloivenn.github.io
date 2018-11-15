@@ -44,7 +44,10 @@
 			<td id = "expr"></td> 
 		</tr>
 	</table>
-	
+	<div style="text-align: right; font-size: 10px; color: #666; font-family: Qicksand, sans-serif; width: 1500px">
+		Generated with the 
+		<a target="_blank" rel="noopener noreferrer" href="https://anders-biostat.github.io/linked-charts/">LinkedCharts</a> library.
+	</div>
 	<script type="text/javascript">
 		//var sp1 = "Human", sp2 = "Macaque", tissue = "Brain";
 		var geneHover = 0;
@@ -405,7 +408,7 @@
 			if(expr) expr.update();
 		}
 
-		expr.container.select("#legend")
+		expr.container
 			.append("div")
 				.attr("class", "note")
 				.text("Note: the transcriptome and translatome data were normalized separately. " +

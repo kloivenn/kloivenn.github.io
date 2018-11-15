@@ -10,6 +10,9 @@
 	color: #777;
 	font-size: 75%;
 	text-align: justify;
+	position: absolute;
+	left: 800px;
+	top: 250px;
 }
 
 .tick text {
