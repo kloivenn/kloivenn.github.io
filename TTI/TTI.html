@@ -6,7 +6,13 @@
 	<title>TTI Browser</title>
 </head>
 <body>
-<div id="lists">
+<div style="border-bottom: 1px solid #CCC;">
+	<div id = "topbar">
+		<img src = "src/Mammalian_evolutionTransparent.png" width = "150px" style = "margin-left: 10px;">
+		<div><span style="font-style: italic; color: #B2303A">Ex<sup>2</sup></span>plorer</div>
+	</div>
+</div>
+<div id = "lists">
 	Compare
 	<select id = "sp1" onchange = "changeSp1(this.value);">
 		<option value = "Human">Human</option>
@@ -32,6 +38,7 @@
 				<span>Enter gene name:</span> <input id = "geneName" type = "text" onchange = "searchGene(this.value);"> <br>
 				<span>Enter Ensembl ID:</span> <input id = "ensembl" type = "text" onchange = "searchEnsembl(this.value);">
 				<table id = "info"></table>
+				Search for this gene on <a target="_blank" rel="noopener noreferrer">GeneCards</a>.
 				</div>
 			</td>
 			<td id = "expr"></td> 
@@ -71,9 +78,9 @@
 				if(col == 1)
 					return "Sig. Compensation";
 			})
-			.colourDomain(["Not significant", "Sig. Reinforcement", "Sig. Compensation"])
+			.colourDomain(["Sig. Reinforcement", "Sig. Compensation", "Not significant"])
 			.colourLegendTitle("")
-			.palette(["#aaa", "#00C3C3", "#B2303A"])
+			.palette(["#00C3C3", "#B2303A", "#aaa"])
 			.size(function(i) {
 				return (this.get_colourValue(i) == "Not significant") ? 2 : 4;
 			})
@@ -244,7 +251,7 @@
 			.symbolLegendTitle("Species")
 			.colourLegendTitle("")
 			.symbolValue(i => sampleTable.species[i])
-			.palette(["#B991CD", "#123456"])
+			.palette(["#000", "#aaa"])
 			.x(i => sampleTable.species[i] + "_" + sampleTable.rep[i])
 			.y(i => geneExpr[i][selGene])
 			.ticksRotateX(45)
@@ -284,8 +291,13 @@
 							return "<b>" + cols[d[1]] + "</b>";
 						if(d[1] == "names")
 							return "<b>" + d[0] + "</b>";
+						if(d[1] == 1)
+							return "<i>" + geneInfo[d[0]][d[1]][selGene] + "</i>";
 						return geneInfo[d[0]][d[1]][selGene]; 
 					})
+			d3.select("#genes")
+				.select("a")
+					.attr("href", "https://www.genecards.org/cgi-bin/carddisp.pl?gene=" + geneInfo.Human[1][selGene]);
 		}
 
 		updateTable();
@@ -401,5 +413,8 @@
 
 		d3.selectAll(".sample").selectAll("text")
 			.attr("dy", 3);
+
+		cross.legend.set_title({"error": ""});
+		cross.legend.add_block([["Standard error"], [0]], "dash", "error");
 	</script>
 </body>
