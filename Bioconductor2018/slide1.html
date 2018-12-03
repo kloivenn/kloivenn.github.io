@@ -1,0 +1,21 @@
+<script type="text/javascript" src="src/js/linked-charts.min.js"></script>
+<link rel="stylesheet" type="text/css" href="src/css/linked-charts.css">
+<script type="text/javascript" src="src/js/iris.js"></script>
+<div id="slide1"></div>
+<script type="text/javascript">
+var scatter = lc.scatter()
+	.x(iris.Sepal_Length)
+	.y(iris.Petal_Length)
+	.size(iris.Sepal_Width.map(e => e * 2))
+	.colourValue(iris.Petal_Width)
+	.symbolValue(iris.Species)
+	.title("Iris dataset")
+	.axisTitleX("Sepal Length")
+	.axisTitleY("Petal Length")
+	.colourLegendTitle("Petal Width")
+	.symbolLegendTitle("Species")
+	.place("#slide1");
+
+scatter.legend.width(110);
+scatter.legend.update();
+</script>
