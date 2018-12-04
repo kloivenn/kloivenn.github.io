@@ -8,11 +8,11 @@
 <table>
    <tr>
       <td id = "mean-var"></td>
-      <td id = "expr"></td>
+      <td id = "tsne"></td>
    </tr>
    <tr>
-   		<td id = "tsne"></td>
-   		<td id = "table"><table border=2></table></td>
+      <td id = "expr"></td>
+  		<td id = "table"><table border=2></table></td>
    </tr>
 </table>
 </div>	
@@ -23,6 +23,9 @@
          .x(i => data.means[i])
          .y(i => data.vars[i]/data.means[i])
          .label(i => data.geneNames[i])
+         .title("Variable genes")
+         .axisTitleX("Expression")
+         .axisTitleY("Variability")
          .logScaleX(10)
          .logScaleY(10)
          .width(380)
@@ -51,6 +54,7 @@
       var tsneFA = lc.scatter()
          .x(i => data.tsne[i][0])
          .y(i => data.tsne[i][1])
+         .title("T-SNE: 2000 cells")
          .label(i => data.cellNames[i])
          .colourValue(i => Math.sqrt(data.countMatrix[selGeneFA][i]/data.sf[i]))
          .palette(["#FFFFCC","#FFEDA0","#FED976","#FEB24C","#FD8D3C","#FC4E2A","#E31A1C","#BD0026","#800026"])
@@ -61,6 +65,11 @@
          .height(380)
          .set_paddings({left:20})
          .place(d3.select("#fullApp").select("#tsne"));
+
+d3.selectAll(".axis")
+   .selectAll(".label")
+   .style("fill", "#444")
+   .style("font-size", 18);         
 
       tsneFA.legend.width(60).update();
 

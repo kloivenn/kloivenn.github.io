@@ -372,7 +372,7 @@
 			opts.exit().remove();
 			opts.enter()
 				.append("option")
-				.attr("selected", d => (!lfs && d == "Mouse") ? true : undefined)
+				.attr("selected", d => d == "Mouse" ? true : undefined)
 				.merge(opts)
 					.attr("value", d => d)
 					.text(d => d);

@@ -24,9 +24,12 @@
 
 		<main role="main">
       <article id="webslides">
+      	<!--Title-->
       	<section>
       		<header>
-      			
+      			<img src="src/images/ZMBH_Logo_transparent.gif" class="alignleft" width="100">
+      			<img src="src/images/heidelberg-university-logo.png" class="alignright" width="170">
+      			<p class="text-intro aligncenter">University of Heidelberg</p>
       		</header>
       		<div class="grid vertical-align">
       			<div class="column">
@@ -37,54 +40,41 @@
      				</div>
      			</div>
       		<footer>
-      			<div class="content-right">
-      				<h3>Svetlana Ovchinnikova</h3>
-      				<h3>Simon Anders</h3>
-      			</div>
+      				<p><span class="text-subtitle alignleft">This presentation online: <br> 
+      					<strong>kloivenn.github.io/Bioconductor2018</strong></span>
+      				<span class="alignright text-pull-right" style="padding-right: 50px">
+      					Svetlana Ovchinnikova<br>
+      					Simon Anders
+      				</span></p>
       		</footer>
       	</section>
 
-      	<section>
+      <!-- Slide 01 -->
+	      <section>
       	<header>
       	<div class="content-center">
-      		<h2>It's simple!</h2>
+      		<h2>Explore your data</h2>
       	</div>      		
       	</header>
-      	<ul class="flexblock gallery">
-      		<li>
-      			<figure>
-      				<img src="src/images/iris_slide_1.png">
-      				<figcaption>
-      					<pre class="language-r">
-<code>ggplot(iris) + geom_point(aes(x = Sepal.Length, y = Petal.Length,</code>
-<code>		size = Sepal.Width * 2, colour = Petal.Width, shape = Species))</code>
-      					</pre>
-      				</figcaption>
-      			</figure>
-      		</li>
-      		<li>
-      			<figure>
-      				<iframe src="slide1.html" class="wrap" height="550" allowfullsreen></iframe>
-      				<figcaption>
-      					<pre class="language-r">
-<code>lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length,</code>
-<code>		size = iris$Sepal.Width * 2, colourValue = iris$Petal.Width,</code>
-<code>		symbolValue = iris$Species))</code></pre>
-      				</figcaption>
-      			</figure>
-      		</li>
-      	</ul>
+   				<figure class="aligncenter wrap">
+   					<iframe src="slide01.html" class = "wrap" height="600" allowfullscreen></iframe>
+   				</figure>
+   				<p class="text-subtitle">RNA-Seq data, <strong>57</strong> samples, <strong>8000 out of ~60000</strong> genes.</p>
+   				<footer>
+   					<p class="text-intro content-right" style="font-size: 1.2em;">from C. Conway et al. Oncotarget, 6:40186-40201 (2015), doi:10.18632/oncotarget.5529</p>
+   				</footer>
       	</section>
 
+      <!-- Slide 02 -->
       <section>
       	<header>
       	<div class="content-center">
-      		<h2>Linking</h2>
+      		<h2>With just few lines of code</h2>
       	</div>      		
       	</header>
       	<div class="wrap">
       		<div class="card-60">
-      			<figure><iframe src="slide3.html" height="550" class = "wrap" allowfullscreen></iframe></figure>
+      			<figure><iframe src="slide02.html" height="550" class = "wrap" allowfullscreen></iframe></figure>
       			<div><pre class="language-r">
 <code>openPage(useViewer = FALSE, layout = "table1x2")</code>
 
@@ -112,8 +102,45 @@
       			</pre></div>
       		</div>
       	</div>
+   			<footer>
+   				<p class="text-intro content-right" style="font-size: 1.2em;">from C. Conway et al. Oncotarget, 6:40186-40201 (2015), doi:10.18632/oncotarget.5529</p>
+   			</footer>      	
       </section>
 
+      <!-- Slide 03 -->
+      	<section>
+      	<header>
+      	<div class="content-center">
+      		<h2>It's simple!</h2>
+      	</div>      		
+      	</header>
+      	<ul class="flexblock gallery">
+      		<li>
+      			<figure>
+      				<img src="src/images/iris_slide_1.png">
+      				<figcaption>
+      					<pre class="language-r">
+<code>ggplot(iris) + geom_point(aes(x = Sepal.Length, y = Petal.Length,</code>
+<code>		size = Sepal.Width * 2, colour = Petal.Width, shape = Species))</code>
+      					</pre>
+      				</figcaption>
+      			</figure>
+      		</li>
+      		<li>
+      			<figure>
+      				<iframe src="slide03.html" class="wrap" height="550" allowfullsreen></iframe>
+      				<figcaption>
+      					<pre class="language-r">
+<code>lc_scatter(dat(x = iris$Sepal.Length, y = iris$Petal.Length,</code>
+<code>		size = iris$Sepal.Width * 2, colourValue = iris$Petal.Width,</code>
+<code>		symbolValue = iris$Species))</code></pre>
+      				</figcaption>
+      			</figure>
+      		</li>
+      	</ul>
+      	</section>
+
+      <!-- Slide 04 -->
       <section>
       	<header>
       	<div class="content-center">
@@ -123,8 +150,8 @@
       	<div class="wrap content-center">
       					<pre class="language-r" style="font-size: 1.3em;">
 <code>on_click = function(i) {</code>
-<code>		#put here your R code. For example:</code>
-<code>		selPoint <<- i</code>
+<code>		# put here your R code. For example:</code>
+<code>		selPoint <<- i # change some global variable</code>
 <code>		updateCharts()</code>
 <code>}</code></pre>
 				<p class="text-intro">Customizable events:</p>
@@ -141,6 +168,7 @@
       	</div>
       </section>
 
+			<!-- Slide 05 -->
       <section>
       	<header>
       	<div class="content-center">
@@ -149,7 +177,21 @@
       	</header>
       	<div class="wrap">
       		<div class="card-60">
-      			<figure><iframe src="slide4.html" height="550" class = "wrap" allowfullscreen></iframe></figure>
+     				<div class="wrap">
+     					<iframe src="slide05.html" height="400" class="wrap" allowfullscreen></iframe>
+     					<p class="text-subtitle">
+     						<span style="width: 350px; float: left;"><strong>MA Plot</strong></span> 
+     						<span style="width: 300px;"><strong>Expression</strong></span>
+     					</p>
+     					<p class="text-subtitle">
+     						<span style="width: 350px; float: left;">
+     							log<sub>2</sub>-fold changes of <strong>58037</strong> genes
+     						</span>
+     						<span style="width: 300px;">
+     							<strong>19</strong> patients, normal and tumor tissues
+     						</span>
+     					</p>
+     				</div>
       			<div><pre class="language-r">
 <code>openPage(useViewer = FALSE, layout="table1x2")</code>
 
@@ -178,26 +220,45 @@
       			</pre></div>
       		</div>
       	</div>
+   			<footer>
+   				<p class="text-intro content-right" style="font-size: 1.2em;">from C. Conway et al. Oncotarget, 6:40186-40201 (2015), doi:10.18632/oncotarget.5529</p>
+   			</footer>
       </section>
 
+			<!-- Slide 06 -->
       <section>
       	<header>
       	<div class="content-center">
       		<h2>Maybe something more complicated?</h2>
       	</div>      		
       	</header>
-      	<div class="wrap">
-     			<figure><iframe src="slide5.html" height="800" class = "wrap" allowfullscreen></iframe></figure>
-      	</div>
+      	<figure>
+     			<iframe src="slide06.html" height="800" class="wrap" allowfullscreen></iframe>
+      	</figure>
+   			<div class="alignright">
+   				<p class="text-intro content-right" style="font-size: 1.2em;">Stoeckius et al. Nature Methods, 14:865, 2017</p>
+   				<p class="text-intro content-right" style="font-size: 1.2em;">
+						You can find tutorial for this example
+						<a href="https://anders-biostat.github.io/linked-charts/rlc/citeseq/example_1.html">
+      				here
+      			</a>   					
+   				</p>
+   			</div>      	
       </section>
 
       <section>
+      	<header>
+      		<div class="content-center">
+      			<h2>Online tutorials</h2>
+      		</div>      		
+      	</header>
       	<div class="content-center">
-      		<h1>For more details</h1>
-      		<h3>check this tutorial</h3>
-      		<h3><strong><a href="https://anders-biostat.github.io/linked-charts/rlc/citeseq/example_1.html">
-      			https://anders-biostat.github.io/linked-charts/rlc/citeseq/example_1.html
+      		<h3><strong><a href="https://anders-biostat.github.io/linked-charts">
+      			https://anders-biostat.github.io/linked-charts
       		</a></strong></h3>
+      		<figure>
+      			<img src="src/images/linked-charts - Google Chrome_003.png">
+      		</figure>
       	</div>
       </section>
 
@@ -226,7 +287,7 @@
       <section>
         <header>
       		<div class="content-center">
-      			<h2>Thank you for attention!</h2>
+      			<h2>Thank you for your attention!</h2>
       		</div>      		
       	</header>
       	<h3>Try it now:</h3>
@@ -235,10 +296,11 @@
       		<code>devtools::install_github( "anders-biostat/rlc" )</code></pre>
       	<h3>This presentation is available at:</h3>
       	<h4 class="content-center"><strong>kloivenn.github.io/Bioconductor2018</strong></h4>
-      	<div class="grid vertical-align">
-      		<div class="column">
-      		</div>
-      	</div>
+      	<h3>Tutorial available at:</h3>
+      	<h4 class="content-center"><strong>anders-biostat.github.io/linked-charts</strong></h4>
+ 				<div class="wrap">
+ 					<p><span class="text-pull-right" style="padding-right: 100px; font-size: 1.5em"><strong>Anders group is hiring</strong></span></p>
+ 				</div>
       </section>
 
       </article>
