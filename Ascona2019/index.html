@@ -76,7 +76,7 @@
 				</section>
 				<section>
 					<h2>Compare Several Embeddings</h2>
-					<pre><code data-trim data-noescape class="r">
+					<pre style="width: 95%"><code data-trim data-noescape class="r">
 						sleepwalk(list(citeSeq$tsne, citeSeq$umap), citeSeq$pca, titles = c("t-SNE", "UMAP"))
 					</code></pre>
 					<div class="aspect-ratio" style="padding-top: calc(50% + 75px);">
@@ -127,7 +127,7 @@ sleepwalk(list(um13_A, um13_B, um14),
 				</section>
 				<section>
 					<h2>Additional Features</h2>
-					<h3>Lasso</h3>
+					<h3>Lasso Selection</h3>
 					<pre><code class="r" data-trim data-noescape style="font-size: 0.8em; line-height: 1.2;">
 getHighGenes <- function(marked){
   if( length(marked) == 0 ) return( "" )
@@ -154,13 +154,17 @@ getHighGenes <- function(marked){
 
 <mark>sleepwalk(data$umap, data$pca, pointSize = 2.5, on_selection = getHighGenes)</mark>
 					</code></pre>
-					<p class="footnote" style="text-align: left">
-						Load data from <a target="about:blank" href="https://kloivenn.github.io/Ascona2019/data/e13_A.rds">https://kloivenn.github.io/Ascona2019/data/e13_A.rds</a><br>
-						Load script from <a target="about:blank" href="https://kloivenn.github.io/Ascona2019/data/trySleepwalk.R">https://kloivenn.github.io/Ascona2019/data/trySleepwalk.R</a>
-					</p>
 					<div class="wrapper" style="z-index: 1; background: none;">
 						<div class="bottom-cell">
-							<img data-src="img/cowboy.png" width = "30%" align="right" class="plain"  style="background: none;">
+							<img data-src="img/cowboy.png" width = "30%" align="right" class="plain" style="background: none;">
+						</div>
+					</div>
+					<div class="wrapper" style="z-index: 2; background: none;">
+						<div class="bottom-cell">
+							<p class="footnote" style="text-align: left; z-index: 2">
+								Load data from <a target="about:blank" href="https://kloivenn.github.io/Ascona2019/data/e13_A.rds">https://kloivenn.github.io/Ascona2019/data/e13_A.rds</a><br>
+								Load script from <a target="about:blank" href="https://kloivenn.github.io/Ascona2019/data/trySleepwalk.R">https://kloivenn.github.io/Ascona2019/data/trySleepwalk.R</a>
+							</p>
 						</div>
 					</div>
 				</section>
@@ -199,7 +203,7 @@ sleepwalk(data$umap, data$pca, saveToFile = "myFile.html")
 					<div class="aspect-ratio" style="padding-top: calc(50% + 30px);">
 						<iframe data-src="examples/slide05.html"></iframe>
 					</div>
-					<div class="wrapper">
+					<div class="wrapper" style="z-index: 1">
 						<div class="bottom-cell">
 							<p>more information at 
 								<a target="about:blank" href="https://anders-biostat.github.io/linked-charts/">https://anders-biostat.github.io/linked-charts/</a>
