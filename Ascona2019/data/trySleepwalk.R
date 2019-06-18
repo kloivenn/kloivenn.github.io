@@ -2,6 +2,7 @@
 
 #downoload from 
 library(readr)
+library(ggplot2)
 data <- read_rds("e13_A.rds")
 
 library(sleepwalk)
