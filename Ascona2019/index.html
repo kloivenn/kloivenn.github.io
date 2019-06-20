@@ -198,8 +198,8 @@ sleepwalk(data$umap, data$pca, saveToFile = "myFile.html")
 					</tr></table>
 				</section>
 				<section>
-					<h2>And More</h2>
-					<h3>Linked Charts</h3>
+					<h2>Linked Charts</h2>
+					<h3>Interactivity with minimal effort</h3>
 					<div class="aspect-ratio" style="padding-top: 50%;">
 						<iframe data-src="examples/slide05.html"></iframe>
 					</div>
@@ -209,6 +209,42 @@ sleepwalk(data$umap, data$pca, saveToFile = "myFile.html")
 								<a target="about:blank" href="https://anders-biostat.github.io/linked-charts/">https://anders-biostat.github.io/linked-charts/</a>
 							</p>
 						</div>
+				</section>
+				<section>
+					<h2>Linked Charts</h2>
+					<h3>Interactivity with minimal effort</h3>
+					<pre><code class="r" data-trim data-noescape style="font-size: 0.8em; line-height: 1.2">
+openPage(useViewer = FALSE, layout="table1x2")
+
+gene <- 1
+
+lc_scatter(dat(
+      x = voomResult$AveExpr,
+      y = voomResult$tissuetumour,
+      color = ifelse( voomResult$adj.P.Val < 0.1, "red", "black" ),
+      label = rownames(voomResult),
+      size = 1.3,
+      on_click = function(k) { gene <<- k; updateCharts("A2") }),
+   "A1")
+
+countsums <- colSums(countMatrix)
+
+lc_scatter(dat(
+      x = sampleTable$patient,
+      y = countMatrix[gene,] / countsums * 1e6 + .1,
+      logScaleY = 10,
+      colorValue = sampleTable$tissue,
+      title = rownames(countMatrix)[gene],
+      axisTitleY = "counts per million (CPM)",
+      ticksRotateX = 45),
+   "A2")
+					</code></pre>
+					<div class="wrapper" style="z-index: 1; background: none;">
+						<div class="bottom-cell">
+							<img data-src="img/computer.png" width = "30%" align="right" class="plain" style="background: none;">
+						</div>
+					</div>
+
 				</section>
 				<section>
 					<h2>Thank you for your attention</h2>
