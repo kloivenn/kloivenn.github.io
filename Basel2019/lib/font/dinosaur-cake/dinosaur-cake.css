@@ -1,0 +1,12 @@
+@font-face {
+  font-family: 'DinosaurCake';
+  src: url('DinosaurCakeDEMO-Regular.eot');
+  src: url('DinosaurCakeDEMO-Regular.eot?#iefix') format('embedded-opentype'),
+       url('DinosaurCakeDEMO-Regular.svg#DinosaurCakeDEMO-Regular') format('svg'),
+       url('DinosaurCakeDEMO-Regular.ttf') format('truetype'),
+       url('DinosaurCakeDEMO-Regular.woff') format('woff'),
+       url('DinosaurCakeDEMO-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+

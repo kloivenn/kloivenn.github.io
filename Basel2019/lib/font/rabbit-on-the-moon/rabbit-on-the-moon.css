@@ -1,0 +1,18 @@
+@font-face {
+  font-family: 'Rabbit On The Moon';
+  src: url('Rabbit On The Moon.eot');
+  src: url('Rabbit On The Moon.eot?#iefix') format('embedded-opentype'),
+       url('Rabbit On The Moon.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'RabbitOnTheMoon';
+  src: url('RabbitOnTheMoon.svg#RabbitOnTheMoon') format('svg'),
+       url('RabbitOnTheMoon.ttf') format('truetype'),
+       url('RabbitOnTheMoon.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
