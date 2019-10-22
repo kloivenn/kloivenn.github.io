@@ -92,3 +92,14 @@ a:visited {
 	vertical-align: middle;
 	padding-left: 100px;
 }
+
+.icon {
+	filter: brightness(0.05);	
+}
+
+.icon.active {
+	filter: brightness(1);
+}
+.icon:hover {
+	filter: brightness(0.5);
+}

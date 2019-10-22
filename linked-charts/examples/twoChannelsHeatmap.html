@@ -148,11 +148,14 @@ var CTXSlider = lc.colourSlider()
     heatmap.updateCellColour();
   })
   .place( "#heatmap" );
+
 heatmap.colour( function( val ){
   return "rgb(" + Math.round( CTXSlider.the_sigmoid( val[1] ) * 255 ) + ", " 
              + Math.round( RTGSlider.the_sigmoid( val[0] ) * 255 ) + ", 0)";
 } )
   .updateCellColour();
+
+  
 var curveFit = lc.scatter( "void" )
   .width( 300 )
   .height( 300 )
