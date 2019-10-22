@@ -18,15 +18,23 @@
 		<div id = "geneName" style="grid-column: 2/4; grid-row: 1"><p style="font-weight: bold; font-size: 16pt;"></p></div>
 		<div id = "transcription" style="grid-column: 2; grid-row: 2;"></div>
 		<div id = "translation" style="grid-column: 3; grid-row: 2;"></div>
-		<div id = "geneInfo" style="grid-column: 2/4; grid-row: 3"></div>
+		<div id = "genes" style="grid-column: 2/4; grid-row: 3">
+			<p id = "notFound" style="color: red; visibility: hidden; text-align: center;">Gene with this ID was not found.</p>
+			<span>Enter gene name:</span> <input id = "geneName" type = "text" onchange = "searchGene(this.value);"> <br>
+			<span>Enter Ensembl ID:</span> <input id = "ensembl" type = "text" onchange = "searchEnsembl(this.value);">
+			<table id = "info"></table>
+			<p id = "description"></p>
+			Search for this gene on <a target="_blank" rel="noopener noreferrer">GeneCards</a>.
+		</div>
 	</div>
 	<script type="text/javascript">
 		var tissues = ["Brain", "Liver", "Testis"],
 			colours = {Brain: "#3399CC", Liver: "#339900", Testis: "#FF6600"},
 			tissue = "Brain",
-			species = ["Human", "Macaque", "Mouse", "Opossum", "Platypus", "Chicken"];
+			species = ["Human", "Macaque", "Mouse", "Opossum", "Platypus", "Chicken"],
+			sp;
 
-		var changeGene = function() {
+		function changeGene() {
 			var geneId = Object.keys(data[tissue])[gene];
 			d3.select("#geneName")
 				.select("p")
@@ -34,7 +42,72 @@
 					.text(geneInfo.geneName[gene]);
 			tr.update();
 			tl.update();
+			updateTable();
+			d3.select("#geneName").node().value = geneInfo.geneName[gene];
+			d3.select("#ensembl").node().value = geneInfo["geneId_" + (sp || "Human")][gene];
 		}
+
+		function updateTable() {
+			d3.select("#info")
+				.selectAll(".cell")
+					.text(d => geneInfo[d[1] + "_" + d[0]][gene]);
+			d3.select("#genes")
+				.select("a")
+					.attr("href", "https://www.genecards.org/cgi-bin/carddisp.pl?gene=" + geneInfo.geneName[gene]);
+			d3.select("#genes")
+				.select("#description")
+					.html("<b>Description:</b> " + geneInfo.description[gene]);
+		}
+
+		function searchEnsembl(name) {
+			d3.select("#notFound")
+				.style("visibility", "hidden");			
+
+			sp = undefined;
+			if(name.substring(0, 4) == "ENSG")
+				sp = "Human";
+			if(name.substring(0, 7) == "ENSMUSG")
+				sp = "Mouse";
+			if(name.substring(0, 7) == "ENSMMUG")
+				sp = "Macaque";
+			if(name.substring(0, 7) == "ENSMODG")
+				sp = "Opossum";
+			if(name.substring(0, 7) == "ENSOANG")
+				sp = "Platypus";
+			if(name.substring(0, 7) == "ENSGALG")
+				sp = "Chicken";
+
+
+			if(!sp){
+				d3.select("#notFound")
+					.style("visibility", "visible")
+				return;
+			}
+
+			var gene = geneInfo["geneId_" + sp].indexOf(name);
+			if(gene == -1) 
+				d3.select("#notFound")
+					.style("visibility", "visible")
+			else {
+				selGene = gene;
+				changeGene();
+			}
+		}
+
+		function searchGene(name) {
+			d3.select("#notFound")
+				.style("visibility", "hidden");			
+
+			var newGene = geneInfo.geneName.indexOf(name.toUpperCase());
+
+			if(newGene == -1)
+				d3.select("#notFound")
+					.style("visibility", "visible")
+			else {
+				gene = newGene;
+				changeGene();
+			}
+		}		
 
 		d3.select("#tissues")
 			.selectAll(".icon")
@@ -80,7 +153,7 @@
 		var tr = lc.xLine("grid")
 			.width(300)
 			.height(300)
-			.set_paddings({left: 65})
+			.set_paddings({left: 65, right: 5})
 			.domainY(species)
 			.title("Transcriptional layer")
 			.ticksRotateX(45)
@@ -135,6 +208,25 @@
 			.colour(function() {return colours[tissue]})
 			.stroke(function() {return colours[tissue]})
 			.place("#translation");
+
+		d3.select("#info")
+			.selectAll(".tr")
+				.data(["names"].concat(species))
+				.enter()
+					.append("tr");
+		d3.select("#info")
+			.selectAll("tr").selectAll("td")
+				.data(d => ["names", "geneId", "chr"].map(el => [d, el]))
+				.enter()
+					.append("td")
+					.html(function(d) {
+						if(d[0] == "names" && d[1] == "names") return "";
+						if(d[0] == "names")
+							return d[1] == "geneId" ? "<b>Ensembl ID</b>" : "<b>Chromosome</b>";
+						if(d[1] == "names")
+							return "<i>" + d[0] + "</i>";
+					})
+					.attr("class", d => d[0] == "names" || d[1] == "names" ? "header" : "cell");
 
 		changeGene();
 	</script>
