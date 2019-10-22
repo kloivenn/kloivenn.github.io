@@ -15,16 +15,26 @@
 	<div id = "plots" style="display: grid;">
 		<div id = "tissues" style="text-align: center; grid-column: 1; grid-row: 1;"></div>
 		<div id = "mainPlot" style="grid-column: 1; grid-row: 2/4;"></div>
-		<div id = "geneName" style=""></div>
+		<div id = "geneName" style="grid-column: 2/4; grid-row: 1"><p style="font-weight: bold; font-size: 16pt;"></p></div>
 		<div id = "transcription" style="grid-column: 2; grid-row: 2;"></div>
 		<div id = "translation" style="grid-column: 3; grid-row: 2;"></div>
-		<div id = "geneInfo"></div>
+		<div id = "geneInfo" style="grid-column: 2/4; grid-row: 3"></div>
 	</div>
 	<script type="text/javascript">
 		var tissues = ["Brain", "Liver", "Testis"],
 			colours = {Brain: "#3399CC", Liver: "#339900", Testis: "#FF6600"},
 			tissue = "Brain",
 			species = ["Human", "Macaque", "Mouse", "Opossum", "Platypus", "Chicken"];
+
+		var changeGene = function() {
+			var geneId = Object.keys(data[tissue])[gene];
+			d3.select("#geneName")
+				.select("p")
+					.style("color", data[tissue][geneId].padj < 0.1 ? (data[tissue][geneId].delta < 0 ? "#A6AE00" : "#9F00FF") : colours[tissue])
+					.text(geneInfo.geneName[gene]);
+			tr.update();
+			tl.update();
+		}
 
 		d3.select("#tissues")
 			.selectAll(".icon")
@@ -61,12 +71,12 @@
 			.strokeWidth(d => data[tissue][d].padj < 0.1 ? 1 : 2)
 			.size(d => data[tissue][d].padj < 0.1 ? 2 : 1)
 			.on_click(function(d) {
-				gene = fpkm.indexOf(d);
-				tr.update();
-				tl.update();
+				gene = Object.keys(data[tissue]).indexOf(d);
+				changeGene();
 			})
 			.place("#mainPlot");
 
+//transcription
 		var tr = lc.xLine("grid")
 			.width(300)
 			.height(300)
@@ -96,6 +106,7 @@
 			.stroke(function() {return colours[tissue]})
 			.place("#transcription");
 
+//translation
 		var tl = lc.xLine("grid")
 			.width(300)
 			.height(300)
@@ -125,6 +136,6 @@
 			.stroke(function() {return colours[tissue]})
 			.place("#translation");
 
-
+		changeGene();
 	</script>
 </body>

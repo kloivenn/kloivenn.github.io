@@ -40,9 +40,34 @@ as_tibble(data[, 1:104]) %>%
   separate(col, c("species", "tissue", "assay", "repl"), sep = "[_.]") %>%
   mutate(fpkm = log2(fpkm + 1)) %>%
   group_by(geneId, species, tissue, assay) %>%
-  summarise(med = median(fpkm), min = min(fpkm), max = max(fpkm)) -> fpkm
+  summarise(med = median(fpkm), min = min(fpkm), max = max(fpkm)) %>%
+  gather(type, fpkm, (med:max)) %>%
+  unite(colId, species, tissue, assay, type) %>%
+  spread(colId, fpkm) -> fpkm
+
+library(biomaRt)
+mart <- useMart("ensembl", dataset = "hsapiens_gene_ensembl",  host = "dec2016.archive.ensembl.org")
+genes <- getBM(c("ensembl_gene_id","chromosome_name", "external_gene_name", "description", 
+                      "mmusculus_homolog_ensembl_gene", "mmulatta_homolog_ensembl_gene",
+                      "oanatinus_homolog_ensembl_gene", "ggallus_homolog_ensembl_gene",
+                      "mdomestica_homolog_ensembl_gene"), "ensembl_gene_id", data$Gene_ID, mart)
+colnames(genes) <- c("geneId_Human", "chr_Human", "geneName", colnames(genes)[-(1:3)])
+species <- c("hsapiens" = "Human", "mmusculus" = "Mouse", "mmulatta" = "Macaque", 
+             "mdomestica" = "Opossum", "oanatinus" = "Platypus", "ggallus" = "Chicken")
+for(sp in names(species)[-1]) {
+  mart <- useMart("ensembl", dataset = paste0(sp, "_gene_ensembl"),  host = "dec2016.archive.ensembl.org")
+  newGenes <- getBM(c("ensembl_gene_id", "chromosome_name"), 
+                    "ensembl_gene_id", genes[[paste0(sp, "_homolog_ensembl_gene")]], mart)
+  colnames(newGenes) <- paste(c("geneId", "chr"), species[sp], sep = "_")
+  by <- paste0(sp, "_homolog_ensembl_gene")
+  names(by) <- paste0("geneId_", species[sp])
+  genes <- inner_join(newGenes, genes, by = by)
+}
 
 library(jsonlite)
 writeLines(c(paste0("var data = ", toJSON(globalData), ";"),
              paste0("var fpkm = ", toJSON(fpkm, dataframe = "columns"), ";")), "data.js")
+
+writeLines(paste0("var geneInfo = ", toJSON(genes, dataframe = "columns"), ";"), "geneInfo.js")
+
     
