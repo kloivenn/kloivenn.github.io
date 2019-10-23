@@ -31,8 +31,8 @@
 		var tissues = ["Brain", "Liver", "Testis"],
 			colours = {Brain: "#3399CC", Liver: "#339900", Testis: "#FF6600"},
 			tissue = "Brain",
-			species = ["Human", "Macaque", "Mouse", "Opossum", "Platypus", "Chicken"],
-			sp;
+			species = ["Chicken", "Platypus", "Opossum", "Mouse", "Macaque", "Human"],
+			sp, domain = [0, 1];
 
 		function changeGene() {
 			var geneId = Object.keys(data[tissue])[gene];
@@ -40,6 +40,9 @@
 				.select("p")
 					.style("color", data[tissue][geneId].padj < 0.1 ? (data[tissue][geneId].delta < 0 ? "#A6AE00" : "#9F00FF") : colours[tissue])
 					.text(geneInfo.geneName[gene]);
+			var domainTr = tr.get_layer("range").get_layerDomainX(),
+				domainTl = tl.get_layer("range").get_layerDomainX();
+			domain = [d3.min([domainTr[0], domainTl[0]]), d3.max([domainTr[1], domainTl[1]])]
 			tr.update();
 			tl.update();
 			updateTable();
@@ -125,8 +128,7 @@
 								.classed("active", false);
 						d3.select(this).classed("active", true);
 						mainPlot.update();
-						tr.update();
-						tl.update();
+						changeGene();
 					});
 
 		data = lc.separateBy(data, ["tissue", "geneId"]);
@@ -138,6 +140,8 @@
 			.y(d => data[tissue][d].delta)
 			.domainY([-3, 3])
 			.domainX([0, 10])
+			.axisTitleX("log2(FPKM + 1)")
+			.axisTitleY("Delta")
 			.colour(d => data[tissue][d].padj < 0.1 ? (data[tissue][d].delta < 0 ? "#A6AE00" : "#9F00FF") : "white")
 			.opacity(d => data[tissue][d].padj < 0.1 ? 0.8 : 0.4)
 			.stroke(function() {return colours[tissue]})
@@ -153,6 +157,8 @@
 		var tr = lc.xLine("grid")
 			.width(300)
 			.height(300)
+			.domainX(function() {return domain})
+			.axisTitleX("log2(FPKM + 1)")
 			.set_paddings({left: 65, right: 5})
 			.domainY(species)
 			.title("Transcriptional layer")
@@ -183,6 +189,8 @@
 		var tl = lc.xLine("grid")
 			.width(300)
 			.height(300)
+			.domainX(function() {return domain})
+			.axisTitleX("log2(FPKM + 1)")
 			.set_paddings({left: 65})
 			.domainY(species)
 			.title("Translational layer")
