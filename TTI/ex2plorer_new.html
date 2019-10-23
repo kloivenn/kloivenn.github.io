@@ -84,12 +84,12 @@
 				return;
 			}
 
-			var gene = geneInfo["geneId_" + sp].indexOf(name);
-			if(gene == -1) 
+			var newGene = geneInfo["geneId_" + sp].indexOf(name);
+			if(newGene == -1) 
 				d3.select("#notFound")
 					.style("visibility", "visible")
 			else {
-				selGene = gene;
+				gene = newGene;
 				changeGene();
 			}
 		}
@@ -144,7 +144,7 @@
 			.strokeWidth(d => data[tissue][d].padj < 0.1 ? 1 : 2)
 			.size(d => data[tissue][d].padj < 0.1 ? 2 : 1)
 			.on_click(function(d) {
-				gene = Object.keys(data[tissue]).indexOf(d);
+				gene = fpkm.geneId.indexOf(d);
 				changeGene();
 			})
 			.place("#mainPlot");

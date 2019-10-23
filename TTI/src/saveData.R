@@ -12,7 +12,6 @@ as_tibble(data[, 1:104]) %>%
   group_by(geneId, tissue) %>%
   summarise(med = median(med)) -> medians
 
-
 as_tibble(data[, c(1, 141:154)]) %>%
   select(-(Brain.TR_median)) %>%
   rename(geneId = Gene_ID) %>%
@@ -29,10 +28,9 @@ as_tibble(data[, c(1, 141:154)]) %>%
   group_by(tissue) %>%
   mutate(padj = p.adjust(pval, method = "BH")) %>%
   inner_join(medians, by = c("geneId", "tissue")) %>%
-  mutate(med = log2(med + 1)) -> globalData
-  #filter(padj_new < 0.1) %>% View()
-  ggplot() + geom_point(aes(-log10(padj_bh), -log10(padj_new))) + facet_wrap(~tissue) + ylim(0, 10) + xlim(0, 10)
-    select(pval) %>% unlist() %>% max()
+  mutate(med = log2(med + 1)) %>%
+  select(-(pval)) %>%
+  ungroup() -> globalData
 
 as_tibble(data[, 1:104]) %>%
   gather(col, fpkm, -(Gene_ID)) %>%
@@ -63,6 +61,9 @@ for(sp in names(species)[-1]) {
   names(by) <- paste0("geneId_", species[sp])
   genes <- inner_join(newGenes, genes, by = by)
 }
+
+right_join(genes, select(globalData, geneId), by = c("geneId_Human" = "geneId")) %>%
+  re
 
 library(jsonlite)
 writeLines(c(paste0("var data = ", toJSON(globalData), ";"),
