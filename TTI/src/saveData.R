@@ -66,8 +66,6 @@ for(sp in names(species)[-1]) {
 
 library(jsonlite)
 writeLines(c(paste0("var data = ", toJSON(globalData), ";"),
-             paste0("var fpkm = ", toJSON(fpkm, dataframe = "columns"), ";")), "data.js")
-
-writeLines(paste0("var geneInfo = ", toJSON(genes, dataframe = "columns"), ";"), "geneInfo.js")
-
-    
+             paste0("var fpkm = ", toJSON(fpkm, dataframe = "columns"), ";"),
+             paste0("var geneInfo = ", toJSON(genes, dataframe = "columns"), ";")), "data.js")
+      

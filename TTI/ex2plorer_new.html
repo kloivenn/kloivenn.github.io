@@ -15,7 +15,7 @@
 	<div id = "plots" style="display: grid; grid-template-columns: 550px 300px 300px">
 		<div id = "tissues" style="text-align: center; grid-column: 1; grid-row: 1;"></div>
 		<div id = "mainPlot" style="grid-column: 1; grid-row: 2/4;"></div>
-		<div id = "geneName" style="grid-column: 2/4; grid-row: 1"><p style="font-weight: bold; font-size: 16pt;"></p></div>
+		<div id = "geneTitle" style="grid-column: 2/4; grid-row: 1"><p style="font-weight: bold; font-size: 16pt;"></p></div>
 		<div id = "transcription" style="grid-column: 2; grid-row: 2;"></div>
 		<div id = "translation" style="grid-column: 3; grid-row: 2;"></div>
 		<div id = "genes" style="grid-column: 2/4; grid-row: 3">
@@ -36,7 +36,7 @@
 
 		function changeGene() {
 			var geneId = Object.keys(data[tissue])[gene];
-			d3.select("#geneName")
+			d3.select("#geneTitle")
 				.select("p")
 					.style("color", data[tissue][geneId].padj < 0.1 ? (data[tissue][geneId].delta < 0 ? "#A6AE00" : "#9F00FF") : colours[tissue])
 					.text(geneInfo.geneName[gene]);
