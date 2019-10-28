@@ -3,6 +3,8 @@
 	<link rel="stylesheet" type="text/css" href="src/style.css">
 	<script type="text/javascript" src = "src/linked-charts.min.js"></script>
 	<script type="text/javascript" src = "src/data.js"></script>
+	<script type="text/javascript" src = "src/awesomplete.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="src/awesomplete.css">
 	<title>Ex2plorer</title>
 </head>
 <body>
@@ -17,13 +19,16 @@
 		<div id = "mainPlot" style="grid-column: 2; grid-row: 2;"></div>
 		<div id = "geneTitle" style="grid-column: 1/4; grid-row: 3; text-align: center;"><p style="font-weight: bold; font-size: 16pt;"></p></div>
 		<div style="grid-column: 1/4; grid-row: 4">
+			<div id = "dendogram" style="display: inline-block;">
+				<img src="src/dendogram.png" width="400px" height="300px">
+			</div>
 			<div id = "transcription" style="display: inline-block;"></div>
 			<div id = "translation" style="display: inline-block;"></div>
 		</div>
 		<div id = "density" style="grid-column: 3; grid-row: 2"></div>
 		<div id = "genes" style="grid-column: 1; grid-row: 2">
 			<p id = "notFound" style="color: red; visibility: hidden; text-align: center;">Gene with this ID was not found.</p>
-			<span>Enter gene name:</span> <input id = "geneName" type = "text" onchange = "searchGene(this.value);"> <br>
+			<span>Enter gene name:</span> <input id = "geneName" type = "text"> <br>
 			<span>Enter Ensembl ID:</span> <input id = "ensembl" type = "text" onchange = "searchEnsembl(this.value);">
 			<table id = "info"></table>
 			<p id = "description"></p>
@@ -31,14 +36,15 @@
 		</div>
 	</div>
 	<script type="text/javascript">
+		data = lc.separateBy(data, ["tissue", "geneId"]);
+
 		var tissues = ["Brain", "Liver", "Testis"],
 			colours = {Brain: "#3399CC", Liver: "#339900", Testis: "#FF6600"},
 			tissue = "Brain",
 			species = ["Chicken", "Platypus", "Opossum", "Mouse", "Macaque", "Human"],
-			sp, domain = [0, 1];
-
+			sp, domain = [0, 1], gene = 0, geneId = Object.keys(data[tissue])[gene];
 		function changeGene() {
-			var geneId = Object.keys(data[tissue])[gene];
+			geneId = Object.keys(data[tissue])[gene];
 			d3.select("#geneTitle")
 				.select("p")
 					.style("color", data[tissue][geneId].padj < 0.1 ? (data[tissue][geneId].delta < 0 ? "#A6AE00" : "#9F00FF") : colours[tissue])
@@ -136,9 +142,6 @@
 						changeGene();
 					});
 
-		data = lc.separateBy(data, ["tissue", "geneId"]);
-		var gene = 0, geneName = Object.keys(data[tissue])[0];
-
 		var mainPlot = lc.scatter()
 			.elementIds(Object.keys(data[tissue]))
 			.x(d => data[tissue][d].med)
@@ -155,14 +158,13 @@
 			.strokeWidth(1)
 			.on_click(function(d) {
 				gene = fpkm.geneId.indexOf(d);
-				geneName = d;
 				changeGene();
 			});
 
 		lc.scatter("selGene", mainPlot)
 			.elementIds(["Selected gene"])
-			.x(d => data[tissue][geneName].med)
-			.y(d => data[tissue][geneName].delta)
+			.x(d => data[tissue][geneId].med)
+			.y(d => data[tissue][geneId].delta)
 			.colour("none")
 			.stroke("#333")
 			.strokeWidth(2)
@@ -178,7 +180,7 @@
 			.height(380)
 			.width(200)
 			.nsteps(500)
-			.ticksRotateX(45)
+			.ticksRotateX(90)
 			.fill(function(){return colours[tissue];})
 			.domainY(function() {return mainPlot.get_domainY()});
 
@@ -266,7 +268,7 @@
 
 		d3.select("#info")
 			.selectAll(".tr")
-				.data(["names"].concat(species))
+				.data(["names"].concat(species.slice().reverse()))
 				.enter()
 					.append("tr");
 		d3.select("#info")
@@ -283,6 +285,12 @@
 					})
 					.attr("class", d => d[0] == "names" || d[1] == "names" ? "header" : "cell");
 
+		new Awesomplete(d3.select("#geneName").node(), {list: geneInfo.geneName});
+		d3.select("#geneName")
+			.on("awesomplete-selectcomplete", function() {
+				console.log(this.value);
+				searchGene(this.value);
+			});
 		changeGene();
 	</script>
 </body>
