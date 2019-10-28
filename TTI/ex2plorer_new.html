@@ -20,6 +20,7 @@
 			<div id = "transcription" style="display: inline-block;"></div>
 			<div id = "translation" style="display: inline-block;"></div>
 		</div>
+		<div id = "density" style="grid-column: 3; grid-row: 2"></div>
 		<div id = "genes" style="grid-column: 1; grid-row: 2">
 			<p id = "notFound" style="color: red; visibility: hidden; text-align: center;">Gene with this ID was not found.</p>
 			<span>Enter gene name:</span> <input id = "geneName" type = "text" onchange = "searchGene(this.value);"> <br>
@@ -47,6 +48,7 @@
 			domain = [d3.min([domainTr[0], domainTl[0]]), d3.max([domainTr[1], domainTl[1]])]
 			tr.update();
 			tl.update();
+			mainPlot.get_layer("selGene").update();
 			updateTable();
 			d3.select("#geneName").node().value = geneInfo.geneName[gene];
 			d3.select("#ensembl").node().value = geneInfo["geneId_" + (sp || "Human")][gene];
@@ -130,11 +132,12 @@
 								.classed("active", false);
 						d3.select(this).classed("active", true);
 						mainPlot.update();
+						densPlot.update();
 						changeGene();
 					});
 
 		data = lc.separateBy(data, ["tissue", "geneId"]);
-		var gene = 0;
+		var gene = 0, geneName = Object.keys(data[tissue])[0];
 
 		var mainPlot = lc.scatter()
 			.elementIds(Object.keys(data[tissue]))
@@ -149,11 +152,48 @@
 			.opacity(d => data[tissue][d].padj < 0.1 ? 0.8 : 0.4)
 			.size(d => data[tissue][d].padj < 0.1 ? 2 : 1)
 			.axisTitlePos({x: "down middle", y: "down middle"})
+			.strokeWidth(1)
 			.on_click(function(d) {
 				gene = fpkm.geneId.indexOf(d);
+				geneName = d;
 				changeGene();
-			})
+			});
+
+		lc.scatter("selGene", mainPlot)
+			.elementIds(["Selected gene"])
+			.x(d => data[tissue][geneName].med)
+			.y(d => data[tissue][geneName].delta)
+			.colour("none")
+			.stroke("#333")
+			.strokeWidth(2)
+			.size(7);
+
+		lc.xLine("horiz", mainPlot)
+			.lineFun(x => 0)
 			.place("#mainPlot");
+
+		var densPlot = lc.pointLine()
+			.x(density[tissue].y)
+			.y(density[tissue].x)
+			.height(380)
+			.width(200)
+			.nsteps(500)
+			.ticksRotateX(45)
+			.fill(function(){return colours[tissue];})
+			.domainY(function() {return mainPlot.get_domainY()});
+
+		lc.xLine("horiz", densPlot)
+			.lineFun(x => 0)
+			.place("#density");
+
+		var updateAxesMP = mainPlot.updateAxes;
+		mainPlot.updateAxes = function() {
+			updateAxesMP();
+			densPlot.updateAxes();
+		}
+
+
+		var points = species.map(el => ["min", "med", "max"].map(el2 => [el, el2].join("_"))).flat();
 
 //transcription
 		var tr = lc.xLine("grid")
@@ -181,10 +221,12 @@
 			.colour(function() {return colours[tissue]});
 
 		lc.scatter("points", tr)
-			.elementIds(species)
-			.x(d => fpkm[d + "_" + tissue + "_TR_med"][gene])
-			.y(d => d)
+			.elementIds(points)
+			.x(d => fpkm[d.split("_")[0] + "_" + tissue + "_TR_" + d.split("_")[1]][gene])
+			.y(d => d.split("_")[0])
 			.colour("white")
+			.strokeWidth(2.5)
+			.size(4)
 			.stroke(function() {return colours[tissue]})
 			.place("#transcription");
 
@@ -214,10 +256,11 @@
 			.colour(function() {return colours[tissue]});
 
 		lc.scatter("points", tl)
-			.elementIds(species)
-			.x(d => fpkm[d + "_" + tissue + "_RP_med"][gene])
-			.y(d => d)
+			.elementIds(points)
+			.x(d => fpkm[d.split("_")[0] + "_" + tissue + "_RP_" + d.split("_")[1]][gene])
+			.y(d => d.split("_")[0])
 			.colour(function() {return colours[tissue]})
+			.size(4)
 			.stroke(function() {return colours[tissue]})
 			.place("#translation");
 

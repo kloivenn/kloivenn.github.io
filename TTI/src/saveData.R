@@ -1,7 +1,9 @@
 data <- read.table("ex2plorer.txt", header = T, stringsAsFactors = F)
 
+library(biomaRt)
 library(tidyverse)
 library(stringi)
+
 as_tibble(data[, 1:104]) %>%
   gather(col, fpkm, -(Gene_ID)) %>%
   rename(geneId = Gene_ID) %>%
@@ -43,7 +45,6 @@ as_tibble(data[, 1:104]) %>%
   unite(colId, species, tissue, assay, type) %>%
   spread(colId, fpkm) -> fpkm
 
-library(biomaRt)
 mart <- useMart("ensembl", dataset = "hsapiens_gene_ensembl",  host = "dec2016.archive.ensembl.org")
 genes <- getBM(c("ensembl_gene_id","chromosome_name", "external_gene_name", "description", 
                       "mmusculus_homolog_ensembl_gene", "mmulatta_homolog_ensembl_gene",
@@ -62,11 +63,21 @@ for(sp in names(species)[-1]) {
   genes <- inner_join(newGenes, genes, by = by)
 }
 
-right_join(genes, select(globalData, geneId), by = c("geneId_Human" = "geneId")) %>%
-  re
+genes <- right_join(genes, select(fpkm, geneId), by = c("geneId_Human" = "geneId")) 
+
+globalData %>%
+  group_by(tissue) %>%
+  do(as.data.frame(density(.$delta, n = 150)[1:2])) -> dens
+
+tissues <- unique(dens$tissue)
+densList <- lapply(tissues, function(t) {
+  filter(dens, tissue == t) %>% ungroup() %>% select(x, y)
+})
+names(densList) <- tissues
 
 library(jsonlite)
 writeLines(c(paste0("var data = ", toJSON(globalData), ";"),
              paste0("var fpkm = ", toJSON(fpkm, dataframe = "columns"), ";"),
-             paste0("var geneInfo = ", toJSON(genes, dataframe = "columns"), ";")), "data.js")
+             paste0("var geneInfo = ", toJSON(genes, dataframe = "columns"), ";"),
+             paste0("var density = ", toJSON(densList, dataframe = "columns"), ";")), "data.js")
       
