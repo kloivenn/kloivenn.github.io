@@ -261,7 +261,7 @@
 			.y(d => d.split("_")[0])
 			.colour("white")
 			.strokeWidth(2.5)
-			.size(4)
+			.size(d => d.split("_")[1] == "med" ? 6 : 3)
 			.stroke(function() {return colours[tissue]})
 			.place("#transcription");
 
@@ -295,7 +295,7 @@
 			.x(d => fpkm[d.split("_")[0] + "_" + tissue + "_RP_" + d.split("_")[1]][gene])
 			.y(d => d.split("_")[0])
 			.colour(function() {return colours[tissue]})
-			.size(4)
+			.size(d => d.split("_")[1] == "med" ? 6 : 3)
 			.stroke(function() {return colours[tissue]})
 			.place("#translation");
 
