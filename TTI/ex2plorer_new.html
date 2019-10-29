@@ -211,7 +211,7 @@
 		}
 
 
-		var points = species.map(el => ["min", "med", "max"].map(el2 => [el, el2].join("_"))).flat();
+		var points = species.map(el => ["min", "max", "med"].map(el2 => [el, el2].join("_"))).flat();
 
 //transcription
 		var tr = lc.xLine("grid")
