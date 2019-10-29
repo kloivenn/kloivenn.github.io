@@ -14,7 +14,34 @@
 			<div><span style="font-style: italic; color: #B2303A">Ex<sup>2</sup></span>plorer</div>
 		</div>
 	</div>
-	<div id = "plots" style="display: grid; grid-template-columns: 450px 550px 150px">
+	<div id = "plots" style="display: grid; grid-template-columns: 300px 650px 500px">
+		<div id = "genes" style="grid-column: 1; grid-row: 1">
+			<p>Select organ:</p>
+			<div id = "tissues" style="text-align: center;"></div>
+			<p>
+				<span style="font-weight: bold;">Selected gene:</span> <span id = "geneTitle" style="font-weight: bold; font-size: 16pt;"></span>
+			</p>
+			<p id = "notFound" style="color: red; visibility: hidden; text-align: center; margin-top: 5px; margin-bottom: 5px;">
+				Gene with this ID was not found.
+			</p>
+			<span>Enter gene name:</span> <input id = "geneName" type = "text"> <br>
+			<span>Enter Ensembl ID:</span> <input id = "ensembl" type = "text" onchange = "searchEnsembl(this.value);">
+			<p id = "description"></p>
+			Search for this gene on <a target="_blank" rel="noopener noreferrer">GeneCards</a>.
+		</div> 	
+		<div id = "mainPlot" style="grid-column: 2; grid-row: 1;"></div>
+		<div id = "density" style="grid-column: 3; grid-row: 1"></div>
+		<div style="grid-column: 1/4; grid-row: 2">
+			<div id = "dendogram" style="display: inline-block; vertical-align: top;">
+				<img src="src/dendogram.png" width="300px" height="250px">
+			</div>
+			<div id = "transcription" style="display: inline-block;"></div>
+			<div id = "translation" style="display: inline-block;"></div>
+			<div style="display: inline-block; vertical-align: top;">
+				<table id = "info" style="margin-top: 50px"></table>	
+			</div>
+		</div>
+<!--
 		<div id = "tissues" style="text-align: center; grid-column: 2; grid-row: 1;"></div>
 		<div id = "mainPlot" style="grid-column: 2; grid-row: 2;"></div>
 		<div id = "geneTitle" style="grid-column: 1/4; grid-row: 3; text-align: center;"><p style="font-weight: bold; font-size: 16pt;"></p></div>
@@ -33,7 +60,8 @@
 			<table id = "info"></table>
 			<p id = "description"></p>
 			Search for this gene on <a target="_blank" rel="noopener noreferrer">GeneCards</a>.
-		</div>
+		</div> 
+-->
 	</div>
 	<script type="text/javascript">
 		data = lc.separateBy(data, ["tissue", "geneId"]);
@@ -46,7 +74,6 @@
 		function changeGene() {
 			geneId = Object.keys(data[tissue])[gene];
 			d3.select("#geneTitle")
-				.select("p")
 					.style("color", data[tissue][geneId].padj < 0.1 ? (data[tissue][geneId].delta < 0 ? "#A6AE00" : "#9F00FF") : colours[tissue])
 					.text(geneInfo.geneName[gene]);
 			var domainTr = tr.get_layer("range").get_layerDomainX(),
@@ -149,6 +176,8 @@
 			.domainY([-3, 3])
 			.domainX([0, 10])
 			.height(380)
+			.width(500)
+			.set_paddings({right: 10})
 			.axisTitleX("log2(FPKM + 1)")
 			.axisTitleY("&Delta;")
 			.colour(d => data[tissue][d].padj < 0.1 ? (data[tissue][d].delta < 0 ? "#A6AE00" : "#9F00FF") : "#aaa")
@@ -160,6 +189,10 @@
 				gene = fpkm.geneId.indexOf(d);
 				changeGene();
 			});
+
+		mainPlot.legend
+			.add_block([["Stabilizing", "Directional", "Not significant"], ["#A6AE00", "#9F00FF", "#aaa"]], "colour", "col", "Layer1")
+			.legend.titles({col: ""});
 
 		lc.scatter("selGene", mainPlot)
 			.elementIds(["Selected gene"])
@@ -288,7 +321,6 @@
 		new Awesomplete(d3.select("#geneName").node(), {list: geneInfo.geneName});
 		d3.select("#geneName")
 			.on("awesomplete-selectcomplete", function() {
-				console.log(this.value);
 				searchGene(this.value);
 			});
 		changeGene();
