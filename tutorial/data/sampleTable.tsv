@@ -1,0 +1,189 @@
+sample	patient	condition	timePoint
+SRR1747213	p1	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747214	p1	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747215	p2	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747216	p2	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747217	p3	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747218	p3	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747219	p4	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747220	p4	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747221	p5	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747222	p5	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747223	p6	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747224	p6	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747225	p7	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747226	p7	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747227	p8	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747228	p8	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747229	p9	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747230	p9	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747231	p10	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747232	p10	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747233	p11	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747234	p11	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747235	p12	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747236	p12	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747237	p13	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747238	p13	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747239	p14	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747240	p14	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747241	p15	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747242	p15	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747243	p16	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747244	p16	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747245	p17	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747246	p17	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747247	p18	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747248	p18	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747249	p19	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747250	p19	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747252	p20	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747253	p21	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747254	p21	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747255	p22	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747256	p22	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747257	p23	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747258	p23	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747259	p24	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747260	p24	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747261	p25	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747262	p25	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747263	p26	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747264	p26	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747265	p27	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747266	p27	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747267	p28	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747268	p28	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747269	p29	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747270	p29	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747271	p30	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747272	p30	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747273	p31	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747274	p31	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747275	p32	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747276	p32	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747277	p33	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747278	p33	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747280	p34	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747279	p34	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747281	p35	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747282	p35	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747283	p36	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747284	p36	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747285	p37	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747286	p37	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747287	p38	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747288	p38	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747290	p39	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747289	p39	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747291	p40	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747293	p41	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747294	p41	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747292	p40	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747295	p42	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747296	p42	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747297	p43	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747298	p43	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747299	p44	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747300	p44	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747301	p45	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747302	p45	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747303	p46	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747304	p46	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747305	p47	condition: Case (PTSD risk)	time-point: Pre-deployment
+SRR1747306	p47	condition: Case (PTSD)	time-point: Post-deployment
+SRR1747307	p48	condition: Control	time-point: Pre-deployment
+SRR1747308	p48	condition: Control	time-point: Post-deployment
+SRR1747309	p49	condition: Control	time-point: Pre-deployment
+SRR1747310	p49	condition: Control	time-point: Post-deployment
+SRR1747311	p50	condition: Control	time-point: Pre-deployment
+SRR1747313	p51	condition: Control	time-point: Pre-deployment
+SRR1747312	p50	condition: Control	time-point: Post-deployment
+SRR1747314	p51	condition: Control	time-point: Post-deployment
+SRR1747315	p52	condition: Control	time-point: Pre-deployment
+SRR1747316	p52	condition: Control	time-point: Post-deployment
+SRR1747318	p53	condition: Control	time-point: Post-deployment
+SRR1747317	p53	condition: Control	time-point: Pre-deployment
+SRR1747319	p54	condition: Control	time-point: Pre-deployment
+SRR1747320	p54	condition: Control	time-point: Post-deployment
+SRR1747322	p55	condition: Control	time-point: Post-deployment
+SRR1747321	p55	condition: Control	time-point: Pre-deployment
+SRR1747323	p56	condition: Control	time-point: Pre-deployment
+SRR1747324	p56	condition: Control	time-point: Post-deployment
+SRR1747326	p57	condition: Control	time-point: Post-deployment
+SRR1747325	p57	condition: Control	time-point: Pre-deployment
+SRR1747327	p58	condition: Control	time-point: Pre-deployment
+SRR1747328	p58	condition: Control	time-point: Post-deployment
+SRR1747330	p59	condition: Control	time-point: Post-deployment
+SRR1747329	p59	condition: Control	time-point: Pre-deployment
+SRR1747332	p60	condition: Control	time-point: Post-deployment
+SRR1747331	p60	condition: Control	time-point: Pre-deployment
+SRR1747333	p61	condition: Control	time-point: Pre-deployment
+SRR1747334	p61	condition: Control	time-point: Post-deployment
+SRR1747335	p62	condition: Control	time-point: Pre-deployment
+SRR1747336	p62	condition: Control	time-point: Post-deployment
+SRR1747337	p63	condition: Control	time-point: Pre-deployment
+SRR1747338	p63	condition: Control	time-point: Post-deployment
+SRR1747339	p64	condition: Control	time-point: Pre-deployment
+SRR1747340	p64	condition: Control	time-point: Post-deployment
+SRR1747341	p65	condition: Control	time-point: Pre-deployment
+SRR1747342	p65	condition: Control	time-point: Post-deployment
+SRR1747343	p66	condition: Control	time-point: Pre-deployment
+SRR1747344	p66	condition: Control	time-point: Post-deployment
+SRR1747345	p67	condition: Control	time-point: Pre-deployment
+SRR1747346	p67	condition: Control	time-point: Post-deployment
+SRR1747347	p68	condition: Control	time-point: Pre-deployment
+SRR1747348	p68	condition: Control	time-point: Post-deployment
+SRR1747349	p69	condition: Control	time-point: Pre-deployment
+SRR1747351	p70	condition: Control	time-point: Pre-deployment
+SRR1747350	p69	condition: Control	time-point: Post-deployment
+SRR1747352	p70	condition: Control	time-point: Post-deployment
+SRR1747353	p71	condition: Control	time-point: Pre-deployment
+SRR1747354	p71	condition: Control	time-point: Post-deployment
+SRR1747355	p72	condition: Control	time-point: Pre-deployment
+SRR1747356	p72	condition: Control	time-point: Post-deployment
+SRR1747357	p73	condition: Control	time-point: Pre-deployment
+SRR1747358	p73	condition: Control	time-point: Post-deployment
+SRR1747359	p74	condition: Control	time-point: Pre-deployment
+SRR1747360	p74	condition: Control	time-point: Post-deployment
+SRR1747361	p75	condition: Control	time-point: Pre-deployment
+SRR1747362	p75	condition: Control	time-point: Post-deployment
+SRR1747363	p76	condition: Control	time-point: Pre-deployment
+SRR1747364	p76	condition: Control	time-point: Post-deployment
+SRR1747365	p77	condition: Control	time-point: Pre-deployment
+SRR1747366	p77	condition: Control	time-point: Post-deployment
+SRR1747367	p78	condition: Control	time-point: Pre-deployment
+SRR1747369	p79	condition: Control	time-point: Pre-deployment
+SRR1747368	p78	condition: Control	time-point: Post-deployment
+SRR1747370	p79	condition: Control	time-point: Post-deployment
+SRR1747372	p80	condition: Control	time-point: Post-deployment
+SRR1747371	p80	condition: Control	time-point: Pre-deployment
+SRR1747373	p81	condition: Control	time-point: Pre-deployment
+SRR1747374	p81	condition: Control	time-point: Post-deployment
+SRR1747375	p82	condition: Control	time-point: Pre-deployment
+SRR1747376	p82	condition: Control	time-point: Post-deployment
+SRR1747377	p83	condition: Control	time-point: Pre-deployment
+SRR1747378	p83	condition: Control	time-point: Post-deployment
+SRR1747379	p84	condition: Control	time-point: Pre-deployment
+SRR1747380	p84	condition: Control	time-point: Post-deployment
+SRR1747381	p85	condition: Control	time-point: Pre-deployment
+SRR1747382	p85	condition: Control	time-point: Post-deployment
+SRR1747383	p86	condition: Control	time-point: Pre-deployment
+SRR1747384	p86	condition: Control	time-point: Post-deployment
+SRR1747385	p87	condition: Control	time-point: Pre-deployment
+SRR1747386	p87	condition: Control	time-point: Post-deployment
+SRR1747387	p88	condition: Control	time-point: Pre-deployment
+SRR1747388	p88	condition: Control	time-point: Post-deployment
+SRR1747390	p89	condition: Control	time-point: Post-deployment
+SRR1747389	p89	condition: Control	time-point: Pre-deployment
+SRR1747391	p90	condition: Control	time-point: Pre-deployment
+SRR1747392	p90	condition: Control	time-point: Post-deployment
+SRR1747393	p91	condition: Control	time-point: Pre-deployment
+SRR1747394	p91	condition: Control	time-point: Post-deployment
+SRR1747395	p92	condition: Control	time-point: Pre-deployment
+SRR1747396	p92	condition: Control	time-point: Post-deployment
+SRR1747398	p93	condition: Control	time-point: Post-deployment
+SRR1747397	p93	condition: Control	time-point: Pre-deployment
+SRR1747399	p94	condition: Control	time-point: Pre-deployment
+SRR1747400	p94	condition: Control	time-point: Post-deployment
+SRR1747251	p20	condition: Case (PTSD risk)	time-point: Pre-deployment

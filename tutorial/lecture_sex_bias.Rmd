@@ -1,0 +1,229 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r message=FALSE}
+library(tidyverse)
+```
+
+Dataset used here is taken from paper http://dx.doi.org/10.1101/483636. Here, authors look at sex-differences in human fetal brain expression. They've
+taken 120 samples (70 males and 50 females) from 12 to 19 week of pregnancy.
+Unfortunately, I don't have raw counts, only normalized and with stabilized variance. I don't know yet what kind of stabilazation was used, but gene expression looks bimodal and zero is moved to ~3.5. And even this table I got only after writing to the corresponding author, and he seemed not very happy to five counts at least before regressing out lots and lots of stuff (see covariates.txt).
+
+```{r message=FALSE}
+read_tsv("data/fetalBrainGenes.tsv.gz") -> countsWide
+read_tsv("data/covariates.txt") -> sampleTable
+```
+
+```{r}
+countsWide[1:7, 1:5]
+```
+```{r}
+sampleTable[1:7, 1:5]
+```
+All sample IDs are numbers, and so I turn them into characters
+
+```{r}
+sampleTable %>% 
+  mutate(Sample = as.character(Sample)) %>%
+  rename(sample = Sample, sex = Sex) -> sampleTable
+```
+
+```{r}
+countsWide %>%
+  select(-(Chr:end)) %>%
+  gather(sample, expr, -ID) -> countsLong
+
+countsLong
+```
+
+```{r}
+countsLong %>%
+  group_by(ID) %>%
+  summarise(mean_expr = mean(expr)) %>%
+  ggplot() + geom_histogram(aes(mean_expr), bins = 60)
+```
+```{r}
+countsLong %>%
+  left_join(sampleTable) %>%
+  select(ID:sex) -> countsLong
+
+countsLong
+```
+
+```{r}
+countsLong %>%
+  group_by(ID, sex) %>%
+  summarise(mean = mean(expr), sd = sd(expr), n = n()) %>%
+  mutate(sem = sd/sqrt(n)) %>%
+  ungroup() -> semTable
+
+semTable
+```
+
+```{r}
+genes <- c("ENSG00000252130", "ENSG00000251838", "ENSG00000234684", "ENSG00000253696")
+countsLong %>%
+  filter(ID %in% genes) %>%
+  left_join(semTable) %>%
+  ggplot() + geom_point(aes(sample, expr, colour = sex)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5)) +
+    geom_hline(aes(yintercept = mean, colour = sex)) +
+    geom_ribbon(aes(sample, ymax = mean + 2 * sem, ymin = mean - 2 * sem, group = sex, fill = sex), alpha = 0.3) +
+    facet_wrap(~ID, scales = "free_y")
+  
+```
+
+```{r}
+semTable %>%
+  select(-sd) %>%
+  gather(var, value, -(ID:sex)) %>%
+  unite(var, sex, var) %>%
+  spread(var, value) -> semWide
+
+semWide
+```
+
+```{r}
+semWide %>%
+  transmute(ID = ID, 
+            diff = Female_mean - Male_mean,
+            sem_diff = sqrt(Female_sem^2 + Male_sem^2)) %>%
+  mutate(tstat = diff/sem_diff) %>%
+  arrange(desc(abs(tstat))) -> diffGenes
+
+diffGenes
+```
+
+```{r}
+countsLong %>%
+  semi_join(head(diffGenes, 9)) %>%
+  left_join(semTable) %>%
+  ggplot() + geom_point(aes(sample, expr, colour = sex)) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5)) +
+    geom_hline(aes(yintercept = mean, colour = sex)) +
+    geom_ribbon(aes(sample, ymax = mean + 2 * sem, ymin = mean - 2 * sem, group = sex, fill = sex), alpha = 0.3) +
+    facet_wrap(~ID, scales = "free_y")
+```
+```{r message = FALSE}
+#install.packages("BiocManager")
+#BiocManager::install("biomaRt")
+```
+
+```{r}
+mart <- biomaRt::useMart("ensembl", dataset = "hsapiens_gene_ensembl", host = "jul2015.archive.ensembl.org")
+head(biomaRt::listAttributes(mart), 10)
+```
+```{r}
+geneNames <- biomaRt::getBM(c("ensembl_gene_id", "external_gene_name", "description"), "ensembl_gene_id",
+               semWide$ID, mart)
+
+geneNames
+```
+
+```{r}
+diffGenes %>%
+  left_join(geneNames, by = c("ID" = "ensembl_gene_id"))
+```
+```{r}
+sampleTable %>%
+  mutate(sex = sample(sex)) -> sampleTableRand
+
+countsLong %>%
+  left_join(sampleTableRand) %>%
+  select(ID:sex) %>%
+  group_by(ID, sex) %>%
+  summarise(mean = mean(expr), sd = sd(expr), n = n()) %>%
+  mutate(sem = sd/sqrt(n)) %>%
+  ungroup() %>%
+  select(-sd) %>%
+  gather(var, value, -(ID:sex)) %>%
+  unite(var, sex, var) %>%
+  spread(var, value) %>%
+  transmute(ID = ID, 
+            diff = Female_mean - Male_mean,
+            sem_diff = sqrt(Female_sem^2 + Male_sem^2)) %>%
+  mutate(tstat = diff/sem_diff) %>%
+  ggplot() + geom_histogram(aes(tstat), bins = 50) + xlim(-20, 20)
+```
+```{r}
+diffGenes %>%
+  mutate(pvalue = pmin(pt(tstat, df = 120 - 2), pt(tstat, df = 120 - 2, lower.tail = FALSE)) * 2) %>%
+  mutate(expected = pvalue * nrow(.), observed = rank(pvalue)) %>%
+  mutate(fdr = expected/observed) %>%
+  filter(pvalue < 0.05) %>%
+  mutate(bias = ifelse(diff > 0, "Female", "Male")) -> signifGenes
+
+signifGenes
+```
+
+```{r}
+diffGenes %>%
+  left_join(geneNames, by = c("ID" = "ensembl_gene_id")) %>%
+  head(n = 2500) -> signifGenes
+```
+
+```{r}
+goTerms <- biomaRt::getBM(c("ensembl_gene_id", "go_id", "name_1006", "definition_1006", "namespace_1003"), 
+                          "ensembl_gene_id", geneNames$ensembl_gene_id, mart)
+goTerms %>%
+  filter(namespace_1003 == "biological_process") -> goTerms
+
+goTerms %>%
+  filter(go_id != "", ) %>%
+  anti_join(signifGenes, by = c("ensembl_gene_id" = "ID")) %>%
+  group_by(go_id) %>%
+  tally() %>%
+  filter(n > 5) -> background
+
+goTerms %>%
+  filter(go_id != "") %>%
+  semi_join(signifGenes, by = c("ensembl_gene_id" = "ID")) %>%
+  group_by(go_id) %>%
+  tally() %>% 
+  inner_join(background, by = "go_id", suffix = c("_sign", "_bg")) %>%
+  mutate(out_bg = nrow(diffGenes) - n_bg, out_sign = nrow(signifGenes) - n_sign) %>%
+  rowwise() %>%
+  mutate(pvalue = fisher.test(matrix(c(n_sign, out_sign, n_bg, out_bg), nrow = 2))$p.value) %>%
+  ungroup() %>%
+  arrange(pvalue) %>%
+  inner_join( biomaRt::getBM(c("go_id", "name_1006", "definition_1006"), 
+                              "go_id", .$go_id, mart)) %>%
+  View()
+
+```
+
+```{r}
+goTerms <- biomaRt::getBM(c("ensembl_gene_id", "go_id", "name_1006", "definition_1006", "namespace_1003"), 
+                          "ensembl_gene_id", geneNames$ensembl_gene_id, mart)
+goTerms %>%
+  filter(namespace_1003 == "biological_process") -> goTerms
+
+goTerms %>%
+  filter(go_id != "", ) %>%
+  semi_join(filter(signifGenes, bias == "Female"), by = c("ensembl_gene_id" = "ID")) %>%
+  group_by(go_id) %>%
+  tally() -> background
+
+goTerms %>%
+  filter(go_id != "") %>%
+  semi_join(filter(signifGenes, bias == "Male"), by = c("ensembl_gene_id" = "ID")) %>%
+  group_by(go_id) %>%
+  tally() %>% 
+  inner_join(background, by = "go_id", suffix = c("_sign", "_bg")) %>%
+  mutate(out_bg = sum(signifGenes$bias == "Female") - n_bg, out_sign = sum(signifGenes$bias == "Male") - n_sign) %>%
+  rowwise() %>%
+  mutate(pvalue = fisher.test(matrix(c(n_sign, out_sign, n_bg, out_bg), nrow = 2))$p.value) %>%
+  ungroup() %>%
+  arrange(pvalue) %>%
+  inner_join( biomaRt::getBM(c("go_id", "name_1006", "definition_1006"), 
+                              "go_id", .$go_id, mart)) %>%
+  View()
+
+```
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

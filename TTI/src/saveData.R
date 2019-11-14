@@ -67,11 +67,13 @@ genes <- right_join(genes, select(fpkm, geneId), by = c("geneId_Human" = "geneId
 
 globalData %>%
   group_by(tissue) %>%
-  do(as.data.frame(density(.$delta, n = 150)[1:2])) -> dens
+  do(as.data.frame(density(.$delta, n = 500, from = -4, to = 4)[1:2])) -> dens
 
 tissues <- unique(dens$tissue)
 densList <- lapply(tissues, function(t) {
-  filter(dens, tissue == t) %>% ungroup() %>% select(x, y)
+  filter(dens, tissue == t) %>% 
+    ungroup() %>% 
+    select(x, y)
 })
 names(densList) <- tissues
 

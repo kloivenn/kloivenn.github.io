@@ -1,0 +1,255 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r message=FALSE}
+library(tidyverse)
+```
+
+
+```{r message=FALSE}
+countsWide <- read_tsv("data/counts_gene_PTSD.tsv.gz")
+genes <- read_tsv("data/gene_ids.tsv")
+read_tsv("data/sampleTable.tsv") %>%
+  mutate(condition = ifelse(grepl("Case", condition), "case", "control")) %>%
+  mutate(timePoint = fct_recode( timePoint,
+    "pre" = "time-point: Pre-deployment",
+    "post" = "time-point: Post-deployment" ) ) -> sampleTable
+
+```
+
+```{r}
+countsWide[1:5, 184:188]
+```
+```{r}
+genes
+```
+```{r}
+sampleTable
+```
+```{r}
+sampleTable %>%
+  count(condition, timePoint)
+```
+```{r}
+countsWide %>%
+  mutate( gene_id = str_remove( gene_id, "\\.\\d+")) %>%
+  gather(sample, count, -gene_id) -> countsLong
+```
+```{r}
+countsLong %>%
+  left_join( sampleTable ) %>%
+  filter(patient != "p20") %>%
+  group_by(sample) %>%
+  mutate(tpm = log2(count/sum(count) * 1000000 + 1)) %>%
+  ungroup() -> tpmsLong
+
+tpmsLong %>%
+  group_by(gene_id) %>%
+  summarise(max = max(tpm)) %>%
+  filter(max > 1) %>%
+  pull(gene_id) -> expressedGenes
+
+tpmsLong <- filter(tpmsLong, gene_id %in% expressedGenes)
+```
+```{r}
+tpmsLong %>%
+  select(gene_id, condition, patient, timePoint, tpm) %>%
+  spread(timePoint, tpm) %>%
+  group_by(patient) %>%
+  mutate(diff = post - pre, av = (post + pre)/2) %>%
+  group_by(gene_id, condition) %>%
+  summarise(mean_dif = mean(diff), mean_expr = mean(av),  sd_dif = sd(diff), n = n()) %>%
+  mutate(sem = sd_dif/sqrt(n)) -> diffs
+
+diffs
+```
+```{r}
+diffs %>%
+  select(gene_id, condition, mean_dif) %>%
+  spread(condition, mean_dif) %>%
+  ggplot() + geom_point(aes(abs(case), abs(control)), size = 1, alpha = 0.5) +
+    coord_fixed() + scale_x_log10() + scale_y_log10() +
+    geom_abline(slope = 1, intercept = 0, colour = "red")
+```
+
+```{r}
+diffs %>%
+  mutate(tstat = mean_dif/sem) %>%
+  ggplot() + geom_histogram(aes(tstat)) + facet_wrap(~condition)
+```
+```{r}
+sds <- diffs$sd_dif[sample(nrow(diffs), 34000)]
+
+randDiffs <- t(sapply(sds, function(sd) rnorm(50, sd = sd)))
+rownames(randDiffs) <- str_c("gene", 1:nrow(randDiffs))
+colnames(randDiffs) <- str_c("sample", 1:ncol(randDiffs))
+
+randDiffs %>%
+  as.data.frame() %>%
+  rownames_to_column("gene") %>%
+  gather(sample, diff, -gene)
+  
+```
+
+```{r}
+randDiffs %>%
+  as.data.frame() %>%
+  rownames_to_column("gene") %>%
+  gather(sample, diff, -gene) %>%
+  group_by(gene) %>%
+  summarise(mean_dif = mean(diff), sd_dif = sd(diff), n = n()) %>%
+  mutate(sem = sd_dif/sqrt(n)) %>%
+  mutate(tstat = mean_dif/sem) %>%
+  ggplot() + geom_histogram(aes(tstat)) + xlim(-6, 6)
+```
+
+```{r}
+diffs %>%
+  mutate(tstat = mean_dif/sem) %>%
+  mutate(pvalue = pt(tstat, df = n - 1)) %>%
+  mutate(pvalue = ifelse(pvalue > 0.5, 2*(1 - pvalue), 2*pvalue)) %>%
+  select(gene_id, condition, pvalue) -> pvals
+
+pvals %>%
+  spread(condition, pvalue) %>%
+  ggplot() + geom_point(aes(-log10(case), -log10(control))) +
+    geom_abline(slope = 1, intercept = 0, colour = "red")
+```
+```{r}
+pvals %>%
+  group_by(condition) %>%
+  mutate(expected = pvalue * n(),
+         observed = rank(pvalue)) %>%
+  mutate(fdr = expected/observed) -> pvals
+```
+
+
+```{r}
+pvals %>% 
+  filter(fdr < 0.1) %>%
+  tally()
+```
+```{r}
+tpmsLong %>%
+  select(gene_id, condition, patient, timePoint, tpm) %>%
+  spread(timePoint, tpm) %>%
+  group_by(patient) %>%
+  mutate(diff = post - pre, av = (post + pre)/2) %>%
+  group_by(gene_id, condition) %>%
+  summarise(pvalue = t.test(diff, df = n() - 1)$p.value) %>%
+  group_by(condition) %>%
+  mutate(fdr = p.adjust(pvalue, method = "BH")) %>%
+  filter(fdr < 0.1) %>%
+  tally()
+```
+
+```{r}
+tpmsLong %>%
+  filter(timePoint == "pre")  %>%
+  group_by(gene_id, condition) %>%
+  summarise(mean_expr = mean(tpm), sd_expr = sd(tpm), n = n()) %>%
+  mutate(sem = sd_expr/sqrt(n)) -> semTable
+
+semTable %>%
+  select(gene_id, condition, mean_expr) %>%
+  spread(condition, mean_expr) %>%
+  ggplot() + geom_point(aes(case, control), size = 1, alpha = 0.5) +
+    scale_x_log10() + scale_y_log10() + coord_fixed() +
+    geom_abline(slope = 1, intercept = 0, colour = "red")
+```
+```{r}
+semTable %>%
+  select(gene_id, condition, mean_expr) %>%
+  spread(condition, mean_expr) %>%
+  mutate(diff = case - control) %>%
+  select(-case, -control) -> diffsPre
+
+semTable %>%
+  ungroup() %>%
+  select(gene_id, condition, sem) %>%
+  spread(condition, sem) %>%
+  mutate(sem_diff = sqrt(case^2 + control^2)) %>%
+  select(-case, -control) %>%
+  left_join(diffsPre) %>%
+  mutate(tstat = diff/sem_diff) %>%
+  mutate(pvalue = pt(tstat, df = 47 + 46 - 2)) %>%
+  mutate(pvalue = ifelse(pvalue > 0.5, 2 *(1 - pvalue), 2 * pvalue)) %>%
+  mutate(fdr = p.adjust(pvalue, method = "BH")) %>%
+  arrange(fdr)
+```
+
+```{r}
+library(DESeq2)
+countsWide %>%
+  mutate( gene_id = str_remove( gene_id, "\\.\\d+")) %>%
+  as.data.frame() %>%
+  column_to_rownames("gene_id") -> DeCounts
+
+
+
+```
+
+```{r}
+tpmsLong %>%
+  filter(timePoint == "pre", gene_id == "ENSG00000139354") %>%
+  arrange(condition) %>%
+  ggplot() + geom_point(aes(x = patient, y = tpm, colour = condition))
+  
+```
+
+```{r}
+tpmsLong %>%
+  select(gene_id, condition, patient, timePoint, tpm) %>%
+  spread(timePoint, tpm) %>%
+  group_by(patient) %>%
+  mutate(diff = post - pre) %>%
+  select(gene_id, condition, diff) %>%
+  group_by(gene_id, condition) %>%
+  summarise(mean_expr = mean(diff), sd_expr = sd(diff), n = n()) %>%
+  mutate(sem = sd_expr/sqrt(n)) -> semTable
+
+semTable %>%
+  select(gene_id, condition, mean_expr) %>%
+  spread(condition, mean_expr) %>%
+  mutate(diff = case - control) %>%
+  select(-case, -control) -> diffsPre
+
+semTable %>%
+  ungroup() %>%
+  select(gene_id, condition, sem) %>%
+  spread(condition, sem) %>%
+  mutate(sem_diff = sqrt(case^2 + control^2)) %>%
+  select(-case, -control) %>%
+  left_join(diffsPre) %>%
+  mutate(tstat = diff/sem_diff) %>%
+  mutate(pvalue = pt(tstat, df = 47 + 46 - 2)) %>%
+  mutate(pvalue = ifelse(pvalue > 0.5, 2 *(1 - pvalue), 2 * pvalue)) %>%
+  mutate(fdr = p.adjust(pvalue, method = "BH")) %>%
+  arrange(fdr)
+```
+
+```{r}
+```
+
+
+
+```{r}
+sampleTable %>%
+  filter(timePoint == "pre") %>%
+  pull(sample) -> subset
+```
+```{r}
+countsLong %>%
+  filter(sample %in% subset) %>%
+  left_join( sampleTable ) %>%
+  left_join( genes ) %>%
+  group_by(sample) %>%
+  mutate(tpm = count/sum(count) * 1000000) %>%
+  mutate(log2tpm = log2(tpm + 1)) %>%
+  group_by(gene_id) %>%
+  summarise(mean)
+```
+
+
