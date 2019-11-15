@@ -1,6 +1,8 @@
 ---
 title: "R Notebook"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r message=FALSE}
@@ -11,24 +13,32 @@ Dataset used here is taken from paper http://dx.doi.org/10.1101/483636. Here, au
 taken 120 samples (70 males and 50 females) from 12 to 19 week of pregnancy.
 Unfortunately, I don't have raw counts, only normalized and with stabilized variance. I don't know yet what kind of stabilazation was used, but gene expression looks bimodal and zero is moved to ~3.5. And even this table I got only after writing to the corresponding author, and he seemed not very happy to five counts at least before regressing out lots and lots of stuff (see covariates.txt).
 
+Start with reading in the data.
 ```{r message=FALSE}
 read_tsv("data/fetalBrainGenes.tsv.gz") -> countsWide
 read_tsv("data/covariates.txt") -> sampleTable
 ```
 
+`countsWide`, besides expression values for 120 samples, also has columns with chromosome name, and start and end position of each gene. Note, that 
+only autosomal gene expression is used here. There are no genes from X or Y chromosomes.
 ```{r}
 countsWide[1:7, 1:5]
 ```
+`sampleTable` stores all that authors believe to be covariates in this study adn they recomend to regress it all out before any further analysis. These are week of pregnancy, RIN, sequencing batch (ReadLength), first three PCs from genome-wide DNA genotypes, and also 10 hidden confounders through use of probabilistic estimation of expression residuals. Here, I omit this step for now and move to estimating gene expression differences.
 ```{r}
 sampleTable[1:7, 1:5]
 ```
-All sample IDs are numbers, and so I turn them into characters
+
+All sample IDs are numbers. Let's turn them into characters first. This will be required later for joining with expression table and for making plots with
+samples stratified along x-axis. Also just for convenience rename two columns removing capital letters from their names. 
 
 ```{r}
 sampleTable %>% 
   mutate(Sample = as.character(Sample)) %>%
   rename(sample = Sample, sex = Sex) -> sampleTable
 ```
+
+Remove columns that we don't need and convert expression table from wide to long format. 
 
 ```{r}
 countsWide %>%
@@ -37,13 +47,15 @@ countsWide %>%
 
 countsLong
 ```
-
+Calculate mean expression for each gene and make a histogram of it.
+I wanted to use it to decide what genes to throw away, but now I'm confused by this shape. I only know for sure that the minimal obtained value ~3.55 corresponds to zero expression. 
 ```{r}
 countsLong %>%
   group_by(ID) %>%
   summarise(mean_expr = mean(expr)) %>%
   ggplot() + geom_histogram(aes(mean_expr), bins = 60)
 ```
+Join sample table to our long expression table and remove all extra columns, keeping only sex.
 ```{r}
 countsLong %>%
   left_join(sampleTable) %>%
@@ -51,7 +63,8 @@ countsLong %>%
 
 countsLong
 ```
-
+Now we want to find genes that has different expression in males and females. First, we can calculate for each gene, mean male and mean female expression 
+and also standard error of those means, as it was described in the second lecture.
 ```{r}
 countsLong %>%
   group_by(ID, sex) %>%
@@ -61,7 +74,8 @@ countsLong %>%
 
 semTable
 ```
-
+One can already guess that we can call gene differently expressed between sexes if difference between means is considerably larger than both standard erros.
+Let's plot some examples to see what can happen in the data. On the plots below horizontal line show mean expression for males and females. Shaded area indicates confidence interval (twice the standard error of the mean). The two genes on top has clear difference in expression between males and females, the two genes in the bottom doesn't show much difference.
 ```{r}
 genes <- c("ENSG00000252130", "ENSG00000251838", "ENSG00000234684", "ENSG00000253696")
 countsLong %>%
@@ -74,17 +88,22 @@ countsLong %>%
     facet_wrap(~ID, scales = "free_y")
   
 ```
-
+Already from looking at this plots one may conclude that ratio of difference and SEM should be a good measure of how different gene expression is. To be more
+precise, we want to get standard error of the difference between means. To calculate it we first need to spread our table. That is a bit different from usual use of `spread` function because we want to spread multiple columns at once.
+To do that we first remove `sd` and `n` columns, since we don't need them anymore. Next step is to put all means and SEMs together in one column. Now `var` has former columns names and `value` corresponding values (either mean or SEM). Now we can glue together column names with sex using the `unite` function. New `var` columns will have four different values: `Female_mean`, `Female_sem`, `Male_mean` and `Male_sem` and so it can be spread as usual.
 ```{r}
 semTable %>%
-  select(-sd) %>%
+  select(-sd, -n) %>%
   gather(var, value, -(ID:sex)) %>%
   unite(var, sex, var) %>%
   spread(var, value) -> semWide
 
 semWide
 ```
+Now we have everyting we need to find differentially expressed genes. If we know standard error of two values $$u_x$$ and $$u_y$$, standard error of their difference can be calculated as $$\sqrt{u_x^2 + u_y^2}$$. And finally, when we have difference and its standard error, we can get ration between the two, 
+that allows us to arrange genes by how different their expression is in males and in females. The ratio column we call `tstat` (short for t-statistics). The meaning of this name will be explained a bit later.
 
+Note also the `transmute` function. It works almost as `mutate`, but it also keeps only the new columns and removes everything else. That's why we don't have `Female_mean`, `Female_sem`, `Male_mean` and `Male_sem` in the new table.
 ```{r}
 semWide %>%
   transmute(ID = ID, 
@@ -96,6 +115,8 @@ semWide %>%
 diffGenes
 ```
 
+Now we can, for example, plot top nine different genes. Keep in mind, that these are not genes with the largest difference between means, but rather those with the most pronounced, statistically significant difference. 
+
 ```{r}
 countsLong %>%
   semi_join(head(diffGenes, 9)) %>%
@@ -106,26 +127,46 @@ countsLong %>%
     geom_ribbon(aes(sample, ymax = mean + 2 * sem, ymin = mean - 2 * sem, group = sex, fill = sex), alpha = 0.3) +
     facet_wrap(~ID, scales = "free_y")
 ```
+Next question, that one may have in mind, is what are these genes exactly. In previous lectures, we used premade table with gene names and descriptions. Today we are going to construct one ourselves. There several way to annotate genes. One of them is to use package called `biomaRt`. This package is not on CRAN repository, and so you can't install it with `install.packages` function. Instead one needs to install `BiocManager` package first, and then to use its `install` function.
+
+To install `biomaRt` **and** to use it internet connection is required. This package doesn't load the entire database on your hard disk, but rather queries for the information you want to get.
+
+You can install `biomaRt` with these two commands.
 ```{r message = FALSE}
 #install.packages("BiocManager")
 #BiocManager::install("biomaRt")
 ```
 
+Unfortunately, `biomaRt` has a `select` function. Therefore if we load it with `library(biomaRt)`, it will mask tidyverse's `select`. To avoid that, once can load first `biomaRt` and only then `tidyverse`. Since in our case `tidyverse` is already loaded, we will just `biomaRt::` in front of every function from this package instead.
+
+First step in using `biomaRt` is to get a "mart" object, which allows us to access a database we want to use.
+Here, we say, that we want to use "Ensembl" database, dataset with human genes, version from July 2015. We use an archived version, because this is the one
+that authors of the paper used to align RNA-seq reads. You can try to find this information in the "Methods" section of the paper yourself.
+
+Now we can access hundreds of attributes for each gene in the dataset. Here is first ten of them, but there are many, many more.
+
 ```{r}
 mart <- biomaRt::useMart("ensembl", dataset = "hsapiens_gene_ensembl", host = "jul2015.archive.ensembl.org")
 head(biomaRt::listAttributes(mart), 10)
 ```
-```{r}
+Now we can use the selected mart to get the information we need. Next function returns Ensembl ID, gene name and description for every Ensembl ID in `ID` column of `countsWide` table.
+```{r message=FALSE}
 geneNames <- biomaRt::getBM(c("ensembl_gene_id", "external_gene_name", "description"), "ensembl_gene_id",
-               semWide$ID, mart)
+               countsWide$ID, mart)
 
 geneNames
 ```
-
+We can, for example, join `geneNames` table to our result table and check what genes appear to be the most different.
 ```{r}
 diffGenes %>%
-  left_join(geneNames, by = c("ID" = "ensembl_gene_id"))
+  left_join(geneNames, by = c("ID" = "ensembl_gene_id")) %>%
+  select(external_gene_name, description, diff, tstat)
 ```
+So far we only arranged the genes by their difference, but we never tried to ask a question: How important is this difference? Are our top values of `tstat` are actually large enough to claim that there is a significant difference? A look at the plots above suggests that they in fact are. Expression of those genes is clearly different between males and females. But rememeber, that humans are bad intuitive statisticians: Our brain tends to see patternse where there are none. So we really need some computational way to tell us whether the observed difference is unexpectedly high. 
+
+The key to answer this question is in the word "unexpectedly". We can check, what values of `tstat` we would expect to find if there was no difference.
+So we permute `sex` column in sample table and repeat all the calculations from above with permuted labels.
+
 ```{r}
 sampleTable %>%
   mutate(sex = sample(sex)) -> sampleTableRand
@@ -147,83 +188,88 @@ countsLong %>%
   mutate(tstat = diff/sem_diff) %>%
   ggplot() + geom_histogram(aes(tstat), bins = 50) + xlim(-20, 20)
 ```
+As one can see, even values around 10 or -10 are unexpectedly high. And what about 5? Or 3? Sometimes we still get `tstat = 3` in our random data set, but may be it still happens rarely enough for us to call genes with `tstat = 3` significantly different? And here is where term p-value comes in. p-value is a probibility to observe such an extreme result by chance. Histogram above helps us to understand where we can get this p-value from. Looking at this histogram for any value of t-statistics we can ask how many times we got this value or higher (lower in case of negative values). Already with what we have now, we can expect reasonably good results somewhere within range from -3 to 3: where most of our obtained by chance values are. However, to transform more extreme values of t-statistics into p-values would require much more randomly generated values.
+
+Luckily for us, the shape of the distribution above is already known and precalculated. It is called t-distribution and test that we've almost performed to find differentially expressed genes is callt t-test. `pt` function will give us the p-values we want, provided the t-statistics and number of degrees of fredom. The later in our case equals to number of samples minus 2.
+
+There is only on catch here. For any gene we don't know beforehand, whether it is going to be higher expressed in males or in females (whether t-statistics is going to be negative of positive). That means that for each gene we need to ask not one but two questions: what is the probability of obtaining such a high value? And what is the probability of obtaining such a low value? Now we can take smallest of the two p-values, but we need to multiply it by two, because chances of a random gene to succeed in at least one of these two tests are twice as high. This is called a two-sided t-test.
+
 ```{r}
 diffGenes %>%
-  mutate(pvalue = pmin(pt(tstat, df = 120 - 2), pt(tstat, df = 120 - 2, lower.tail = FALSE)) * 2) %>%
+  mutate(pvalue = pmin(pt(tstat, df = 120 - 2), pt(tstat, df = 120 - 2, lower.tail = FALSE)) * 2) -> diffGenes
+
+diffGenes
+```
+Generally accepted cut off for p-values that you can find in many papers is 0.05. It means that a difference with p-value 0.05 or smaller can be called significant. Which at first glance may seem reasonable: there is only 5% chance that such a difference in expression is random.
+
+```{r}
+diffGenes %>%
+  filter(pvalue < 0.05) -> signifGenes
+
+nrow(signifGenes)
+```
+This way we get about 2000 significant genes.
+
+Does it mean that we have detected lots of differences in gene expression between male and female fetal brain? Actually, not. We forgot about multiple testing problem. Remebmer, `p.value = 0.05` in a completely random dataset with no signal 5% of genes will be as different as this one. Seems not too many, but we have tested `r nrow(countsWide)` genes. And even without any difference between male and female brains we should exprect to get `r nrow(countsWide) * 0.05` genes with p-value not bigger than 0.05 simply due to chance.
+
+This is the motivation to introducing so called False Discovery Rate (FDR). It tells us the following: provided we claim that all the genes with not more than a certain FDR value are significant, what fraction of these genes are actually false positives.
+
+To calculate FDR for each gene we need two values: how many genes with such or lower p-value we expected to see in our dataset due to chance and how many genes with such or lower p-value are in fact observed. Ratio between the two give us an FDR value.
+
+```{r}
+diffGenes %>%
   mutate(expected = pvalue * nrow(.), observed = rank(pvalue)) %>%
   mutate(fdr = expected/observed) %>%
-  filter(pvalue < 0.05) %>%
-  mutate(bias = ifelse(diff > 0, "Female", "Male")) -> signifGenes
-
-signifGenes
+  filter(fdr < 0.1)
 ```
+Only 26 genes have FDR lower 0.1. Not so impressing as `r nrow(signifGenes)`.
+
+However, here, we'll go on with previously obtained set of `r nrow(signifGenes)` gene.
+
+How can we check, what are the genes stored in `signifGenes` table? Of course, one way is to join our `geneNames` table and manually look through gene names and descriptions, but for thousands of genes this can be a challange.
+
+Instead we can use predefined groups of genes and check if members of those groups are overrepresented in our list of ~2000 genes. Here again we can use `biomaRt` package to get some of those groups and their members. We are going to look at gene sets from the Gene Ontology (GO) project. We will only leave group (or GO terms) that describe any biological processes.
 
 ```{r}
-diffGenes %>%
-  left_join(geneNames, by = c("ID" = "ensembl_gene_id")) %>%
-  head(n = 2500) -> signifGenes
-```
-
-```{r}
-goTerms <- biomaRt::getBM(c("ensembl_gene_id", "go_id", "name_1006", "definition_1006", "namespace_1003"), 
+goMembers <- biomaRt::getBM(c("ensembl_gene_id", "go_id", "name_1006", "definition_1006", "namespace_1003"), 
                           "ensembl_gene_id", geneNames$ensembl_gene_id, mart)
-goTerms %>%
-  filter(namespace_1003 == "biological_process") -> goTerms
+goMembers %>%
+  filter(namespace_1003 == "biological_process", go_id != "") -> goMembers
 
-goTerms %>%
-  filter(go_id != "", ) %>%
-  anti_join(signifGenes, by = c("ensembl_gene_id" = "ID")) %>%
-  group_by(go_id) %>%
-  tally() %>%
-  filter(n > 5) -> background
+goMembers %>%
+  group_by(go_id, name_1006, definition_1006) %>%
+  tally() -> goTerms
 
-goTerms %>%
-  filter(go_id != "") %>%
+goTerms
+```
+
+For every GO term we can now count how many of its member genes are in `signifGenes` and how many are out.
+
+```{r}
+goMembers %>%
   semi_join(signifGenes, by = c("ensembl_gene_id" = "ID")) %>%
   group_by(go_id) %>%
   tally() %>% 
-  inner_join(background, by = "go_id", suffix = c("_sign", "_bg")) %>%
-  mutate(out_bg = nrow(diffGenes) - n_bg, out_sign = nrow(signifGenes) - n_sign) %>%
-  rowwise() %>%
-  mutate(pvalue = fisher.test(matrix(c(n_sign, out_sign, n_bg, out_bg), nrow = 2))$p.value) %>%
-  ungroup() %>%
-  arrange(pvalue) %>%
-  inner_join( biomaRt::getBM(c("go_id", "name_1006", "definition_1006"), 
-                              "go_id", .$go_id, mart)) %>%
-  View()
+  arrange(desc(n)) -> inside
 
+goMembers %>%
+  anti_join(signifGenes, by = c("ensembl_gene_id" = "ID")) %>%
+  group_by(go_id) %>%
+  tally() -> outside
+
+inside
 ```
+
+Now we face similar question as the one we had after calculatin t-statistics. Having A genes from a given GO term among those we call significatnt, and B genes not in the `signifGenes` table, is it a lot? What are the chances to get something like that by chance? To answer this question we can use Fisher's exact test.
 
 ```{r}
-goTerms <- biomaRt::getBM(c("ensembl_gene_id", "go_id", "name_1006", "definition_1006", "namespace_1003"), 
-                          "ensembl_gene_id", geneNames$ensembl_gene_id, mart)
-goTerms %>%
-  filter(namespace_1003 == "biological_process") -> goTerms
-
-goTerms %>%
-  filter(go_id != "", ) %>%
-  semi_join(filter(signifGenes, bias == "Female"), by = c("ensembl_gene_id" = "ID")) %>%
-  group_by(go_id) %>%
-  tally() -> background
-
-goTerms %>%
-  filter(go_id != "") %>%
-  semi_join(filter(signifGenes, bias == "Male"), by = c("ensembl_gene_id" = "ID")) %>%
-  group_by(go_id) %>%
-  tally() %>% 
-  inner_join(background, by = "go_id", suffix = c("_sign", "_bg")) %>%
-  mutate(out_bg = sum(signifGenes$bias == "Female") - n_bg, out_sign = sum(signifGenes$bias == "Male") - n_sign) %>%
+inside %>%
+  left_join(outside, by = "go_id", suffix = c("_in", "_out")) %>%
+  mutate(n_out = ifelse(is.na(n_out), 0, n_out)) %>%
+  mutate(others_out= nrow(diffGenes) - n_in, others_in = nrow(signifGenes) - n_out) %>%
   rowwise() %>%
-  mutate(pvalue = fisher.test(matrix(c(n_sign, out_sign, n_bg, out_bg), nrow = 2))$p.value) %>%
+  mutate(pvalue = fisher.test(matrix(c(n_in, others_in, n_out, others_out), nrow = 2))$p.value) %>%
   ungroup() %>%
-  arrange(pvalue) %>%
-  inner_join( biomaRt::getBM(c("go_id", "name_1006", "definition_1006"), 
-                              "go_id", .$go_id, mart)) %>%
-  View()
-
+  inner_join(goTerms) %>%
+  arrange(pvalue) 
 ```
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
