@@ -57,7 +57,7 @@
 		function changeGene() {
 			geneId = Object.keys(data[tissue])[gene];
 			d3.select("#geneTitle")
-					.style("color", data[tissue][geneId].padj < 0.1 ? (data[tissue][geneId].delta < 0 ? "#A6AE00" : "#9F00FF") : colours[tissue])
+					.style("color", data[tissue][geneId].padj < 0.1 ? (data[tissue][geneId].delta < 0 ? "#A6AE00" : "#9F00FF") : "#777")
 					.text(geneInfo.geneName[gene]);
 			var domainTr = tr.get_layer("range").get_layerDomainX(),
 				domainTl = tl.get_layer("range").get_layerDomainX();
