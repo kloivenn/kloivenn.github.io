@@ -5,9 +5,10 @@
   display: block;
   background-color: #deebf7;
   padding: 20px;
-  font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'IBM Plex Sans Condensed', sans-serif;
   color: #1f4e79;
-  font-size: 15pt;
+  font-size: 17pt;
+  line-height: 1.5;
 }
 
 @media (min-width: 850px) {
