@@ -1,0 +1,318 @@
+<head>
+<link rel="stylesheet" type="text/css" href="src/linked-charts.css">
+	<link rel="stylesheet" type="text/css" href="src/style.css">
+	<script type="text/javascript" src = "src/linked-charts.min.js"></script>
+	<script type="text/javascript" src = "src/data.js"></script>
+	<script type="text/javascript" src = "src/awesomplete.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="src/awesomplete.css">
+	<title>Ex2plorer</title>
+</head>
+<body>
+	<div style="border-bottom: 1px solid #CCC;">
+		<div id = "topbar">
+			<img src = "src/Mammalian_evolutionTransparent.png" width = "150px" style = "margin-left: 10px;">
+			<div><span style="font-style: italic; color: #B2303A">Ex<sup>2</sup></span>plorer</div>
+		</div>
+	</div>
+	<div id = "plots" style="display: grid; grid-template-columns: 300px 650px 500px">
+		<div id = "genes" style="grid-column: 1; grid-row: 1">
+			<p>Select organ:</p>
+			<div id = "tissues" style="text-align: center;"></div>
+			<p>
+				<span style="font-weight: bold;">Selected gene:</span> <span id = "geneTitle" style="font-weight: bold; font-size: 16pt;"></span>
+			</p>
+			<p id = "notFound" style="color: red; visibility: hidden; text-align: center; margin-top: 5px; margin-bottom: 5px;">
+				Gene with this ID was not found.
+			</p>
+			<span>Enter gene name:</span> <input id = "geneName" type = "text"> <br>
+			<span>Enter Ensembl ID:</span> <input id = "ensembl" type = "text" onchange = "searchEnsembl(this.value);">
+			<p id = "description"></p>
+			Search for this gene on <a target="_blank" rel="noopener noreferrer">GeneCards</a>.
+		</div> 	
+		<div id = "mainPlot" style="grid-column: 2; grid-row: 1;"></div>
+		<div id = "density" style="grid-column: 3; grid-row: 1"></div>
+		<div style="grid-column: 1/4; grid-row: 2">
+			<div id = "dendogram" style="display: inline-block; vertical-align: top;">
+				<img src="src/dendogram.png" width="300px" height="250px" style="margin-top: 50px">
+			</div>
+			<div id = "transcription" style="display: inline-block;"></div>
+			<div id = "translation" style="display: inline-block;"></div>
+			<div style="display: inline-block; vertical-align: top;">
+				<table id = "info" style="margin-top: 50px"></table>	
+			</div>
+		</div>
+	</div>
+		<div style="font-size: 10px; color: #666; font-family: Qicksand, sans-serif; width: 1500px">
+		Generated with the 
+		<a target="_blank" rel="noopener noreferrer" href="https://anders-biostat.github.io/linked-charts/">LinkedCharts</a> library.
+	</div>
+	<script type="text/javascript">
+		data = lc.separateBy(data, ["tissue", "geneId"]);
+
+		var tissues = ["Brain", "Liver", "Testis"],
+			colours = {Brain: "#3399CC", Liver: "#339900", Testis: "#FF6600"},
+			tissue = "Brain",
+			species = ["Chicken", "Platypus", "Opossum", "Mouse", "Macaque", "Human"],
+			sp, domain = [0, 1], gene = 0, geneId = Object.keys(data[tissue])[gene];
+		function changeGene() {
+			geneId = Object.keys(data[tissue])[gene];
+			d3.select("#geneTitle")
+					.style("color", data[tissue][geneId].padj < 0.1 ? (data[tissue][geneId].delta < 0 ? "#A6AE00" : "#9F00FF") : "#777")
+					.text(geneInfo.geneName[gene]);
+			var domainTr = tr.get_layer("range").get_layerDomainX(),
+				domainTl = tl.get_layer("range").get_layerDomainX();
+			domain = [d3.min([domainTr[0], domainTl[0]]), d3.max([domainTr[1], domainTl[1]])]
+			tr.update();
+			tl.update();
+			mainPlot.get_layer("selGene").update();
+			updateTable();
+			d3.select("#geneName").node().value = geneInfo.geneName[gene];
+			d3.select("#ensembl").node().value = geneInfo["geneId_" + (sp || "Human")][gene];
+		}
+
+		function updateTable() {
+			d3.select("#info")
+				.selectAll(".cell")
+					.text(d => geneInfo[d[1] + "_" + d[0]][gene]);
+			d3.select("#genes")
+				.select("a")
+					.attr("href", "https://www.genecards.org/cgi-bin/carddisp.pl?gene=" + geneInfo.geneName[gene]);
+			d3.select("#genes")
+				.select("#description")
+					.html("<b>Description:</b> " + geneInfo.description[gene]);
+		}
+
+		function searchEnsembl(name) {
+			d3.select("#notFound")
+				.style("visibility", "hidden");			
+
+			sp = undefined;
+			if(name.substring(0, 4) == "ENSG")
+				sp = "Human";
+			if(name.substring(0, 7) == "ENSMUSG")
+				sp = "Mouse";
+			if(name.substring(0, 7) == "ENSMMUG")
+				sp = "Macaque";
+			if(name.substring(0, 7) == "ENSMODG")
+				sp = "Opossum";
+			if(name.substring(0, 7) == "ENSOANG")
+				sp = "Platypus";
+			if(name.substring(0, 7) == "ENSGALG")
+				sp = "Chicken";
+
+
+			if(!sp){
+				d3.select("#notFound")
+					.style("visibility", "visible")
+				return;
+			}
+
+			var newGene = geneInfo["geneId_" + sp].indexOf(name);
+			if(newGene == -1) 
+				d3.select("#notFound")
+					.style("visibility", "visible")
+			else {
+				gene = newGene;
+				changeGene();
+			}
+		}
+
+		function searchGene(name) {
+			d3.select("#notFound")
+				.style("visibility", "hidden");			
+
+			var newGene = geneInfo.geneName.indexOf(name.toUpperCase());
+
+			if(newGene == -1)
+				d3.select("#notFound")
+					.style("visibility", "visible")
+			else {
+				gene = newGene;
+				changeGene();
+			}
+		}		
+
+		d3.select("#tissues")
+			.selectAll(".icon")
+				.data(tissues)
+				.enter()
+					.append("img")
+					.attr("width", 75)
+					.attr("src", d => "src/" + d + ".svg")
+					.attr("title", d => d)
+					.attr("class", d => d == tissue ? "icon active" : "icon")
+					.on("click", function(d) {
+						tissue = d;
+						d3.select("#tissues")
+							.selectAll(".icon")
+								.classed("active", false);
+						d3.select(this).classed("active", true);
+						mainPlot.update();
+						densPlot.update();
+						changeGene();
+					});
+
+		var mainPlot = lc.scatter()
+			.elementIds(Object.keys(data[tissue]))
+			.x(d => data[tissue][d].med)
+			.y(d => data[tissue][d].delta)
+			.domainY([-3, 3])
+			.domainX([0, 10])
+			.height(380)
+			.width(500)
+			.set_paddings({right: 10})
+			.axisTitleX("log2(FPKM + 1)")
+			.axisTitleY("&Delta;")
+			.colour(d => data[tissue][d].padj < 0.1 ? (data[tissue][d].delta < 0 ? "#A6AE00" : "#9F00FF") : "#aaa")
+			.opacity(d => data[tissue][d].padj < 0.1 ? 0.8 : 0.4)
+			.size(d => data[tissue][d].padj < 0.1 ? 2 : 1)
+			.axisTitlePos({x: "down middle", y: "down middle"})
+			.strokeWidth(1)
+			.on_click(function(d) {
+				gene = fpkm.geneId.indexOf(d);
+				changeGene();
+			});
+
+		mainPlot.legend
+			.add_block([["Stabilizing", "Directional", "Not significant"], ["#A6AE00", "#9F00FF", "#aaa"]], "colour", "col", "Layer1")
+			.legend.titles({col: ""});
+
+		lc.scatter("selGene", mainPlot)
+			.elementIds(["Selected gene"])
+			.x(d => data[tissue][geneId].med)
+			.y(d => data[tissue][geneId].delta)
+			.colour("none")
+			.stroke("#333")
+			.strokeWidth(2)
+			.size(7);
+
+		lc.xLine("horiz", mainPlot)
+			.lineFun(x => 0)
+			.place("#mainPlot");
+
+		var densPlot = lc.pointLine()
+			.x(density[tissue].y)
+			.y(density[tissue].x)
+			.height(380)
+			.width(200)
+			.nsteps(500)
+			.ticksRotateX(90)
+			.fill(function(){return colours[tissue];})
+			.domainY(function() {return mainPlot.get_domainY()});
+
+		lc.xLine("horiz", densPlot)
+			.lineFun(x => 0)
+			.place("#density");
+
+		var updateAxesMP = mainPlot.updateAxes;
+		mainPlot.updateAxes = function() {
+			updateAxesMP();
+			densPlot.updateAxes();
+		}
+
+
+		var points = species.map(el => ["min", "max", "med"].map(el2 => [el, el2].join("_"))).flat();
+
+//transcription
+		var tr = lc.xLine("grid")
+			.width(300)
+			.height(300)
+			.domainX(function() {return domain})
+			.axisTitleX("log2(FPKM + 1)")
+			.axisTitlePos({x: "down middle"})
+			.set_paddings({left: 65, right: 5})
+			.domainY(species)
+			.title("Transcriptional layer")
+			.ticksRotateX(45)
+			.elementIds(species)
+			.lineFun((x, d) => d)
+			.dasharray(1.5)
+			.lineWidth(0.5)
+			.colour(function() {return colours[tissue]});
+
+		lc.pointLine("range", tr)
+			.elementIds(species)
+			.nsteps(2)
+			.lineWidth(2.5)
+			.y((i, d) => d)
+			.x((i, d) => fpkm[d + "_" + tissue + "_TR_" + (i == 0 ? "min" : "max")][gene])
+			.colour(function() {return colours[tissue]});
+
+		lc.scatter("points", tr)
+			.elementIds(points)
+			.x(d => fpkm[d.split("_")[0] + "_" + tissue + "_TR_" + d.split("_")[1]][gene])
+			.y(d => d.split("_")[0])
+			.colour("white")
+			.strokeWidth(2.5)
+			.size(d => d.split("_")[1] == "med" ? 6 : 3)
+			.stroke(function() {return colours[tissue]})
+			.place("#transcription");
+
+//translation
+		var tl = lc.xLine("grid")
+			.width(300)
+			.height(300)
+			.domainX(function() {return domain})
+			.axisTitleX("log2(FPKM + 1)")
+			.axisTitlePos({x: "down middle"})
+			.set_paddings({left: 65})
+			.domainY(species)
+			.title("Translational layer")
+			.ticksRotateX(45)
+			.elementIds(species)
+			.lineFun((x, d) => d)
+			.dasharray(1.5)
+			.lineWidth(0.5)
+			.colour(function() {return colours[tissue]});
+
+		lc.pointLine("range", tl)
+			.elementIds(species)
+			.nsteps(2)
+			.lineWidth(2.5)
+			.y((i, d) => d)
+			.x((i, d) => fpkm[d + "_" + tissue + "_RP_" + (i == 0 ? "min" : "max")][gene])
+			.colour(function() {return colours[tissue]});
+
+		lc.scatter("points", tl)
+			.elementIds(points)
+			.x(d => fpkm[d.split("_")[0] + "_" + tissue + "_RP_" + d.split("_")[1]][gene])
+			.y(d => d.split("_")[0])
+			.colour(function() {return colours[tissue]})
+			.size(d => d.split("_")[1] == "med" ? 6 : 3)
+			.stroke(function() {return colours[tissue]})
+			.place("#translation");
+
+		d3.select("#info")
+			.selectAll(".tr")
+				.data(["names"].concat(species.slice().reverse()))
+				.enter()
+					.append("tr");
+		d3.select("#info")
+			.selectAll("tr").selectAll("td")
+				.data(d => ["names", "geneId", "chr"].map(el => [d, el]))
+				.enter()
+					.append("td")
+					.html(function(d) {
+						if(d[0] == "names" && d[1] == "names") return "";
+						if(d[0] == "names")
+							return d[1] == "geneId" ? "<b>Ensembl ID</b>" : "<b>Chromosome</b>";
+						if(d[1] == "names")
+							return "<i>" + d[0] + "</i>";
+					})
+					.attr("class", d => d[0] == "names" || d[1] == "names" ? "header" : "cell");
+
+		new Awesomplete(d3.select("#geneName").node(), {list: geneInfo.geneName});
+		d3.select("#geneName")
+			.on("awesomplete-selectcomplete", function() {
+				searchGene(this.value);
+			});
+		changeGene();
+
+		mainPlot.container
+			.select("#legend")
+				.append("p")
+					.attr("class", "note1")
+					.style("width", "150px")
+					.text("To navigate through the plot, use tool panel (click on grey square in the right-upper corner to open it)");
+	</script>
+</body>
