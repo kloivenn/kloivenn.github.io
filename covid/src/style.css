@@ -11,7 +11,7 @@
   line-height: 1.5;
 }
 
-@media (min-width: 850px) {
+@media (min-width: 1000px) {
   .grid_cont { grid-template-columns: repeat(2, 1fr); }
 }
 
