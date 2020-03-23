@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<div class="container">
+		<form id="mainForm">
+			<div class="grid">
+				<div class="block">
+					<h2>Helfen Sie mit, dem Coronavirus nachzuspüren</h2>
+					<h3>... indem Sie uns sagen, wie es Ihnen geht!</h3>
+					<p class="highligted">Wenn sich am selben Ort viele Leute krank fühlen, ist das vielleicht Covid19.</p>
+					<p>Beantworten Sie bitte kurz diese Fragen:</p>
+				</div>
+				<div class="block">
+					<h3>Kurz über Sie</h3>
+					<p>Alter: <input type="text" name="entry.2115741372"> Jahre</p>
+					<p>
+						<input type="radio" name="entry.1694446867" value="m" id="m"><label for="m">Mann</label>
+						<input type="radio" name="entry.1694446867" value="f" id="f"><label for="f">Frau</label>
+						<input type="radio" name="entry.1694446867" value="d" id="d"><label for="d">keine Angabe / divers</label>
+					</p>
+				</div>
+				<div class="block">
+					<h3>Wo wohnen Sie?</h3>
+					<p>Meine Postleitzahl (PLZ): <input type="text" name="entry.2079250418"></p>
+					<p>Haben Sie sich sonst noch wo länger aufgehalten in den letzten 4 Tagen? (z.B. Arbeitsplatz)</p>
+					<p>Hier können Sie weiter Postleitzahlen angeben: <input type="text" name="entry.7236635"></p>
+				</div>
+				<div class="block">
+					<h3>Wie geht es Ihnen heute? Fehlt ihnen etwas?</h3>
+					<p>
+						<input type="checkbox" name="entry.720341760" value="gesund" id="gesund"><label for="gesund">Ich fühle mich <b>gesund</b>.</label><br>
+						<br>
+						<input type="checkbox" name="entry.720341760" value="Husten" id="Husten"><label for="Husten">Ich habe <b>Husten</b>.</label><br>
+						<input type="checkbox" name="entry.720341760" value="abgeschlagen" id="abgeschlagen"><label for="abgeschlagen">Ich fühle mich <b>abgeschlagen</b> oder <b>erschöpft</b></label><br>						
+						<input type="checkbox" name="entry.720341760" value="Gliederschmerzen" id="Gliederschmerzen"><label for="Gliederschmerzen">Ich habe <b>Gliederschmerzen</b> (Arme oder Beine tun weh).</label><br>
+						<input type="checkbox" name="entry.720341760" value="Kurzatmigkeit" id="Kurzatmigkeit"><label for="Kurzatmigkeit">Ich habe <b>Probleme</b> beim <b>Atem</b> (Kurzatmigkeit).</label><br>
+						<input type="checkbox" name="entry.720341760" value="Schnupfen" id="Schnupfen"><label for="Schnupfen">Ich habe eine laufende oder verstopfte Nase (<b>Schnupfen</b>).</label><br>
+						<input type="checkbox" name="entry.720341760" value="Durchfall" id="Durchfall"><label for="Durchfall">Ich habe <b>Durchfall</b>.</label><br>
+						<input type="checkbox" name="entry.720341760" value="uebel" id="uebel"><label for="uebel">Mir ist <b>übel</b> und ich musste mich <b>übergeben</b>.</label><br>
+						<br>
+						<input type="checkbox" name="entry.720341760" value="Fieber" id="Fieber"><label for="Fieber">Ich habe <b>Fieber</b>.</label>
+					</p>
+					<p>Falls Sie ein Fieberthermometer zur Hand haben: <br>
+						Körpertemperatur: <input type="number" name="entry.348367839"> °C
+					</p>
+				</div>
+				<div class="block">
+					<h3>Noch vier kurze Fragen:</h3>
+					<p>
+						Haben Sie Diabetes, hohen Blutdruck, Asthma, oder chronische Erkrankungen von Herz, Lungen oder Nieren?<br>
+						<input type="radio" name="entry.1130185710" value="Nein" checked id="k_nein"><label for="k_nein">Nein.</label>
+						<input type="radio" name="entry.1130185710" value="Ja" id="k_ja"><label for="k_ja">Ja.</label>
+						<input type="radio" name="entry.1130185710" value="Weiss nicht" id="Weiss_nicht"><label for="Weiss_nicht">Weiss nicht.</label>					
+					</p>
+					<p>
+						Rauchen Sie?<br>
+						<input type="radio" name="entry.1524483832" value="Nein" id="r_nein" checked><label for="r_nein">Nein.</label>
+						<input type="radio" name="entry.1524483832" value="Ja" id="r_ja"><label for="r_ja">Ja.</label>
+						<input type="radio" name="entry.1524483832" value="Keine Angabe" id="keine"><label for="keine">Keine Angabe.</label>					
+					</p>
+					<p>Sind Sie einverstanden, dass wir diese Daten speichern?<br>
+	  				Dann klicken Sie auf "Abschicken"</p>
+	  			<div onclick="submit();">Abschicken2</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="container">
+		<div class="block">
+			<h2>Weitere Infos</h2>
+			<ul>
+				<li>Das hier ist ein Versuch, zu zählen, wie viele Leute sich in jedem PLZ-Gebiet gesund fühlen und wie viele krank.</li>
+				<li>Wenn sich viele Menschen am selben Ort krank fühlen, dann ist da vielleicht das Coronavirus im Umlauf.</li>
+				<li>Vielleicht aber auch nicht: Also keine Sorge, wenn Sie überall "Ja" angeklickt haben. Vielleicht ist es ja doch nur ein grippaler Infekt. Wenn Sie es wissen wollen, fragen Sie bitte Ihren Hausarzt, nicht uns. Wir sind Informatiker, keine Ärzte!</li>
+				<li>Wer wir sind: Die <a href="https://www.zmbh.uni-heidelberg.de/anders/">Projektgruppe für Bioinformatik</a> am Zentrum für Molekularbiologie der Universität Heidelberg.</li>
+				<li>Was wir mit den Ergebnissen machen werden: Alles zählen, Karten anfertigen, nach Trends suchen, und dann die Daten online stellen ([hier]) -- und natürlich die Gesundheitsbehörden informieren, falls wir etwas finden sollten.</li>
+				<li>Die Idee stammt aus Israel, von der <a href="https://genie.weizmann.ac.il/">Arbeitsgruppe von Prof. Eran Segal</a> am <a href="https://de.wikipedia.org/wiki/Weizmann-Institut_f%C3%BCr_Wissenschaften">Weizmann-Institut</a> in Rehovot. Die haben ihr Experiment <a href="https://doi.org/10.1101/2020.03.19.20038844">hier</a>beschrieben.</li>
+			</ul>
+			<h3>Fragen, Anregungen oder Kritik?</h3>
+			<p>Schreiben Sie uns: <a href="mailto:s.anders@zmbh.uni-heidelberg.de">s.anders@zmbh.uni-heidelberg.de</a></p>
+		</div>
+	</div>
+	<script type="text/javascript">
+		function submit() {
+			var kvpairs = [];
+			var form = document.getElementById("mainForm");
+			for ( var i = 0; i < (form.elements.length - 1); i++ ) {
+   			var e = form.elements[i];
+   			kvpairs.push(encodeURIComponent(e.name) + "=" + encodeURIComponent(e.value));
+			}
+			var queryString = kvpairs.join("&");
+
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", "https://docs.google.com/forms/d/e/1FAIpQLSdzwkvo4lYuHRqihoDnZR1zSOzQbwS-xCFxucCzxzsmp00UcQ/formResponse", true);
+
+			xhr.onreadystatechange = function() { // Call a function when the state changes.
+				console.log(this);
+    		if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+        	console.log("AAAA")
+    		}
+			}
+			xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			xhr.send(queryString);
+			console.log(queryString)
+			alert("something")
+
+		}
+	</script>
+</body>
+</html>
