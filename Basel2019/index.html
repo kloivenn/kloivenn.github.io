@@ -6,21 +6,13 @@
 
 		<title>Sleepwalk</title>
 
-		<link rel="stylesheet" href="../revealjs/css/reset.css">
-		<link rel="stylesheet" href="../revealjs/css/reveal.css">
-		<link rel="stylesheet" href="../revealjs/css/theme/nice.css">
+		<link rel="stylesheet" href="../revealjs/dist/reset.css">
+		<link rel="stylesheet" href="../revealjs/dist/reveal.css">
+		<link rel="stylesheet" href="../revealjs/dist/theme/nice.css">
 
 		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="../revealjs/lib/css/monokai.css">
+		<link rel="stylesheet" href="../revealjs/plugin/highlight/monokai.css">
 
-		<!-- Printing and PDF exports -->
-		<script>
-			var link = document.createElement( 'link' );
-			link.rel = 'stylesheet';
-			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? '../revealjs/css/print/pdf.css' : '../revealjs/css/print/paper.css';
-			document.getElementsByTagName( 'head' )[0].appendChild( link );
-		</script>
 	</head>
 	<body>
 		<div class="reveal">
@@ -258,20 +250,18 @@ lc_scatter(dat(
 			</div>
 		</div>
 
-		<script src="../revealjs/js/reveal.js"></script>
+		<script src="../revealjs/dist/reveal.js"></script>
 
+		<script src="../revealjs/plugin/markdown/markdown.js"></script>
+		<script src='../revealjs/plugin/notes/notes.js'></script>
+		<script src="../revealjs/plugin/highlight/highlight.js"></script>
 		<script>
 			// More info about config & dependencies:
 			// - https://github.com/hakimel/reveal.js#configuration
 			// - https://github.com/hakimel/reveal.js#dependencies
 			Reveal.initialize({
 				center: false,
-				dependencies: [
-					{ src: '../revealjs/plugin/markdown/marked.js' },
-					{ src: '../revealjs/plugin/markdown/markdown.js' },
-					{ src: '../revealjs/plugin/notes/notes.js', async: true },
-					{ src: '../revealjs/plugin/highlight/highlight.js', async: true }
-				]
+				plugins: [ RevealMarkdown, RevealNotes, RevealHighlight ]
 			});
 		</script>
 	</body>
