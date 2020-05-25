@@ -6,19 +6,19 @@
 
 		<title>Sleepwalk</title>
 
-		<link rel="stylesheet" href="css/reset.css">
-		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/nice.css">
+		<link rel="stylesheet" href="../revealjs/css/reset.css">
+		<link rel="stylesheet" href="../revealjs/css/reveal.css">
+		<link rel="stylesheet" href="../revealjs/css/theme/nice.css">
 
 		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="lib/css/monokai.css">
+		<link rel="stylesheet" href="../revealjs/lib/css/monokai.css">
 
 		<!-- Printing and PDF exports -->
 		<script>
 			var link = document.createElement( 'link' );
 			link.rel = 'stylesheet';
 			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? '../revealjs/css/print/pdf.css' : '../revealjs/css/print/paper.css';
 			document.getElementsByTagName( 'head' )[0].appendChild( link );
 		</script>
 	</head>
@@ -38,7 +38,7 @@
 					</div>
 					<div class="wrapper" style="z-index: -1">
 						<div class="bottom-cell">
-							<img data-src="img/clipart128314.png" width="75%" align="left" style="border: 0; box-shadow: none">
+							<img data-src="../Ascona2019/img/clipart128314.png" width="75%" align="left" style="border: 0; box-shadow: none">
 						</div>
 					</div>
 				</section>
@@ -51,11 +51,11 @@
 				</section>
 				<section>
 					<h2>Visualizing Your Data</h2>
-					<img data-src="img/firstSlide.png" class="stretch plain">
+					<img data-src="../Ascona2019/img/firstSlide.png" class="stretch plain">
 				</section>
 				<section>
 					<h2>Distortion Is Unavoidable</h2>
-					<img data-src="img/1ev1X.png" class="stretch">
+					<img data-src="../Ascona2019/img/1ev1X.png" class="stretch">
 					<p><a target="about:blank" href="https://xkcd.com/977/">https://xkcd.com/977/</a></p>
 				</section>
 				<section>
@@ -64,7 +64,7 @@
 						sleepwalk(citeSeq$tsne, features)
 					</code></pre>
 					<div class="aspect-ratio" style="padding-top: calc(50% + 75px);">
-						<iframe data-src="examples/Fig_B.html"></iframe>
+						<iframe data-src="../Ascona2019/examples/Fig_B.html"></iframe>
 					</div>
 					<div class="wrapper">
 						<div class="bottom-cell">
@@ -80,7 +80,7 @@
 						sleepwalk(list(citeSeq$tsne, citeSeq$umap), citeSeq$pca, titles = c("t-SNE", "UMAP"))
 					</code></pre>
 					<div class="aspect-ratio" style="padding-top: calc(50% + 75px);">
-						<iframe data-src="examples/Fig_Ca.html"></iframe>
+						<iframe data-src="../Ascona2019/examples/Fig_Ca.html"></iframe>
 					</div>
 					<div class="wrapper">
 						<div class="bottom-cell">
@@ -98,7 +98,7 @@ sleepwalk(list(um13_A, um13_B, um14),
 	titles = c("e13.5_A", "e13.5_B", "e14.5"), nrow = 1)
  					</code></pre>
 					<div class="aspect-ratio" style="padding-top: calc(35% + 75px);">
-						<iframe data-src="examples/Fig_D.html"></iframe>
+						<iframe data-src="../Ascona2019/examples/Fig_D.html"></iframe>
 					</div>
 					<div class="wrapper">
 						<div class="bottom-cell">
@@ -115,7 +115,7 @@ sleepwalk(list(um13_A, um13_B, um14),
        		compare = "distances")
  					</code></pre>
 					<div class="aspect-ratio" style="padding-top: calc(50% + 75px);">
-						<iframe data-src="examples/Fig_E.html"></iframe>
+						<iframe data-src="../Ascona2019/examples/Fig_E.html"></iframe>
 					</div>
 					<div class="wrapper">
 						<div class="bottom-cell">
@@ -156,7 +156,7 @@ getHighGenes <- function(marked){
 					</code></pre>
 					<div class="wrapper" style="z-index: 1; background: none;">
 						<div class="bottom-cell">
-							<img data-src="img/cowboy.png" width = "30%" align="right" class="plain" style="background: none;">
+							<img data-src="../Ascona2019/img/cowboy.png" width = "30%" align="right" class="plain" style="background: none;">
 						</div>
 					</div>
 					<div class="wrapper" style="z-index: 2; background: none;">
@@ -173,7 +173,7 @@ getHighGenes <- function(marked){
 					<h3>Snapshot</h3>
 					<table><tr>
 						<td style="vertical-align: top;" width="20%">
-							<img data-src="img/camera.png" width = "100%" class="plain"  style="background: none;">
+							<img data-src="../Ascona2019/img/camera.png" width = "100%" class="plain"  style="background: none;">
 						</td>
 						<td style="vertical-align: middle;">
 							<pre><code class="r" data-trim data-noescape>
@@ -193,7 +193,7 @@ sleepwalk(data$umap, data$pca, saveToFile = "myFile.html")
 							</code></pre>
 						</td>
 						<td width="20%" style="vertical-align: top;">
-							<img data-src="img/save.png" width = "100%" class="plain"  style="background: none;">
+							<img data-src="../Ascona2019/img/save.png" width = "100%" class="plain"  style="background: none;">
 						</td>
 					</tr></table>
 				</section>
@@ -201,7 +201,7 @@ sleepwalk(data$umap, data$pca, saveToFile = "myFile.html")
 					<h2>Linked Charts</h2>
 					<h3>Interactivity with minimal effort</h3>
 					<div class="aspect-ratio" style="padding-top: 50%;">
-						<iframe data-src="examples/slide05.html"></iframe>
+						<iframe data-src="../Ascona2019/examples/slide05.html"></iframe>
 					</div>
 					<div class="wrapper" style="z-index: -1">
 						<div class="bottom-cell">
@@ -241,7 +241,7 @@ lc_scatter(dat(
 					</code></pre>
 					<div class="wrapper" style="z-index: 1; background: none;">
 						<div class="bottom-cell">
-							<img data-src="img/computer.png" width = "30%" align="right" class="plain" style="background: none;">
+							<img data-src="../Ascona2019/img/computer.png" width = "30%" align="right" class="plain" style="background: none;">
 						</div>
 					</div>
 
@@ -258,7 +258,7 @@ lc_scatter(dat(
 			</div>
 		</div>
 
-		<script src="js/reveal.js"></script>
+		<script src="../revealjs/js/reveal.js"></script>
 
 		<script>
 			// More info about config & dependencies:
@@ -267,10 +267,10 @@ lc_scatter(dat(
 			Reveal.initialize({
 				center: false,
 				dependencies: [
-					{ src: 'plugin/markdown/marked.js' },
-					{ src: 'plugin/markdown/markdown.js' },
-					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true }
+					{ src: '../revealjs/plugin/markdown/marked.js' },
+					{ src: '../revealjs/plugin/markdown/markdown.js' },
+					{ src: '../revealjs/plugin/notes/notes.js', async: true },
+					{ src: '../revealjs/plugin/highlight/highlight.js', async: true }
 				]
 			});
 		</script>
