@@ -1,0 +1,271 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Sex-bias</title>
+		<link rel="stylesheet" href="../revealjs/dist/reset.css">
+		<link rel="stylesheet" href="../revealjs/dist/reveal.css">
+		<link rel="stylesheet" href="../revealjs/dist/theme/nice.css">
+		<link rel="stylesheet" type="text/css" href="src/style.css">
+		<script type="text/javascript" src="src/js/d3.v5.min.js"></script>
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="../revealjs/plugin/highlight/monokai.css">
+
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h2>Samples overview</h2>
+					<h3>Species</h3>
+					<div class="species"></div>
+					<h3>Tissues</h3>
+					<div class="tissues"></div>
+					<p><span class="highlight">8-16</span> time points, <span class="highlight">1-3</span> samples per time point of each sex</p>
+				</section>
+				<section>
+					<h2>Examples</h2>
+					<div class="r-stretch" style="display: grid;">
+						<img src="src/img/plots/all.png" style="grid-column: 1; grid-row: 1" class="plain"/>
+						<img src="src/img/plots/interest.png" style="grid-column: 2; grid-row: 1" class="plain"/>
+						<img src="src/img/plots/same.png" style="grid-column: 1; grid-row: 2" class="plain"/>
+						<img src="src/img/plots/noise.png" style="grid-column: 2; grid-row: 2" class="plain"/>						
+					</div>					
+				</section>
+				<section>
+					<h2>Difference score</h2>
+					\[score = \sqrt{dist \cdot maxVal}\]
+					<div class="r-stack r-stretch">
+						<img src="src/img/plots/all_score.png" class="plain fragment fade-out" data-fragment-index="0"/>
+						<img src="src/img/plots/interest_score.png" class="plain fragment" data-fragment-index="0"/>
+						<img src="src/img/plots/same_score.png" class="plain fragment"/>
+						<img src="src/img/plots/noise_score.png" class="plain fragment"/>							
+					</div>
+						
+					Trajectory is fitted with locfit
+	
+				</section>
+				<section>
+					<section>
+						<h2>Time warp</h2>
+						<p>If for many genes \(e_2 - e_1 > e_3 - e_2\), then \(t_2 - t_1 > t_3 - t_2\)</p>
+						<table>
+							<tr><td>
+								<img src="src/img/time.png" class="plain">	
+							</td><td  style="vertical-align: top;">
+								\[v =  \frac{|e_2 - e_1|}{t_2 - t_1}\]							
+							</td></tr>
+						</table>						
+					</section>
+					<section>
+						<h2>Time warp</h2>
+						\[v =  \frac{|e_2 - e_1|}{t_2 - t_1}\]
+						<table>
+							<tr><td>
+								<img src="src/img/plots/Human_Brain_difs.png" class="plain">	
+							</td><td>
+								<img src="src/img/plots/Mouse_Kidney_difs.png" class="plain">	
+							</td></tr>
+						</table>						
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>Significance test</h2>
+						<h3>Fractional-Random-Weight Bootstrap</h3>
+						<pre><code class="r" data-trim data-noescape style="font-size: 0.8em; line-height: 1.2;">
+fitM <- locfit.raw(xM, dataTableM$expr, 
+	weights = rgamma(nrow(dataTableM), shape = 1, scale = 1), ev = grid)
+						</code></pre>
+						<img src="src/img/pval.png" class="plain r-stretch">				
+						<p class="footnote"> 
+							<a target="about:blank" href="https://arxiv.org/pdf/1808.08199">Gotwalt, Chris, et al. "Applications of the Fractional-Random-Weight Bootstrap." arXiv preprint arXiv:1808.08199 (2018).</a>
+						</p>
+					</section>
+					<section>
+						<h2>Significance test</h2>
+						<div class="r-stack r-stretch">
+							<img src="src/img/plots/all_hist.png" class="plain fragment fade-out" data-fragment-index="0"/>
+							<img src="src/img/plots/interest_hist.png" class="plain fragment" data-fragment-index="0"/>
+							<img src="src/img/plots/same_hist.png" class="plain fragment"/>
+							<img src="src/img/plots/noise_hist.png" class="plain fragment"/>								
+						</div>
+					</section>
+					<section>
+						<h2>Unsolved problems</h2>
+						<div class="r-stack r-stretch">
+							<div class="fragment fade-out" data-fragment-index="0">
+								<h3>Outliers</h3>
+								<img src="src/img/plots/outlier1.png" class="plain">
+							</div>
+							<div class="fragment fade-in-then-out" data-fragment-index="0">
+								<h3>Outliers</h3>
+								<img src="src/img/plots/outlier2.png" class="plain">
+							</div>
+							<div class="fragment">
+								<h3>Edges</h3>
+								<img src="src/img/plots/edge1.png" class="plain">
+							</div>
+							<div class="fragment">
+								<h3>Edges</h3>
+								<img src="src/img/plots/edge2.png" class="plain">
+							</div>							
+						</div>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>Species Comparison</h2>
+						<img src="src/img/plots/Kidney_Comparison_all.png" class="plain r-stretch">	
+					</section>
+					<section>
+						<h2>Species Comparison</h2>
+						<img src="src/img/plots/comparison.png" class="plain r-stretch">	
+					</section>					
+				</section>
+				<section>
+					<section>
+						<h2>Clustering</h2>
+						<p>Some genes have very similar trajectories</p>
+						<div class="r-stack r-stretch">
+							<img src="src/img/plots/cluster1/gene1.png" class="plain fragment fade-out" data-fragment-index="0"/>
+							<img src="src/img/plots/cluster1/gene2.png" class="plain fragment" data-fragment-index="0"/>
+							<img src="src/img/plots/cluster1/gene3.png" class="plain fragment"/>
+							<img src="src/img/plots/cluster1/gene4.png" class="plain fragment"/>								
+						</div>							
+					</section>
+					<section>
+						<h2>Clustering</h2>
+						<h3>Cliques in the neighbourhood graph</h3>
+						<img src="src/img/clique.png" class="plain r-stretch"/>
+						<p style="font-size: 90%">Keep only cliques of size <span class="highlight">4</span> and larger with at least <span class="highlight">half</span> of vertices corresponding to protein coding genes with significant difference between sexes. Remove all other edges.</p>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>Clusters</h2>
+						<h3>Human Brain</h3>
+						<p><span class="highlight">51</span> clusters of size from <span class="highlight">4</span> to <span class="highlight">91</span></p>
+						<img src="src/img/cluster_table.png" class="plain r-stretch">	
+						<p><span class="highlight">863</span> clustered genes. Among them <span class="highlight">247</span> with adj.pvalue &gt; 0.1</p>			
+					</section>
+					<section>
+						<h2>Clusters</h2>
+						<div class="aspect-ratio" style="padding-top: 50%;">
+							<iframe data-src="src/clusters.html"></iframe>
+						</div>						
+					</section>
+					<section>
+						<h2>Cluster 14279</h2>
+						<p><span class="highlight">51</span> genes, among them <span class="highlight">47</span> ribosomal proteins</p>
+						<table><tr><td>
+							<p>FAU</p>
+						</td><td>
+							<p>BTF3</p>
+						</td><td>
+							<p>NACA</p>
+						</td></tr></table>
+						<div class="r-stack">
+							<img src="src/img/plots/cluster2/gene1.png" class="plain fragment fade-out" data-fragment-index="0"/>
+							<img src="src/img/plots/cluster2/gene2.png" class="plain fragment" data-fragment-index="0"/>
+							<img src="src/img/plots/cluster2/gene3.png" class="plain fragment"/>							
+						</div>
+					</section>
+					<section>
+						<h2>Cluster 23900</h2>
+						<img src="src/img/cluster23900.png" class="plain r-stretch">
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>Not clustered genes</h2>
+						<h3>All significant genes</h3>
+						<div class="aspect-ratio" style="padding-top: 50%;">
+							<iframe data-src="src/allSignificant.html"></iframe>
+						</div>												
+					</section>
+					<section>
+						<h2>Not clustered genes</h2>
+						<p>This is a very <span class="highlight">wrong</span> way to put them together</p>
+						<img src="src/img/wrongUmap.png" class="plain r-stretch">
+					</section>
+					<section>
+						<h2>Not clustered genes</h2>
+						<div class="aspect-ratio" style="padding-top: 100%; width: 550px" >
+							<iframe data-src="src/sleepwalkClusts.html"></iframe>
+						</div>							
+					</section>
+					<section>
+						<img src="src/img/distClusts.png" class="plain r-stretch">
+					</section>
+				</section>
+				<section>
+					<h2>Cross species correlation</h2>
+						<div class="r-stack">
+							<img src="src/img/plots/cluster3/gene1.png" class="plain fragment fade-out" data-fragment-index="0" width="70%" />
+							<img src="src/img/plots/cluster3/gene2.png" class="plain fragment" data-fragment-index="0" width="70%" />
+							<img src="src/img/plots/cluster3/gene3.png" class="plain fragment" width="70%" />							
+							<img src="src/img/plots/cluster3/gene4.png" class="plain fragment" width="70%" />							
+							<img src="src/img/plots/cluster3/gene5.png" class="plain fragment" width="70%" />							
+
+						</div>
+
+				</section>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			var species = ["Human", "Mouse", "Rat", "Rabbit", "Opossum", "Chicken"];
+			var tissues = ["Brain", "Cerebellum", "Heart", "Liver", "Kidney", "Gonads"];
+			d3.selectAll("div.species")
+				.selectAll(".icon")
+					.data(species)
+					.enter()
+						.append("div")
+							.attr("class", "icon");
+			d3.selectAll("div.tissues")
+				.selectAll(".icon")
+					.data(tissues)
+					.enter()
+						.append("div")
+							.attr("class", "icon");
+
+			d3.selectAll(".icon")
+				.append("img")
+					.attr("width", "75px")
+					.attr("src", d => "src/img/icons/" + d + ".svg")
+					.attr("class", "plain");
+			d3.selectAll(".icon")
+				.append("p")
+					.text(d => d)
+		</script>
+		<script src="../revealjs/dist/reveal.js"></script>
+
+		<script src="../revealjs/plugin/markdown/markdown.js"></script>
+		<script src='../revealjs/plugin/notes/notes.js'></script>
+		<script src="../revealjs/plugin/highlight/highlight.js"></script>
+		<script src="../revealjs/plugin/math/math.js"></script>
+		<script src="../revealjs/plugin/zoom/zoom.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				center: false,
+				hash: true,
+		    math: {
+		      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+		      config: 'TeX-AMS_HTML-full',
+		      // pass other options into `MathJax.Hub.Config()`
+		      TeX: { Macros: { RR: "{\\bf R}" } }
+		    },
+
+				plugins: [ RevealMarkdown, RevealNotes, RevealHighlight, RevealMath, RevealZoom ]
+			});
+		</script>
+	</body>
+</html>

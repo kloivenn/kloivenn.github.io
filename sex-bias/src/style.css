@@ -1,0 +1,16 @@
+div.icon {
+	display: inline-block;
+	width: 120px;
+}
+
+div.icon img {
+	margin: 0px;
+}
+div.icon p {
+	margin: 0px;
+	font-size: 70%;
+}
+
+span.highlight {
+	color: #e21f28;
+}
