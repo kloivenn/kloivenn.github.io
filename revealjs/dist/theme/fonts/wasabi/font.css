@@ -1,0 +1,9 @@
+@font-face {
+  font-family: 'Wasabi';
+  src: url('Wasabi Regular.eot');
+  src: url('Wasabi Regular.eot?#iefix') format('embedded-opentype'),
+       url('Wasabi Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+

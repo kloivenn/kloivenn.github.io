@@ -1,0 +1,22 @@
+<html>
+<head>
+	<title>Test jrc</title>
+	<script type="text/javascript" src="src/js/d3.v5.min.js"></script>
+</head>
+<body>
+	<svg width="500" height="500">
+		<circle cx="30" cy="30" r="20" fill="red" stroke="black" onclick="clicked(this)"/>
+	</svg>
+	<script type="text/javascript">
+		function moveCircle(x, y) {
+			d3.select("circle")
+				.transition()
+				.attr("cx", x)
+				.attr("cy", y);
+		}
+		function clicked(c) {
+			jrc.sendData('coord', [c.cx.baseVal.value, c.cy.baseVal.value]);
+		}
+	</script>
+</body>
+</html>

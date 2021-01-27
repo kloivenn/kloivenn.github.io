@@ -1,0 +1,498 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Interactive visualization</title>
+    <link rel="stylesheet" href="../revealjs/dist/reset.css">
+    <link rel="stylesheet" href="../revealjs/dist/reveal.css">
+    <link rel="stylesheet" href="../revealjs/dist/theme/mdzs.css">
+    <script type="text/javascript" src="src/js/d3.v5.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="src/css/prism.css">
+  </head>
+  <body background-size="cover">
+    <div class="reveal">
+      <div class="slides">
+        <section>
+          <div>
+            <h1>Interactive visualization for omics data exploration</h1>
+          </div>
+          <div style="display: grid;">
+            <div style="grid-column: 1; grid-row: 1" class="cloud">
+              <ul class="logo">
+                <li>jrc</li>
+                <li>sleepwalk</li>
+                <li>rlc</li>
+              </ul>
+              <p style="font-size: 80%; font-style: italic;">(available on CRAN)</p>
+            </div>
+            <div style="grid-column: 2; grid-row: 1" class="cloud">
+              <span class="highlight">Svetlana Ovchinnikova</span><br>
+              Supervised by <span class="highlight">Simon Anders</span><br>
+              <img src="src/img/rabbits.png" class="plain" width="40%">
+            </div>              
+          </div>
+        </section>
+        <section>
+          <section>
+            <h2>Implementation</h2>
+            <table width="100%">
+              <tr>
+                <td width="12%">
+                  <img src="src/img/R_logo.png" class="plain">
+                </td>
+                <td style="vertical-align: middle;" align="center" width="38%">
+                  <h3>R</h3>
+                </td>
+                <td width="12%">
+                  <img src="src/img/js_logo.png" class="plain">
+                </td>
+                <td style="vertical-align: middle;" align="center" width="38%">
+                  <h3>JavaScript</h3>
+                </td>             
+              </tr>
+              <tr>
+                <td colspan="2" style="vertical-align: top">
+                  <ul class="cloud">
+                    <li>great for statistical computations</li>
+                    <li>one of the most commonly used tools in bioinformatics</li>
+                  </ul>
+                  <div>
+                    <img src="src/img/rabbit_2.png" class="plain" width="40%">
+                  </div>
+                </td>
+                <td colspan="2" style="vertical-align: top">
+                  <ul class="cloud">
+                    <li>easy interactivity</li>
+                    <li>works in any browser</li>
+                    <li>customizeable</li>
+                    <li>can be turned into an application</li>
+                  </ul>
+                </td>
+              </tr>
+            </table>            
+          </section>
+          <section>
+            <h2>Combining languages</h2>
+            <span class="fragment step-fade-in-then-out"></span>
+            <span class="fragment step-fade-in-then-out"></span>
+            <span class="fragment step-fade-in-then-out"></span>
+            <span class="fragment step-fade-in-then-out"></span>
+            <span class="fragment step-fade-in-then-out"></span>
+            <span class="fragment step-fade-in-then-out"></span>
+            <span class="fragment step-fade-in-then-out"></span>
+            <span class="fragment step-fade-in-then-out"></span>  
+            <div data-animate class="cloud">
+              <svg width="960" height="550">
+                <image id="R" x="60" y="50" width="180" opacity="0" href="src/img/R_logo.svg"/>
+                <image id="libuv" x="370" y="50" width = "200" opacity="0" href="src/img/libuv_logo.svg"/>
+                <g id="httpuv" transform="translate(330, 5)" opacity="0">
+                  <rect id="httpuv_rect" width="280" height="260" rx="20" fill="none" stroke="#1c1917" stroke-width="4" stroke-dasharray="7"/>
+                  <text y="245" x="150" text-anchor="middle">httpuv</text>
+                  <image id="httpuv_arrow" x="-90" y="130" width="80" href="src/img/arrow.svg"/>
+                </g>
+                <g id="html" transform="translate(650, 5)" opacity="0">
+                  <image id="html_logo" y="45" x="50" width = "180" href="src/img/HTML_logo.svg"/>
+                  <image id="html_arrow" x="-25" y="130" width="80" href="src/img/arrow.svg"/>
+                  <g id="js" opacity="0">
+                    <rect x="30" width="220" height="450" rx="20" fill="none" stroke="#1c1917" stroke-width="4" stroke-dasharray="7"/>
+                    <image x="70" y="260" width="140" href="src/img/js_logo.svg"/>
+                  </g>
+                </g>
+                <path id="rws" d="M250 300 Q400 450 660 370" stroke="#c8012f" stroke-width="4" stroke-dasharray="7" fill="none" opacity="0"/>
+                <image id="websocket" x="400" y="300" width="140" href="src/img/websocket_logo.svg" opacity="0"/>
+              </svg>
+              <!--
+                {
+                "setup": [],
+                "animation": [
+                [{
+                "element": "#R",
+                "modifier": "opacity",
+                "parameters": [ 1 ] 
+                }
+                ],
+                [{
+                "element": "#libuv", 
+                "modifier": "attr",
+                "parameters": [{"opacity": "1"}]
+                }
+                ],
+                [{
+                "element": "#libuv", 
+                "modifier": "attr",
+                "parameters": [{"width": "140", "x": "400"}]
+                },
+                {
+                "element": "#httpuv",
+                "modifier": "opacity",
+                "parameters": [ 1 ]
+                }
+                ], [
+                {
+                "element": "#html",
+                "modifier": "opacity",
+                "parameters": [ 1 ]
+                }
+                ], [{
+                "element": "#html_logo", 
+                "modifier": "attr",
+                "parameters": [{"width": "140", "x": "70"}]
+                }, {
+                "element": "#html_arrow",
+                "modifier": "width",
+                "parameters": [ 50 ]
+                },{
+                "element": "#js",
+                "modifier": "opacity",
+                "parameters": [ 1 ]
+                }
+                ], [{
+                "element": "#R",
+                "modifier": "y",
+                "parameters": [ 200 ]
+                }, {
+                "element": "#httpuv_arrow",
+                "modifier": "y",
+                "parameters": [230]
+                }, {
+                "element": "#rws",
+                "modifier": "opacity",
+                "parameters": [ 1 ]
+                }
+                ], [ {
+                "element": "#websocket",
+                "modifier": "opacity",
+                "parameters": [ 1 ]
+                }
+                ], [{
+                "element": "#httpuv_rect",
+                "modifier": "height",
+                "parameters": [ 470 ]
+                }
+                ], []
+                ]
+                }                               
+              -->
+            </div>
+          </section>
+        </section>
+        <section>
+          <section>
+          <h2>Building a foundation</h2>
+          <h3 style="display: inline-block;">jrc:</h3>
+          <p style="display: inline-block;">A low-level tool to build apps based on <span class="highlight">httpuv</span></p>
+          <ul class="cloud" style="margin-top: 20px;">
+            <li>runs a local TCP server</li>
+            <li>can run any JavaScript code from R and any R code from JavaScript</li>
+            <li>handles multiple connections simultaneously</li>
+            <li>sets sucurity restrictions</li>
+            <li>works on top of any HTML page</li>
+          </ul>
+          </section>
+          <section>
+            <h2>Connect R and JavaScript</h2>
+            <ul style="text-align: right; font-size: 90%; margin-top: 20px;" class="cloud">
+              <p class="highlight leftHeader">Command</p>
+              <li>evaluate any piece of code on the other side of the connection</li>
+              <p class="highlight leftHeader">Data</p>
+              <li>send variables through the websocket in JSON format</li>
+              <p class="highlight leftHeader">Function call</p>
+              <li>call an existing function with a given set of arguments and stores returned value, if any</li>
+              <p class="highlight leftHeader">HTML</p>
+              <li>apend custom HTML code to the web page</li>
+            </ul>
+          </section>
+          <section>
+            <h2>Demonstration</h2>
+            <p class="highlight" style="text-align: left;">test_jrc.html</p>
+<pre data-noescape class="language-html"><code>&lt;html>
+&lt;head>
+  &lt;title>Test jrc&lt;/title>
+  &lt;script type="text/javascript" src="src/js/d3.v5.min.js">&lt;/script>
+&lt;/head>
+&lt;body>
+  &lt;svg width="500" height="500">
+    &lt;circle cx="30" cy="30" r="20" fill="red" stroke="black" onclick="clicked(this)"/>
+  &lt;/svg>
+  &lt;script type="text/javascript">
+    function moveCircle(x, y) {
+      d3.select("circle")
+        .transition()
+        .attr("cx", x)
+        .attr("cy", y);
+    }
+    function clicked(c) {
+      jrc.sendData('coord', [c.cx.baseVal.value, c.cy.baseVal.value]);
+    }
+  &lt;/script>
+&lt;/body>
+&lt;/html></code></pre>
+          <p>Switch to <span class="highlight">test_jrc.R</span></p>
+          </section>
+          <section>
+            <h2>Multiple connections</h2>
+            <h3>Based on R6 classes</h3>
+            <div data-animate>
+              <svg width="960" height="500">
+                <rect x="45" y="25" width="850" height="400" rx="20" fill="none" stroke="#1c1917" stroke-width="5" stroke-dasharray="11"/>
+                <text id="app" x="400" y="200" font-size="300%" fill="#c8012f"
+                style="text-shadow: 1px 1px 0px #1c1917, -1px -1px 0px #1c1917">App</text>
+                <image href="../revealjs/dist/theme/img/sect_symbol.png" x="50" y="230" width="200" opacity="0.7"/>
+                <g id="sessions" transform="translate(390, 40)" opacity="0">
+                  <rect id="s_rect" width="200" height="100" rx="20" fill="none" stroke="#c8012f" stroke-width="3" stroke-dasharray="7"/>
+                  <rect class="s_remove" x="100" y="135" width="200" height="100" rx="20" fill="none" stroke="#c8012f" stroke-width="3" stroke-dasharray="7"/>
+                  <rect class="s_remove" y="270" width="200" height="100" rx="20" fill="none" stroke="#c8012f" stroke-width="3" stroke-dasharray="7"/>
+                  <text id="s_text" x="20" y="60">Session 1</text>
+                  <text class="s_remove" x="120" y="195">Session 2</text>
+                  <text class="s_remove" x="20" y="330">Session 3</text>
+                </g>
+              </svg>
+              <!--
+                {
+                "setup": [],
+                "animation": [
+                [{
+                "element": "#app",
+                "modifier": "attr",
+                "parameters": [{"x": 80, "y": 85, "font-size": "150%"}] 
+                }
+                ], [{
+                "element": "#sessions",
+                "modifier": "opacity",
+                "parameters": [ 1 ]
+                }
+                ], [{
+                "element": ".s_remove",
+                "modifier": "opacity",
+                "parameters": [ 0 ]
+                }, {
+                "element": "#s_rect",
+                "modifier": "attr",
+                "parameters": [{"x": -90, "width": 575, "height": 370}]
+                }, {
+                "element": "#s_text",
+                "modifier": "attr",
+                "parameters": [{"x": -70, "y": 40}]
+                }
+                ], []
+                ]
+                }                
+              -->     
+            </div>
+            <div style="position: absolute; top: 300px; left:200px; z-index: -1; width: 700px"
+              class="fragment fade-in-then-out">
+              <ul class="cloud">
+                <li>holds the server handle</li>
+                <li>stores all global settings</li>
+                <li>creates, keeps and removes all user sessions</li>
+              </ul>
+            </div>
+            <span class="fragment fade-in-then-out"></span>
+            <div style="position: absolute; top: 300px; left:300px; z-index: -1; width: 550px; font-size: 80%"
+              class="fragment fade-in-then-out">
+              <ul class="cloud">
+                <li>holds websocket connection</li>
+                <li>stores client-specific variables</li>
+                <li>manages all incoming and outgoing messages</li>
+                <li>populates the new page with default content and performs cleaning up</li>
+              </ul>
+            </div>
+          </section>
+          <section>
+            <h2>jrc package</h2>
+            <p class="highlight leftHeader">on CRAN (v.0.4.0)</p>
+            <p><a href="https://CRAN.R-project.org/package=jrc">https://CRAN.R-project.org/package=jrc</a></p>
+            <p class="highlight leftHeader">Tutorial</p>
+            <p><a href="https://kloivenn.github.io/jrc_vign.html">https://kloivenn.github.io/jrc_vign.html</a></p>
+            <p class="highlight leftHeader">Paper</p>
+            <p>To be finished...</p>            
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Sleepwalk</h2>
+            <pre><code data-trim data-noescape class="language-r">sleepwalk(citeSeq$tsne, features)</code></pre>
+            <div class="aspect-ratio" style="padding-top: calc(45% + 70px);">
+              <iframe data-src="src/Fig_B.html"></iframe>
+            </div>
+            <div class="wrapper">
+              <div class="bottom-cell">
+                <p class="footnote">data from 
+                  <a target="about:blank" href="https://doi.org/10.1038/nmeth.4380">Stoeckius et al., Simultaneous epitope and transcriptome measurement in single cells, Nature Methods, 14:865, 2017</a>
+                </p>
+              </div>
+            </div>
+          </section>
+          <section>
+            <h2>Compare Samples</h2>
+            <pre><code data-trim data-noescape class="language-r">sleepwalk(list(um13_A, um13_B, um14), 
+  list(comFeatures13_A, comFeatures13_B, comFeatures14), same = "features",
+  titles = c("e13.5_A", "e13.5_B", "e14.5"), nrow = 1)</code></pre>
+            <div class="aspect-ratio" style="padding-top: calc(45% + 5px);">
+              <iframe data-src="src/Fig_D.html"></iframe>
+            </div>
+            <div class="wrapper">
+              <div class="bottom-cell">
+                <p class="footnote">data from 
+                  <a target="about:blank" href="https://doi.org/10.1016/j.cub.2018.07.062">Carter et al., A Single-Cell Transcriptional Atlas of the Developing Murine Cerebellum, Current Biology, 28:18, 2018</a>
+                </p>
+              </div>
+            </div>
+          </section>     
+          <section>
+            <h2>sleepwalk package</h2>
+            <p class="highlight leftHeader">on CRAN (v.0.3.1)</p>
+            <p><a href="https://CRAN.R-project.org/package=sleepwalk">https://CRAN.R-project.org/package=sleepwalk</a></p>
+            <p class="highlight leftHeader">Web page</p>
+            <p><a href="https://anders-biostat.github.io/sleepwalk/">https://anders-biostat.github.io/sleepwalk/</a></p>
+            <p class="highlight leftHeader">Paper</p>
+            <p><a target="about:blank" href="https://doi.org/10.1101/gr.251447.119">S. Ovchinnikova and S. Anders: Exploring dimension-reduced embeddings with Sleepwalk. Genome Research 30.5 (2020)</a></p>              
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Linked Charts</h2>
+            <h3>Interactivity with minimal effort</h3>
+            <div class="aspect-ratio" style="padding-top: 43%;">
+              <iframe data-src="src/slide05.html"></iframe>
+            </div>
+            <div class="wrapper">
+              <div class="bottom-cell">
+                <p class="footnote">data from 
+                  <a target="about:blank" href="https://doi.org/10.18632/oncotarget.5529">Conway et al., Elucidating drivers of oral epithelial dysplasia formation and malignant transformation to cancer using RNAseq, Oncotarget, 6:40186-40201 (2015)</a>
+                </p>
+              </div>
+            </div>
+          </section>
+          <section>
+            <h2>Simple to use</h2>
+            <div class="aspect-ratio" style="padding-top: 40%;">
+              <iframe data-src="src/figB.html"></iframe>
+            </div>
+            <table width="100%">
+              <tr>
+                <td>
+                  <pre><code data-trim data-noescape class="language-r line-numbers">ggplot(iris) + geom_point(aes(
+  x = Sepal.Length,
+  y = Petal.Length,
+  size = Sepal.Width * 2,
+  colour = Petal.Width,
+  shape = Species
+))</code></pre>
+                </td>
+                <td>
+                  <pre><code data-trim data-noescape class="language-r line-numbers">lc_scatter(with = iris, data = dat(
+  x = Sepal.Length,
+  y = Petal.Length,
+  size = Sepal.Width * 2,
+  colourValue = Petal.Width,
+  symbolValue = Species
+))</code></pre>                  
+                </td>
+              </tr>
+            </table>        
+          </section>
+          <section>
+            <h2>R and JavaScript</h2>
+            <table width="100%">
+              <tr>
+                <td width="50%">
+                  <pre class="language-r"><code>openPage( useViewer=FALSE, layout="table1x2" )
+
+gene <- 1
+
+lc_scatter(dat(
+      x = voomResult$AveExpr,
+      y = voomResult$tissuetumour,
+      color = ifelse( voomResult$adj.P.Val < 0.1, 
+                      "red", "black" ),
+      label = rownames(voomResult),
+      size = 1.3,
+      on_click = function(k) { 
+        gene <<- k; 
+        updateCharts("A2") 
+      } ),
+   "A1")
+
+countsums <- colSums(countMatrix)
+
+lc_scatter(dat(
+      x = sampleTable$patient,
+      y = countMatrix[gene,] / countsums * 1e6 + .1,
+      logScaleY = 10,
+      colorValue = sampleTable$tissue,
+      title = rownames(countMatrix)[gene],
+      axisTitleY = "counts per million (CPM)",
+      ticksRotateX = 45),
+   "A2")</code></pre>
+                </td>
+                <td width="50%">
+                  <pre class="language-js"><code>var selGene = 0;
+
+lc.scatter()
+   .x(i => maData.pvals[i].AveExpr)
+   .y(i => maData.pvals[i].tissuetumour)
+   .colour(i => maData.pvals[i]["adj.P.Val"] < 0.1 ? 
+            "red" : "black")
+   .label(i => maData.geneNames[i])
+   .size(1.3)
+   .on_click(i => {selGene = i; exprPlot.update();})
+   .place("#ma");
+
+var exprPlot = lc.scatter()
+   .x(i => maData.patients[i])
+   .y(i => maData.countMatrix[selGene][i]/
+            maData.countSums[i] * 1e6 + .1)
+   .logScaleY(10)
+   .colourValue(i => maData.tissue[i])
+   .title(function() {
+      return maData.geneNames[selGene]
+    })
+   .axisTitleY("counts per million (CPM)")
+   .ticksRotateX(45)
+   .place("#expr");</code></pre></td>
+              </tr>
+            </table>
+          </section>
+          <section>
+            <h2>rlc package</h2>
+            <p class="highlight leftHeader">on CRAN (v.0.3.0)</p>
+            <p><a href="https://CRAN.R-project.org/package=rlc">https://CRAN.R-project.org/package=rlc</a></p>
+            <p class="highlight leftHeader">Web page</p>
+            <p><a href="https://anders-biostat.github.io/linked-charts/">https://anders-biostat.github.io/linked-charts/</a></p>
+            <p class="highlight leftHeader">Paper</p>
+            <p>To be submitted...</p>              
+          </section>
+        </section>
+
+      </div>
+    </div>
+
+    <script type="text/javascript" src="src/js/prism.js"></script>
+    <script src="../revealjs/dist/reveal.js"></script>
+    <script src='../revealjs/plugin/notes/notes.js'></script>
+    <script src="../revealjs/plugin/animate/plugin.js"></script>
+    <script src="../revealjs/plugin/animate/svg.min.js"></script>
+
+    <script>
+      // More info about config & dependencies:
+      // - https://github.com/hakimel/reveal.js#configuration
+      // - https://github.com/hakimel/reveal.js#dependencies
+      Reveal.initialize({
+        center: false,
+        hash: true,
+        slideNumber: 'c/t',
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          // pass other options into `MathJax.Hub.Config()`
+          TeX: { Macros: { RR: "{\\bf R}" } }
+        },
+
+        plugins: [ RevealNotes, RevealAnimate ]
+      });
+    </script>
+  </body>
+</html>
