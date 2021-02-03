@@ -10,6 +10,17 @@
     <link rel="stylesheet" href="../revealjs/dist/theme/mdzs.css">
     <script type="text/javascript" src="src/js/d3.v5.min.js"></script>
     <link rel="stylesheet" type="text/css" href="src/css/prism.css">
+    <style type="text/css">
+      #tti {
+        zoom: 0.65;
+        -moz-transform: scale(0.65);
+        -moz-transform-origin: 0 0;
+        -o-transform: scale(0.65);
+        -o-transform-origin: 0 0;
+        -webkit-transform: scale(0.65);
+        -webkit-transform-origin: 0 0;        
+      }
+    </style>
   </head>
   <body background-size="cover">
     <div class="reveal">
@@ -32,6 +43,33 @@
               Supervised by <span class="highlight">Simon Anders</span><br>
               <img src="src/img/rabbits.png" class="plain" width="40%">
             </div>              
+          </div>
+        </section>
+        <section>
+          <h2>Outline</h2>
+          <div class="cloud">
+            <p class="leftHeader highlight">Project's goal</p>
+            <p>To develop easy-to-use interactive applications for every-day exploratory analysis of omics data.</p>            
+          </div>
+          <table width="100%">
+            <tr>
+              <td width="30%">
+                <img src="src/img/rabbit_4.png" class="plain" width="150px" />
+              </td>
+              <td style="vertical-align: top;">
+                <ul>
+                  <li>Implementation</li>
+                  <li>jrc package</li>
+                  <li>sleepwalk</li>
+                  <li>rlc package</li>
+                </ul>                
+              </td>
+            </tr>
+          </table>
+          <div class="wrapper">
+            <div class="bottom-cell">
+              <p class="footnote" style="font-size: 90%">slides on <span class="highlight">kloivenn.github.io/tac</span></p>
+            </div>
           </div>
         </section>
         <section>
@@ -395,66 +433,108 @@
             </table>        
           </section>
           <section>
-            <h2>R and JavaScript</h2>
+            <h2>Linking</h2>
+            <p class="leftHeader">1. Set a state variable</p>
+            <pre class="language-r" data-fragment-index="0"><code>gene <- 123          # currently selected gene</code></pre>
+            <p class="leftHeader">2. Use it in the dependent plot</p>
+            <pre class="language-r" data-fragment-index="0"><code>lc_scatter(dat(           #dat() function is important!
+  x = sampleTable$patient,
+  y = countMatrix[gene,] / countsums * 1e6 + .1,
+  ...),
+  place = "A2")           # where to place the chart on the web page</code></pre>
+            <p class="leftHeader">3. In the main plot change state variable and update</p>
+            <pre class="language-r" data-fragment-index="0"><code>lc_scatter(
+  x = voomResult$AveExpr,
+  y = voomResult$tissuetumour,
+  ...,
+  on_click = function(k) {             # 'k' is an index of the clicked point
+    gene <<- k; 
+    updateCharts("A2") 
+  },
+  place = "A1")</code></pre>
+
+          </section>
+          <section>
+            <div style="position: absolute; z-index: 100; left: 20%">
+              <h2>Stand-alone app</h2>
+            </div>
+            <div class="aspect-ratio">
+              <iframe data-src="../TTI/ex2plorer_new.html" id="tti" 
+              style="width: 1550px; height: 950px; max-width: none; max-height: none; background-color: #fff"></iframe>
+            </div>
+            <div class="wrapper">
+              <div class="bottom-cell">
+                <p class="footnote">supplement for 
+                  <a target="about:blank" href="https://www.nature.com/articles/s41586-020-2899-z">Wang et al., Transcriptome and translatome co-evolution in mammals. Nature 588.7839 (2020)</a>
+                </p>
+              </div>
+            </div>                    
+          </section>
+          <section>
+            <h2>R to JavaScript</h2>
             <table width="100%">
               <tr>
                 <td width="50%">
-                  <pre class="language-r"><code>openPage( useViewer=FALSE, layout="table1x2" )
-
-gene <- 1
-
-lc_scatter(dat(
-      x = voomResult$AveExpr,
-      y = voomResult$tissuetumour,
-      color = ifelse( voomResult$adj.P.Val < 0.1, 
-                      "red", "black" ),
-      label = rownames(voomResult),
-      size = 1.3,
-      on_click = function(k) { 
-        gene <<- k; 
-        updateCharts("A2") 
-      } ),
-   "A1")
-
-countsums <- colSums(countMatrix)
-
-lc_scatter(dat(
-      x = sampleTable$patient,
-      y = countMatrix[gene,] / countsums * 1e6 + .1,
-      logScaleY = 10,
-      colorValue = sampleTable$tissue,
-      title = rownames(countMatrix)[gene],
-      axisTitleY = "counts per million (CPM)",
-      ticksRotateX = 45),
-   "A2")</code></pre>
+                  <h3>R</h3>
                 </td>
                 <td width="50%">
-                  <pre class="language-js"><code>var selGene = 0;
-
-lc.scatter()
-   .x(i => maData.pvals[i].AveExpr)
-   .y(i => maData.pvals[i].tissuetumour)
-   .colour(i => maData.pvals[i]["adj.P.Val"] < 0.1 ? 
-            "red" : "black")
-   .label(i => maData.geneNames[i])
-   .size(1.3)
-   .on_click(i => {selGene = i; exprPlot.update();})
-   .place("#ma");
-
-var exprPlot = lc.scatter()
-   .x(i => maData.patients[i])
-   .y(i => maData.countMatrix[selGene][i]/
-            maData.countSums[i] * 1e6 + .1)
-   .logScaleY(10)
-   .colourValue(i => maData.tissue[i])
-   .title(function() {
-      return maData.geneNames[selGene]
-    })
-   .axisTitleY("counts per million (CPM)")
-   .ticksRotateX(45)
-   .place("#expr");</code></pre></td>
+                  <h3>JavaScript</h3>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="r-stack">
+                    <pre class="language-r fragment fade-out" data-fragment-index="0"><code>lc_scatter(
+  x = myVector,
+  y = myAnotherVector,
+  place = "A1")</code></pre>
+                    <pre class="language-r fragment" data-fragment-index="0"><code>lc_scatter(dat(
+  x = myVector,
+  y = myAnotherVector),
+  place = "A1")</code></pre>                    
+                  </div>
+                </td>
+                <td>
+                <div class="r-stack">
+                   <pre class="language-js fragment fade-out" data-fragment-index="0"><code>lc.scatter()
+  .x(myArray)
+  .y(myAnotherArray)
+  .place("#A1")</code></pre>
+                     <pre class="language-js fragment" data-fragment-index="0"><code>lc.scatter()
+  .x(i => myArray[i])
+  .y(i => myAnotherArray[i])
+  .place("#A1")</code></pre>
+                     <pre class="language-js fragment"><code>lc.scatter()
+  .x(i => myCsv[i].feature1)
+  .y(i => myCsv[i].feature2)
+  .place("#A1")</code></pre>               
+                </div>
+                </td>
               </tr>
             </table>
+            <div class="fragment">
+              <h3 style="box-shadow: none; background: none;">Load data</h3>
+              JS is not allowed to read local files from a browser!
+              <table style="margin-top: 30px">
+                <tr width="100%">
+                  <td style="vertical-align: middle;">
+                    <span class="highlight">Solutions:</span>
+                  </td>
+                  <td>
+                    <ul class="cloud" style="font-size: 90%">
+                      <li style="margin: 0px">inline JSON or CSV</li>
+                      <li style="margin: 0px">"input file" button</li>
+                      <li style="margin: 0px">store data on the server</li>
+                    </ul>                  
+                  </td>
+                </tr>
+              </table>
+              <p style="font-size: 80%">Data input tutorial at 
+                <a href="https://anders-biostat.github.io/linked-charts/js/tutorials/data.html">
+                  anders-biostat.github.io/linked-charts/js/tutorials/data.html
+                </a>
+              </p>                         
+            </div>
           </section>
           <section>
             <h2>rlc package</h2>
@@ -466,7 +546,11 @@ var exprPlot = lc.scatter()
             <p>To be submitted...</p>              
           </section>
         </section>
-
+        <section>
+          <h1 style="margin-bottom: 20px">Thank you</h1>
+          <img src="src/img/rabbits_3.png" class="plain" width="50%">
+          <h1>for attention!</h1>
+        </section>
       </div>
     </div>
 

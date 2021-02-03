@@ -1,9 +1,12 @@
 library(jrc)
 
+openPage()
+sendHTML("Hello world!")
+
 openPage(startPage = "test_jrc.html")
 
 callFunction("moveCircle", list(200, 400))
-sendCommand("moveCircle(200, 300)")
+sendCommand("moveCircle(200, 300);")
 
 sendHTML("<p>Let's add some <b>text</b>!</p>")
 
