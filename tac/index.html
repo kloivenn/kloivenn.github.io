@@ -434,16 +434,21 @@
           </section>
           <section>
             <h2>Linking</h2>
-            <p class="leftHeader">1. Set a state variable</p>
-            <pre class="language-r" data-fragment-index="0"><code>gene <- 123          # currently selected gene</code></pre>
-            <p class="leftHeader">2. Use it in the dependent plot</p>
-            <pre class="language-r" data-fragment-index="0"><code>lc_scatter(dat(           #dat() function is important!
+            <div class="fragment">
+              <p class="leftHeader">1. Set a state variable</p>
+              <pre class="language-r" data-fragment-index="0"><code>gene <- 123          # currently selected gene</code></pre>
+            </div>
+            <div class="fragment">
+              <p class="leftHeader">2. Use it in the dependent plot</p>
+              <pre class="language-r" data-fragment-index="0"><code>lc_scatter(dat(           #dat() function is important!
   x = sampleTable$patient,
   y = countMatrix[gene,] / countsums * 1e6 + .1,
   ...),
   place = "A2")           # where to place the chart on the web page</code></pre>
-            <p class="leftHeader">3. In the main plot change state variable and update</p>
-            <pre class="language-r" data-fragment-index="0"><code>lc_scatter(
+            </div>
+            <div class="fragment">
+              <p class="leftHeader">3. In the main plot change state variable and update</p>
+              <pre class="language-r" data-fragment-index="0"><code>lc_scatter(
   x = voomResult$AveExpr,
   y = voomResult$tissuetumour,
   ...,
@@ -452,7 +457,7 @@
     updateCharts("A2") 
   },
   place = "A1")</code></pre>
-
+            </div>
           </section>
           <section>
             <div style="position: absolute; z-index: 100; left: 20%">
