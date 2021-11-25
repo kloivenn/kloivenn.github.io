@@ -1,0 +1,582 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Interactive visualization</title>
+    <link rel="stylesheet" href="../revealjs/dist/reset.css">
+    <link rel="stylesheet" href="../revealjs/dist/reveal.css">
+    <link rel="stylesheet" href="../revealjs/dist/theme/insomnia.css">
+    <script type="text/javascript" src="src/js/d3.v5.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="src/css/prism.css">
+    <style type="text/css">
+      #tti {
+        zoom: 0.65;
+        -moz-transform: scale(0.65);
+        -moz-transform-origin: 0 0;
+        -o-transform: scale(0.65);
+        -o-transform-origin: 0 0;
+        -webkit-transform: scale(0.65);
+        -webkit-transform-origin: 0 0;        
+      }
+    </style>
+  </head>
+  <body background-size="cover">
+    <div class="reveal">
+      <div class="slides">
+        <section style="background-color: #000;">
+          <div>
+            <h1>Interactive visualization for omics data exploration</h1>
+            <h2>Thesis Defence</h2>
+          </div>
+          <img src="src/img/insomnia.png" class="plain" width="15%" style="margin: 5px;">
+          <table>
+            <tr width="100%">
+              <th width="50%">Supervised by:</th>
+              <th width="50%">Presented by:</th>
+            </tr>
+            <tr>
+              <td style="color: #d2dae7;">Dr. Simon Anders</td>
+              <td style="color: #d2dae7;">Svetlana Ovchinnikova, M.Sc.</td>
+            </tr>
+          </table>
+          <div class="twosided">
+            <small style="color: #d4c78c; text-align: center;">
+              November 26th, 2021
+            </small>
+            <small style="color: #d4c78c; text-align: center;">
+              Heidelberg
+            </small>  
+          </div>
+          
+        </section>
+        <section>
+          <h2>Outline</h2>
+          <div class="content">
+            <div class="content-pads">
+              <p class="leftHeader"><span class="highlight">Project's goal:</span></p>
+              <p>Develop easy-to-use interactive applications for every-day exploratory analysis of omics data.</p>
+              <p class="leftHeader"><span class="highlight">Main tool:</span></p>
+              <p>Combination of R and Javascript.</p>
+              <p class="leftHeader"><span class="highlight">Outcome:</span></p>
+              <p>Three R packages</p>
+              <ul>
+                <li>rlc (LinkedCharts)</li>
+                <p class="note">Interactive plotting library</p>                
+                <li>jrc</li>
+                <p class="note">R-JavaScript bridge for package developers</p>
+                <li>sleepwalk</li>
+                <p class="note">A tool to explore 2D embeddings</p>
+              </ul>
+            </div>
+          </div>
+          <div class="wrapper">
+            <div class="bottom-cell">
+              <p class="footnote" style="font-size: 90%">slides on <span class="highlight">kloivenn.github.io/defence</span></p>
+            </div>
+          </div>
+        </section>
+        <section>
+          <section>
+            <h2>Limitations of Static Plots</h2>
+            <div class="content">
+              <div class="content-pads">
+                <table>
+                  <tr>
+                    <td width="50%">
+                      <h3>Number of elements</h3>
+                      <img src="src/img/zoomPlot.png" width="400px" style="margin: 0px;">
+                    </td>
+                    <td width="50%">
+                      <h3>Number of channels</h3>
+                      <img src="src/img/vis_channels_gold.png" width="400px" style="margin: 0px;">
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </section>
+          <section>
+            <h2>Additional Details</h2>
+            <div class="content">
+              <div class="content-pads">
+                <svg width="900" height="470">
+                  <image href="src/img/MAPlot.png" width="350" x="10" y="45"/>
+                  <image href="src/img/gene_WNT2.png" width="300" x="500"/>
+                  <image href="src/img/gene_COL1A1.png" width="300" x="500" y="155"/>
+                  <image href="src/img/gene_KRT13.png" width="300" x="500" y="310"/>
+                  <image href="src/img/arrow.svg" width="120" x="380" y="220"/>
+                  <image href="src/img/arrow.svg" width="120" x="380" y="160" transform="rotate(-35, 380, 175)"/>
+                  <image href="src/img/arrow.svg" width="120" x="380" y="280" transform="rotate(35, 380, 295)"/>                  
+                </svg>
+              </div>
+            </div>
+            <div class="wrapper">
+              <div class="bottom-cell">
+                <p class="footnote">data from 
+                  <a target="about:blank" href="https://doi.org/10.18632/oncotarget.5529">Conway et al., Elucidating drivers of oral epithelial dysplasia formation and malignant transformation to cancer using RNAseq, Oncotarget, 6:40186-40201 (2015)</a>
+                </p>
+              </div>
+            </div>
+          </section>
+          <section>
+            <h2>Linked Charts</h2>
+            <div class="content">
+              <div class="content-pads">
+                <div class="aspect-ratio" style="padding-top: 43%;">
+                  <iframe data-src="src/slide05.html"></iframe>
+                </div>
+              </div>
+            </div>
+            <div class="wrapper">
+              <div class="bottom-cell">
+                <p class="footnote">data from 
+                  <a target="about:blank" href="https://doi.org/10.18632/oncotarget.5529">Conway et al., Elucidating drivers of oral epithelial dysplasia formation and malignant transformation to cancer using RNAseq, Oncotarget, 6:40186-40201 (2015)</a>
+                </p>
+              </div>
+            </div>
+          </section>
+          <section>
+            <h2>Visulisation flow</h2>
+            <div class="content">
+              <div class="content-pads">
+                <div class="aspect-ratio" style="padding-top: 50%;">
+                  <iframe data-src="src/drug_full.html" ></iframe>
+                </div>
+              </div>
+            </div>            
+          </section>          
+          <section>
+            <h2>Simple to use</h2>
+            <div class="content">
+              <div class="content-pads">
+                <div class="aspect-ratio" style="padding-top: 40%;">
+                  <iframe data-src="src/figB.html"></iframe>
+                </div>
+                <table width="100%">
+                  <tr>
+                    <td>
+                      <pre><code data-trim data-noescape class="language-r line-numbers">ggplot(iris) + geom_point(aes(
+  x = Sepal.Length,
+  y = Petal.Length,
+  size = Sepal.Width * 2,
+  colour = Petal.Width,
+  shape = Species
+))</code></pre>
+                    </td>
+                    <td>
+                      <pre><code data-trim data-noescape class="language-r line-numbers">lc_scatter(with = iris, data = dat(
+  x = Sepal.Length,
+  y = Petal.Length,
+  size = Sepal.Width * 2,
+  colourValue = Petal.Width,
+  symbolValue = Species
+))</code></pre>                  
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </section>
+          <section>
+            <h2>Linking</h2>
+            <div class="content">
+              <div class="content-pads">
+                <table>
+                  <tr>
+                    <td>
+                      <div>
+                        <h3>State variables</h3>
+                        <pre><code class="language-r">selectedGene <- "KRT13"</code></pre>
+                      </div>
+                      <div class="fragment fade-in">
+                        <h3>'dat' function</h3>
+                        <pre><code class="language-r">dat(
+  x = patient,                          
+  y = normCounts[selectedGene, ],
+  colour = tissueType,
+)
+                        </code></pre>
+                      </div>
+                    </td>
+                    <td width="50%">
+                      <div class="fragment fade-in">
+                        <h3>'on_click' function</h3>
+                        <p style="text-align: center; font-size: 80%;">(or other events)</p>  
+                        <svg width="400" height="250">
+                          <filter x="0" y="0" width="1" height="1" id="solid1">
+                            <feFlood flood-color="#000" result="bg" />
+                            <feMerge>
+                              <feMergeNode in="bg"/>
+                              <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                          </filter>
+                          <text font-family="monospace" y="20">on_click = function(d) {</text>
+                          <text font-family="monospace" y="240">}</text>
+                          <g transform="translate(10, 40)">
+                            <rect class="svg_container" width="130" height="130" rx="10" ry="10"/>
+                            <text font-family="monospace" filter="url(#solid1)" y="40" x="65" text-anchor="middle" fill="#d4c78c" font-size="120%">
+                              ( d )
+                            </text>
+                            <text text-anchor="middle" y="70" font-size="80%">
+                              <tspan x="65">identifier of the</tspan>
+                              <tspan x="65" dy="1.4em">clicked element</tspan>
+                            </text>
+                          </g>
+                          <image href="src/img/arrow.svg" x="150" y="105" width="50"/>
+                          <g transform="translate(210, 40)">
+                            <rect class="svg_container" width="130" height="130" rx="10" ry="10"/>
+                            <text text-anchor="middle" y="40">
+                              <tspan x="65">new</tspan>
+                              <tspan x="65" dy="1.4em">state</tspan>
+                              <tspan x="65" dy="1.4em">variables</tspan>
+                            </text>
+                          </g>
+                          <text font-family="monospace" text-anchor="middle" x="180" y="210">updateCharts()</text>
+                        </svg>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </section>
+          <section>
+            <div style="position: absolute; z-index: 100; left: 20%">
+              <h2 style="background-color: #fff; color: #000;">Apps for data presentation</h2>
+            </div>
+            <div class="aspect-ratio">
+              <iframe data-src="../TTI/ex2plorer_new.html" id="tti" 
+              style="width: 1550px; height: 950px; max-width: none; max-height: none; background-color: #fff"></iframe>
+            </div>
+            <div class="fragment fade-out" data-fragment-index="2" style="z-index: 10; position: absolute; left: 50px; top: 50px;">
+              <img src="src/img/owl.jpg"/>
+            </div>
+            <div class="fragment fade-out" data-fragment-index="2" style="z-index: 9; position: absolute; left: 0px; top: 0px; width: 1050px; height: 700px; background-color: #fff;"></div>
+            <div class="fragment fade-out" data-fragment-index="1" style="z-index: 11; position: absolute; left: 400px; top: 0px; width: 550px; height: 700px; background-color: #fff;"></div>
+            <div class="wrapper">
+              <div class="bottom-cell">
+                <p class="footnote">supplement for 
+                  <a target="about:blank" href="https://www.nature.com/articles/s41586-020-2899-z">Wang et al., Transcriptome and translatome co-evolution in mammals. Nature 588.7839 (2020)</a>
+                </p>
+              </div>
+            </div>                    
+          </section>
+          <section>
+            <h2>rlc package</h2>
+            <div class="content">
+              <div class="content-pads">
+                <p class="leftHeader"><span class="highlight">on CRAN (v.0.4.0)</span></p>
+                <p><a href="https://CRAN.R-project.org/package=rlc" style="color: #000;">https://CRAN.R-project.org/package=rlc</a></p>
+                <p class="leftHeader"><span class="highlight">Web page</span></p>
+                <p><a href="https://anders-biostat.github.io/linked-charts/" style="color: #000;">https://anders-biostat.github.io/linked-charts/</a></p>
+                <p class="leftHeader"><span class="highlight">Paper</span></p>
+                <p>To be submitted...</p>
+              </div>
+            </div>
+          </section>          
+        </section>
+        <section>
+          <section>
+            <h2>Implementation</h2>
+            <div class="content">
+              <div class="content-pads">
+                <table width="100%">
+                  <tr>
+                    <td width="12%">
+                      <img src="src/img/R_logo.png" class="plain">
+                    </td>
+                    <td style="vertical-align: middle;" align="center" width="38%">
+                      <h3>R</h3>
+                    </td>
+                    <td width="12%">
+                      <img src="src/img/js_logo.png" class="plain">
+                    </td>
+                    <td style="vertical-align: middle;" align="center" width="38%">
+                      <h3>JavaScript</h3>
+                    </td>             
+                  </tr>
+                  <tr>
+                    <td colspan="2" style="vertical-align: top">
+                      <ul>
+                        <li>great for statistical computations</li>
+                        <li>one of the most commonly used tools in bioinformatics</li>
+                      </ul>
+                    </td>
+                    <td colspan="2" style="vertical-align: top">
+                      <ul>
+                        <li>easy interactivity</li>
+                        <li>works in any browser</li>
+                        <li>customizeable</li>
+                        <li>can be turned into an application</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <span class="fragment">
+              <div data-animate>
+                <svg width="400" height="240" style="margin-left: auto;">
+                  <g transform="translate(20, 0)">
+                    <image href="src/img/websocket_logo.svg" width="120" x="10" y="10"/>
+                    <image href="src/img/libuv_logo.svg" width="120" x="230" y="30"/>
+                    <g transform="translate(155, 65)">
+                      <path d="M 0 25 h 50" stroke="#d4c78c" stroke-width="4"/>
+                      <path d="M 25 0 v 50" stroke="#d4c78c" stroke-width="4"/>
+                    </g>
+                  </g>
+                  <path d="M 0 165 h 400" stroke="#d4c78c" stroke-width="1"/>
+                  <text y="190" fill="#d2dae7" width="400">
+                    <tspan text-anchor="middle" x="200"><tspan fill="#d4c78c">httpuv</tspan>: R package for handling HTTP</tspan>
+                    <tspan text-anchor="middle" x="200" dy="1.2em">and WebSocket requests</tspan>
+                  </text>
+                </svg>
+              </div>            
+            </span>
+          </section>
+          <section>
+            <h2>Building a Foundation</h2>
+            <div class="content">
+              <div class="content-pads">            
+                <h3 style="display: inline-block;">jrc:</h3>
+                <p style="display: inline-block;">JavaScript-R Communication</p>
+                <ul>
+                  <li class="fragment fade-in" data-fragment-index="1">Sits on both sides of the connection, proccesses and evaluates messages.</li>
+                  <li class="fragment fade-in" data-fragment-index="2">Handles multiple connection and organises data storage.</li>
+                  <li class="fragment fade-in" data-fragment-index="3">Manages security restrictions.</li>
+                  <li class="fragment fade-in" data-fragment-index="4">Loads and populates any HTML page.</li>
+                </ul>
+                <div class="r-stack">
+                  <span class="fragment fade-out" data-fragment-index="2">
+                    <svg width="900" height="300" class="fragment fade-in" data-fragment-index="1">
+                      <defs>
+                        <filter x="0" y="0" width="1" height="1" id="solid">
+                          <feFlood flood-color="#000" result="bg" />
+                          <feMerge>
+                            <feMergeNode in="bg"/>
+                            <feMergeNode in="SourceGraphic"/>
+                          </feMerge>
+                        </filter>
+                      </defs>                  
+                      <g transform="translate(150, 10)">
+                        <rect class="svg_container" width="200" height="280" rx="10" ry="10"/>
+                        <image href="src/img/R_logo.svg" width="130" x="35" y="10"/>
+                        <text class="text_block" x="100" y="160" filter="url(#solid)">Command</text>
+                        <text class="text_block" x="100" y="260" filter="url(#solid)">Message</text>
+                        <image href="src/img/arrow.svg" transform="rotate(90)" x="170" y="-90" width="65"/>
+                        <text x="95" y="205" font-size="120%">jrc</text>
+                      </g>
+                      <g transform="translate(550, 10)">
+                        <rect class="svg_container" width="200" height="280" rx="10" ry="10"/>
+                        <image href="src/img/js_logo.svg" width="110" x="35" y="10"/>
+                        <text class="text_block" x="100" y="160" filter="url(#solid)">Message</text>
+                        <text class="text_block" x="100" y="260" filter="url(#solid)">Command</text>
+                        <image href="src/img/arrow.svg" transform="rotate(90)" x="170" y="-90" width="65"/>
+                        <text x="95" y="205" font-size="120%">jrc</text>
+                        <image href="src/img/arrow_long.svg" transform="rotate(-30)" x="-350" y="80" width="330"/>
+                        <text transform="rotate(-30)" x="-220" y="80" width="330">WebSocket</text>
+                      </g>
+                    </svg>                    
+                  </span>
+                  <svg width="500" height="300" class="fragment fade-in" data-fragment-index="2" style="margin-left: auto;">
+                    <g transform="translate(10,10)">
+                      <rect class="svg_container" width="250" height="280" rx="10" ry="10"/>
+                      <image href="src/img/R_logo.svg" width="130" x="10" y="100"/>
+                      <rect width="80" height="260" x="160" y="10" fill="none" stroke="#000"/> 
+                      <rect width="60" height="60" x="170" y="20" fill="#d4c78c" stroke="#000" stroke-width="3"/>
+                      <rect width="60" height="60" x="170" y="90" fill="#d4c78c" stroke="#000" stroke-width="3"/>
+                      <rect width="60" height="60" x="170" y="160" fill="#d4c78c" stroke="#000" stroke-width="3"/>
+                      <text x="190" y="250">jrc</text>
+                      <text y="45" font-size="75%" text-anchor="middle">
+                        <tspan x="200">client 1</tspan>
+                        <tspan x="200" dy="1.2em">data</tspan>
+                      </text>
+                      <text y="115" font-size="75%" text-anchor="middle">
+                        <tspan x="200">client 2</tspan>
+                        <tspan x="200" dy="1.2em">data</tspan>
+                      </text>
+                      <text y="185" font-size="75%" text-anchor="middle">
+                        <tspan x="200">client 3</tspan>
+                        <tspan x="200" dy="1.2em">data</tspan>
+                      </text>
+                    </g>
+                    <g transform="translate(400, 10)">
+                      <image href="src/img/js_logo.svg" width="90" border="#000" stroke-width="1"/>
+                      <image href="src/img/js_logo.svg" width="90" y="100" border="#000" stroke-width="1"/>
+                      <image href="src/img/js_logo.svg" width="90" y="200" border="#000" stroke-width="1"/>
+                    </g>
+                    <path d="M240 60 L 400 55" stroke="#000000" stroke-width="2" stroke-dasharray="15 15"/>
+                    <path d="M240 130 L 400 155" stroke="#000000" stroke-width="2" stroke-dasharray="15 15"/>
+                    <path d="M240 200 L 400 255" stroke="#000000" stroke-width="2" stroke-dasharray="15 15"/>
+                  </svg>                  
+                </div>
+              </div>
+            </div>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Dimensionality Reduction</h2>
+            <div class="content">
+              <div class="content-pads">
+                <span class="fragment fade-in-and-out"></span>
+                <div data-animate>
+                  <svg width="900" height="500">
+                    <image href="src/img/table.png" width="300" x="50" y="30"/>
+                    <image href="src/img/clusters.png" width="300" x="550" y="150"/>
+                    <text x="200" y="260" text-anchor="middle">(m cells x n genes)</text>
+                    <g id="dimred_arrow">
+                      <image href="src/img/arrow_long.svg" width="200" x="380" y="160" transform="rotate(30, 380, 160)"/>                    
+                      <text text-anchor="middle" x="470" y="210" transform="rotate(30, 470, 210)">
+                        <tspan x="470">Dimensionality</tspan>
+                        <tspan x="470" dy="1.4em">reduction</tspan>
+                      </text>
+                    </g>
+                    <text x="700" y="140" text-anchor="middle">2D embedding</text>
+                    <g id="graph" transform="translate(150, 410)">
+                      <image href="src/img/arrow_long.svg" width="120" y="-5" x="-5"/>
+                      <image href="src/img/arrow_long.svg" width="120" y="-5" x="-5" transform="rotate(-90)"/>
+                      <image href="src/img/arrow_long.svg" width="120" y="-5" x="-5" transform="rotate(135)"/>
+                      <text font-size="70%" x="70" y="-10">gene 1</text>
+                      <text font-size="70%" x="70" y="-10" transform="rotate(-90)">gene 2</text>
+                      <text font-size="70%" x="70" y="-10" transform="rotate(-225) rotate(180,70,-10) translate(-40,-20)">gene 3</text>
+                      <circle r="5" cx="30" cy="-80"/>
+                      <circle r="5" cx="40" cy="-20"/>
+                      <circle r="5" cx="-30" cy="-10"/>
+                      <circle r="5" cx="10" cy="30"/>
+                      <circle r="5" cx="60" cy="50"/>
+                      <text x="40" y="85">n dimensional space</text>
+                    </g>
+                  </svg>
+                  <!--
+                    {
+                    "setup": [{
+                    "element": "#graph",
+                    "modifier": "attr",
+                    "parameters": [{"opacity": 0}]   
+                    }],
+                    "animation": [
+                    [{
+                    "element": "#graph",
+                    "modifier": "attr",
+                    "parameters": [{"opacity": 1}] 
+                    }, {
+                    "element": "#dimred_arrow",
+                    "modifier": "rotate",
+                    "parameters": [-50, 470, 210]
+                    }, {
+                    "element": "#dimred_arrow",
+                    "modifier": "translate",
+                    "parameters": [-40, 100]
+                    }
+                    ], []
+                    ]
+                    }                
+                  -->                   
+                </div>
+              </div>
+            </div>
+          </section>
+          <section>
+            <h2>Distortion Is Unavoidable</h2>
+            <div class="content">
+              <div class="content-pads">
+                <img data-src="src/img/1ev1X.png">
+              </div>
+            </div>
+            <p><a target="about:blank" href="https://xkcd.com/977/">https://xkcd.com/977/</a></p>
+          </section>
+          <section>
+            <h2>Sleepwalk</h2>
+            <div class="content">
+              <div class="content-pads">
+                <pre><code data-trim data-noescape class="language-r">sleepwalk(citeSeq$tsne, features)</code></pre>
+                <div class="aspect-ratio" style="padding-top: 45%; width: 75%; margin-left: 10%;">
+                  <iframe data-src="src/Fig_B.html"></iframe>
+                </div>
+              </div>
+            </div>
+            <div class="wrapper">
+              <div class="bottom-cell">
+                <p class="footnote">data from 
+                  <a target="about:blank" href="https://doi.org/10.1038/nmeth.4380">Stoeckius et al., Simultaneous epitope and transcriptome measurement in single cells, Nature Methods, 14:865, 2017</a>
+                </p>
+              </div>
+            </div>
+          </section>
+          <section>
+            <h2>Compare Samples</h2>
+            <div class="content">
+              <div class="content-pads">
+                <pre><code data-trim data-noescape class="language-r">sleepwalk(list(um13_A, um13_B, um14), 
+      list(comFeatures13_A, comFeatures13_B, comFeatures14), same = "features",
+      titles = c("e13.5_A", "e13.5_B", "e14.5"), nrow = 1)</code></pre>
+                <div class="aspect-ratio" style="padding-top: 42%; width: 95%;">
+                  <iframe data-src="src/Fig_D.html"></iframe>
+                </div>
+              </div>
+            </div>
+            <div class="wrapper">
+              <div class="bottom-cell">
+                <p class="footnote">data from 
+                  <a target="about:blank" href="https://doi.org/10.1016/j.cub.2018.07.062">Carter et al., A Single-Cell Transcriptional Atlas of the Developing Murine Cerebellum, Current Biology, 28:18, 2018</a>
+                </p>
+              </div>
+            </div>
+          </section>     
+        </section>
+        <section>
+          <h2>Benefits of Interactivity</h2>
+          <div class="content">
+            <div class="content-pads">
+              <div class="fragment fade-in">
+                <p class="leftHeader"><span class="highlight">When analysing data:</span></p>
+                <ul>
+                  <li>no need to omit information</li>
+                  <li>fast and easy spot check</li>
+                  <li>easy sharing with collaborators</li>
+                </ul>
+              </div>
+              <div class="fragment fade-in">
+                <p class="leftHeader"><span class="highlight">When publishing results:</span></p>
+                <ul>
+                  <li>prevents cherry picking</li>
+                  <li>engaging</li>
+                  <li>easy reference</li>
+                </ul>                
+              </div>
+            </div>
+          </div>
+          <h1 class="fragment fade-in" style="border: none; margin-top: 50px;">Thank you for your attention!</h1>          
+        </section>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="src/js/prism.js"></script>
+    <script src="../revealjs/dist/reveal.js"></script>
+    <script src='../revealjs/plugin/notes/notes.js'></script>
+    <script src="../revealjs/plugin/animate/plugin.js"></script>
+    <script src="../revealjs/plugin/animate/svg.min.js"></script>
+
+    <script>
+      // More info about config & dependencies:
+      // - https://github.com/hakimel/reveal.js#configuration
+      // - https://github.com/hakimel/reveal.js#dependencies
+      Reveal.initialize({
+        center: false,
+        hash: true,
+        slideNumber: 'c/t',
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          // pass other options into `MathJax.Hub.Config()`
+          TeX: { Macros: { RR: "{\\bf R}" } }
+        },
+
+        plugins: [ RevealNotes, RevealAnimate ]
+      });
+    </script>
+  </body>
+</html>
