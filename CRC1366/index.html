@@ -171,9 +171,15 @@ sleepwalk(um, pca$x)</code></pre>
   	  		</div>
   	  		<div class="wrapper" style="z-index: -1;">
   	  		  <div class="bottom-cell">
-  	  		    <p class="footnote">download data:  
-  	  		      <a target="about:blank" href="https://doi.org/10.1038/nmeth.4380">Stoeckius et al., Simultaneous epitope and transcriptome measurement in single cells, Nature Methods, 14:865, 2017</a>
-  	  		    </p>
+  	  		  	<p class="footnote">download data:  
+  	  		  	  <a target="about:blank" href="R/citeSeq_RNA.rds">citeSeq_RNA.rds</a>
+  	  		  	</p>
+  	  		  	<p class="footnote">download data:  
+  	  		  	  <a target="about:blank" href="R/citeSeq_ADT.rds">citeSeq_ADT.rds</a>
+  	  		  	</p>  	  		  	
+  	  		  	<p class="footnote">data from 
+  	  		  	  <a target="about:blank" href="https://doi.org/10.1038/nmeth.4380">Stoeckius et al., Simultaneous epitope and transcriptome measurement in single cells, Nature Methods, 14:865, 2017</a>
+  	  		  	</p>
   	  		  </div>
   	  		</div>  	  		
   	  	</section>
@@ -182,25 +188,122 @@ sleepwalk(um, pca$x)</code></pre>
   	  	  <div class="content">
   	  	    <div class="content-pads">
   	  	      <pre><code data-trim data-noescape class="language-r">sleepwalk(Embeddings(Reductions(seu, "umap")), Embeddings(Reductions(seu, "pca")))</code></pre>
-  	  	      <div class="aspect-ratio" style="padding-top: 45%; width: 75%; margin-left: 10%;">
+  	  	      <div class="aspect-ratio" style="padding-top: 50%; width: 45%; margin-left: 25%;">
   	  	        <iframe data-src="src/cerebellum_lukas.html"></iframe>
   	  	      </div>
   	  	    </div>  	  		
   	  	</section>
   	  	<section>
   	  		<h2>Metric effect (code)</h2>
+  	  		  	  		<div class="content">
+  	  		  	  			<div class="content-pads">
+  	  		  	  				<pre><code data-trim data-noescape class="language-r">library(sparseMatrixStats)
+library(scales)
+library(rlc)
+
+# getting variable genes
+means <- rowMeans(normCounts)
+vars <- rowVars(normCounts)
+lc_scatter(x = means, y = vars/means, logScaleX = 10, logScaleY = 10, size = 2,
+           opacity = 0.4)
+genes <- getMarked()
+
+# scaling
+variableGenes <- as.matrix(log1p(normCounts[genes, ]))
+scaled <- (variableGenes - rowMeans(variableGenes))/rowSds(variableGenes)
+scaled <- squish(scaled, c(-10, 10))
+
+pca_scaled <- prcomp_irlba(t(scaled), n = 50)
+um_scaled <- umap(pca_scaled$x, min_dist = 0.3,
+                  spread = 3,
+                  n_neighbors = 30, metric = "cosine")
+
+sleepwalk(list(um, um_scaled), list(pca$x, pca_scaled$x), metric = c("euclid", "cosine"))</code></pre>
+  	  		  	  			</div>
+  	  		  	  		</div>  	  		
   	  	</section>
   	  	<section>
   	  		<h2>Metric effect (example)</h2>
+  	  		<div class="content">
+  	  		  <div class="content-pads">
+  	  		    <div class="aspect-ratio" style="padding-top: 55%;">
+  	  		      <iframe data-src="src/scaled.html"></iframe>
+  	  		    </div>
+  	  		  </div>  	
   	  	</section>
   	  	<section>
   	  		<h2>Ground truth</h2>
+  	  		<div class="content">
+  	  		  <div class="content-pads">
+  	  		    <pre><code data-trim data-noescape class="language-r">countsADT <- readRDS("citeSeq_ADT.rds")
+countsADT[1:10, 1:10]
+normCountsADT <- t(countsADT)/colSums(countsADT) * 10000
+sleepwalk(list(um, um_scaled), log1p(normCountsADT))</code></pre>
+  	  		    <div class="aspect-ratio" style="padding-top: 45%; width: 75%; margin-left: 10%;">
+  	  		      <iframe data-src="src/groundTruth.html"></iframe>
+  	  		    </div>
+  	  		  </div>
+  	  		</div>
+  	  	</section>
+  	  	<section>
+  	  		<h2>Comparing samples</h2>
+            <div class="content">
+              <div class="content-pads">
+                <pre><code data-trim data-noescape class="language-r">sleepwalk(list(um13_A, um13_B, um14), 
+      list(comFeatures13_A, comFeatures13_B, comFeatures14), same = "features",
+      titles = c("e13.5_A", "e13.5_B", "e14.5"), nrow = 1)</code></pre>
+                <div class="aspect-ratio" style="padding-top: 42%; width: 95%;">
+                  <iframe data-src="src/Fig_D.html"></iframe>
+                </div>
+              </div>
+            </div>
+            <div class="wrapper" style="z-index: -1;">
+              <div class="bottom-cell">
+                <p class="footnote">data from 
+                  <a target="about:blank" href="https://doi.org/10.1016/j.cub.2018.07.062">Carter et al., A Single-Cell Transcriptional Atlas of the Developing Murine Cerebellum, Current Biology, 28:18, 2018</a>
+                </p>
+              </div>
+            </div>
   	  	</section>
   	  	<section>
   	  		<h2>Comparing samples (code)</h2>
-  	  	</section>
-  	  	<section>
-  	  		<h2>Comparing samples (example)</h2>
+  	  		  	  		<div class="content">
+  	  		  	  			<div class="content-pads">
+  	  		  	  				<pre><code data-trim data-noescape class="language-r">library(irlba)
+library(uwot)
+library(sleepwalk)
+
+load("cerebellum_timepoints.RData")
+
+getEmbedding <- function(data) {
+  pca <- prcomp_irlba(data, n = 50)
+  umap(pca$x, spread = 5, n_sgd_threads = 1, negative_sample_rate = 3)
+}
+
+um13_A <- getEmbedding(e13_A_norm)
+um13_B <- getEmbedding(e13_B_norm)
+um14 <- getEmbedding(e14_norm)
+
+commonGenes <- intersect(intersect(colnames(e13_A_norm), colnames(e13_B_norm)), colnames(e14_norm))
+
+pca <- prcomp_irlba(rbind(e13_A_norm[, commonGenes], e13_B_norm[, commonGenes], 
+                          e14_norm[, commonGenes]), n = 50)
+comFeatures13_A <- e13_A_norm[, commonGenes] %*% pca$rotation
+comFeatures13_B <- e13_B_norm[, commonGenes] %*% pca$rotation
+comFeatures14 <- e14_norm[, commonGenes] %*% pca$rotation
+
+sleepwalk(list(um13_A, um13_B, um14), 
+          list(comFeatures13_A, comFeatures13_B, comFeatures14), 
+          same = "features", titles = c("e13.5_A", "e13.5_B", "e14.5"), nrow = 1)</code></pre>
+  	  		  	  			</div>
+  	  		  	  		</div>
+   	  		<div class="wrapper" style="z-index: -1;">
+  	  		  <div class="bottom-cell">
+  	  		  	<p class="footnote">download data:  
+  	  		  	  <a target="about:blank" href="R/cerebellum_timepoints.RData">cerebellum_timepoints.RData</a>
+  	  		  	</p>
+  	  		  </div>
+  	  		</div>
   	  	</section>
   	  	<section>
   	  		<h2>Lasso selection</h2>

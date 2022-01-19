@@ -12,6 +12,7 @@ sf[1:10]
 
 normCounts <- t(t(rawCounts/sf * 10000))
 pca <- prcomp_irlba(log1p(t(normCounts)), n = 50)
+set.seed(123)
 um <- umap(pca$x, min_dist = 0.3, n_neighbors = 30, spread = 3)
 
 ggplot() + geom_point(aes(um[, 1], um[, 2]), size = 1)
@@ -38,6 +39,7 @@ scaled <- (variableGenes - rowMeans(variableGenes))/rowSds(variableGenes)
 scaled <- squish(scaled, c(-10, 10))
 
 pca_scaled <- prcomp_irlba(t(scaled), n = 50)
+set.seed(12345)
 um_scaled <- umap(pca_scaled$x, min_dist = 0.3,
                   spread = 3,
                   n_neighbors = 30, metric = "cosine")
@@ -50,5 +52,5 @@ sleepwalk(list(um, um_scaled), list(pca$x, pca_scaled$x),
 ###ADT
 countsADT <- readRDS("citeSeq_ADT.rds")
 countsADT[1:10, 1:10]
-normCountsADT <- t(countsADT)/colSums(countsADT)*10000
+normCountsADT <- t(countsADT)/colSums(countsADT) * 10000
 sleepwalk(list(um, um_scaled), log1p(normCountsADT))
