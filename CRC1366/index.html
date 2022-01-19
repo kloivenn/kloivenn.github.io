@@ -307,6 +307,60 @@ sleepwalk(list(um13_A, um13_B, um14),
   	  	</section>
   	  	<section>
   	  		<h2>Lasso selection</h2>
+  	  		<div class="content">
+  	  			<div class="content-pads">
+					<pre><code data-trim data-noescape class="language-r">library(ggplot2)
+library(sleepwalk)
+data <- readRDS("e13_A.rds")
+getHighGenes <- function(marked){
+  if( length(marked) == 0 ) return( "" )
+  
+  df <- data.frame(
+    meanMarked   =  apply( data$expr[ marked, ], 2, mean ),
+    sdMarked     =  apply( data$expr[ marked, ], 2, sd ),
+    meanUnmarked =  apply( data$expr[ -marked, ], 2, mean ),
+    sdUnmarked   =  apply( data$expr[ -marked, ], 2, sd )
+  )
+  df$sepScore <- ( df$meanMarked - df$meanUnmarked ) / pmax( df$sdMarked + df$sdUnmarked, 0.002 )
+  
+  # round to two decimal places
+  df <- round(df * 100)/100
+    
+  print(head( df[ order( df$sepScore, decreasing = TRUE ), ], 15 ))
+  
+  topGene <- rownames(df)[which.max(df$sepScore)]
+  pl <- ggplot() + geom_point(aes(x = data$um[, 1], y = data$um[, 2], 
+  		colour = data$expr[, topGene])) +
+    labs(colour = topGene) + scale_color_gradient(low = "Yellow", high = "Red")
+  print(pl)
+}
+
+sleepwalk(data$umap, data$pca, pointSize = 2.5, on_selection = getHighGenes)</code></pre>  	  				
+  	  			</div>
+  	  		</div>
+					<div class="wrapper" style="z-index: -1;">
+						<div class="bottom-cell">
+							<p class="footnote">
+								Load data: <a target="about:blank" href="https://kloivenn.github.io/Ascona2019/data/e13_A.rds">e13_A.rds</a><br>
+							</p>
+						</div>
+					</div>  	  		
+  	  	</section>
+  	  	<section>
+  	  		<h2>Sleepwalk</h2>
+  	  		<div class="content">
+  	  			<div class="content-pads">
+  	  				<p class="leftHeader"><span class="highlight">Install from CRAN:</span></p>
+  	  				<pre><code data-trim data-noescape class="language-r">install.packages("sleepwalk")</code></pre>
+  	  				<p class="leftHeader"><span class="highlight">On GitHub:</span></p>
+  	  				<a style="color: #000;" target="about:blank" href="https://github.com/anders-biostat/sleepwalk">https://github.com/anders-biostat/sleepwalk</a>
+  	  				<p class="leftHeader"><span class="highlight">Webpage:</span></p>
+  	  				<a style="color: #000;" target="about:blank" href="https://anders-biostat.github.io/sleepwalk/">https://anders-biostat.github.io/sleepwalk/</a>
+  	  				<p class="leftHeader"><span class="highlight">Publication:</span></p>
+  	  				<a style="color: #000;" target="about:blank" href="https://doi.org/10.1101/gr.251447.119">S. Ovchinnikova and S. Anders: Exploring dimension-reduced embeddings with Sleepwalk. Genome Research 30.5 (2020)</a>
+  	  			</div>
+  	  		</div>
+  	  		<h1 class="fragment fade-in" style="border: none; margin-top: 50px;">Thank you for your attention!</h1>  
   	  	</section>
 			</div>
 		</div>
