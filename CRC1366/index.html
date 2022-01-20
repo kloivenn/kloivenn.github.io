@@ -30,7 +30,7 @@
   	  	  </table>
   	  	  <div class="twosided">
   	  	    <small style="color: #d4c78c; text-align: center;">
-  	  	      January 19th, 2022
+  	  	      January 20th, 2022
   	  	    </small>
   	  	    <small style="color: #d4c78c; text-align: center;">
   	  	      <s>Asselheim</s>
@@ -132,7 +132,7 @@
   	  	  <h2>Sleepwalk</h2>
   	  	  <div class="content">
   	  	    <div class="content-pads">
-  	  	      <pre><code data-trim data-noescape class="language-r">sleepwalk(citeSeq$tsne, features)</code></pre>
+  	  	      <pre><code data-trim data-noescape class="language-r">sleepwalk(Embeddings(Reductions(seu, "umap")), Embeddings(Reductions(seu, "pca")))</code></pre>
   	  	      <div class="aspect-ratio" style="padding-top: 45%; width: 75%; margin-left: 10%;">
   	  	        <iframe data-src="src/Fig_B.html"></iframe>
   	  	      </div>
@@ -182,16 +182,6 @@ sleepwalk(um, pca$x)</code></pre>
   	  		  	</p>
   	  		  </div>
   	  		</div>  	  		
-  	  	</section>
-  	  	<section>
-  	  		<h2>For Seurat Users</h2>
-  	  	  <div class="content">
-  	  	    <div class="content-pads">
-  	  	      <pre><code data-trim data-noescape class="language-r">sleepwalk(Embeddings(Reductions(seu, "umap")), Embeddings(Reductions(seu, "pca")))</code></pre>
-  	  	      <div class="aspect-ratio" style="padding-top: 50%; width: 45%; margin-left: 25%;">
-  	  	        <iframe data-src="src/cerebellum_lukas.html"></iframe>
-  	  	      </div>
-  	  	    </div>  	  		
   	  	</section>
   	  	<section>
   	  		<h2>Metric effect (code)</h2>
