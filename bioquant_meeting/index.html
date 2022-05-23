@@ -1,0 +1,311 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Linked Charts</title>
+    <link rel="stylesheet" href="../revealjs/dist/reset.css">
+    <link rel="stylesheet" href="../revealjs/dist/reveal.css">
+    <link rel="stylesheet" href="../revealjs/dist/theme/insomnia.css">
+    <link rel="stylesheet" type="text/css" href="src/css/prism.css">
+  </head>
+  <body background-size="cover">
+  	<div class="reveal">
+  	  <div class="slides">
+  	  	<section style="background-color: #000;">
+  	  	  <div>
+  	  	    <h1>Interactive Visualisation</h1>
+  	  	    <h2> for Omics Data Exploration</h2>
+  	  	  </div>
+  	  	  <img src="src/img/insomnia.png" class="plain" width="15%" style="margin: 5px;">
+  	  	  <table>
+  	  	    <tr width="100%">
+  	  	      <td style="color: #d4c78c;">Presented by:</td>
+  	  	      <td style="color: #d2dae7;">Svetlana Ovchinnikova</td>
+  	  	    </tr>
+  	  	    <tr>
+  	  	      <td style="color: #d4c78c;">Slides at:</td>
+  	  	      <td style="color: #d2dae7;">kloivenn.github.io/bioquant_meeting</td>
+  	  	    </tr>
+  	  	  </table>
+  	  	  <div class="twosided">
+  	  	    <small style="color: #d4c78c; text-align: center;">
+  	  	      May 23rd, 2022
+  	  	    </small>
+  	  	    <small style="color: #d4c78c; text-align: center;">
+  	  	      Heidelberg
+  	  	    </small>  
+  	  	  </div>
+  	  	</section>
+        <section>
+          <h2>Limitations of Static Plots</h2>
+          <div class="content">
+            <div class="content-pads">
+              <table>
+                <tr>
+                  <td width="50%">
+                    <h3>Number of elements</h3>
+                    <img src="src/img/zoomPlot.png" width="400px" style="margin: 0px;">
+                  </td>
+                  <td width="50%">
+                    <h3>Number of channels</h3>
+                    <img src="src/img/vis_channels_gold.png" width="400px" style="margin: 0px;">
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2>Unravel summary plots</h2>
+          <div class="content">
+            <div class="content-pads">
+              <table>
+                <tr>
+                  <td>
+                    <div class="r-stack">
+                      <img src="src/img/embedding_static.png" width="600px" class="fragment fade-out" data-fragment-index="0"/>
+                      <img src="src/img/embedding_static_751.png" width="600px" class="fragment fade-in-then-out" data-fragment-index="0"/>
+                      <img src="src/img/embedding_static_1405.png" width="600px" class="fragment fade-in-then-out" data-fragment-index="1"/>
+                      <img src="src/img/embedding_static_254.png" width="600px" class="fragment fade-in" data-fragment-index="2"/>
+                    </div>
+                  </td>
+                  <td style="vertical-align: middle;">
+                    <img src="src/img/arrow.svg" width="120" style="vertical-align: middle;" class="fragment fade-in" data-fragment-index="0"/>    
+                  </td>
+                  <td>
+                    <div class="r-stack">
+                      <img src="src/img/genes_static_751.png" width="600px" class="fragment fade-in-then-out" data-fragment-index="0"/>
+                      <img src="src/img/genes_static_1405.png" width="600px" class="fragment fade-in-then-out" data-fragment-index="1"/>
+                      <img src="src/img/genes_static_254.png" width="600px" class="fragment fade-in" data-fragment-index="2"/>
+                    </div>                    
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          <div class="wrapper">
+            <div class="bottom-cell">
+              <p class="footnote">
+                data from Moritz Jakab, Vascular Oncology and Metastasis, DKFZ
+              </p>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2>Linked Charts</h2>
+          <div class="content">
+            <div class="content-pads">
+              <div class="aspect-ratio" style="padding-top: 50%;">
+                <iframe data-src="src/app.html"></iframe>
+              </div>
+            </div>
+          </div>
+          <div class="wrapper">
+            <div class="bottom-cell">
+              <p class="footnote">data from Moritz Jakab, Vascular Oncology and Metastasis, DKFZ</a>
+              </p>
+            </div>
+          </div>
+        </section>
+        <section>
+         <h2>Visulisation flow</h2>
+          <div class="content">
+            <div class="content-pads">
+              <div class="aspect-ratio" style="padding-top: 50%;">
+                <iframe data-src="src/drug_full.html" ></iframe>
+              </div>
+            </div>
+          </div>            
+        </section>
+        <section>
+          <h2>Dimensionality Reduction</h2>
+          <div class="content">
+            <div class="content-pads">
+              <span class="fragment fade-in-and-out"></span>
+              <span class="fragment fade-in-and-out"></span>
+              <div data-animate>
+                <svg width="900" height="500">
+                  <g id="sc_table">
+                    <image href="src/img/table.png" width="300" x="50" y="30"/>
+                    <text x="200" y="260" text-anchor="middle">(m cells x n genes)</text>
+                  </g>
+                  <image href="src/img/clusters.png" width="300" x="550" y="150"/>
+                  <g id="dimred_arrow">
+                    <image href="src/img/arrow_long.svg" width="200" x="380" y="160" transform="rotate(30, 380, 160)"/>                    
+                    <text text-anchor="middle" x="470" y="210" transform="rotate(30, 470, 210)">
+                      <tspan x="470">Dimensionality</tspan>
+                      <tspan x="470" dy="1.4em">reduction</tspan>
+                    </text>
+                  </g>
+                  <text x="700" y="140" text-anchor="middle">2D embedding</text>
+                  <g id="graph" transform="translate(150, 410)">
+                    <image href="src/img/arrow_long.svg" width="120" y="-5" x="-5"/>
+                    <image href="src/img/arrow_long.svg" width="120" y="-5" x="-5" transform="rotate(-90)"/>
+                    <image href="src/img/arrow_long.svg" width="120" y="-5" x="-5" transform="rotate(135)"/>
+                    <text font-size="70%" x="70" y="-10">gene 1</text>
+                    <text font-size="70%" x="70" y="-10" transform="rotate(-90)">gene 2</text>
+                    <text font-size="70%" x="70" y="-10" transform="rotate(-225) rotate(180,70,-10) translate(-40,-20)">gene 3</text>
+                    <circle r="5" cx="30" cy="-80"/>
+                    <circle r="5" cx="40" cy="-20"/>
+                    <circle r="5" cx="-30" cy="-10"/>
+                    <circle r="5" cx="10" cy="30"/>
+                    <circle r="5" cx="60" cy="50"/>
+                    <text x="40" y="85">n dimensional space</text>
+                  </g>
+                </svg>
+                <!--
+                  {
+                  "setup": [{
+                  "element": "#graph",
+                  "modifier": "attr",
+                  "parameters": [{"opacity": 0}]   
+                  },{
+                  "element": "#dimred_arrow",
+                  "modifier": "attr",
+                  "parameters": [{"opacity": 0}]   
+                  },{
+                  "element": "#sc_table",
+                  "modifier": "attr",
+                  "parameters": [{"opacity": 0}]   
+                  }],
+                  "animation": [
+                [{
+                  "element": "#dimred_arrow",
+                  "modifier": "attr",
+                  "parameters": [{"opacity": 1}] 
+                  }, {
+                  "element": "#sc_table",
+                  "modifier": "attr",
+                  "parameters": [{"opacity": 1}]
+                  }
+                  ], [{
+                  "element": "#graph",
+                  "modifier": "attr",
+                  "parameters": [{"opacity": 1}] 
+                  }, {
+                  "element": "#dimred_arrow",
+                  "modifier": "rotate",
+                  "parameters": [-50, 470, 210]
+                  }, {
+                  "element": "#dimred_arrow",
+                  "modifier": "translate",
+                  "parameters": [-40, 100]
+                  }
+                  ], []
+                  ]
+                  }                
+                -->                   
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2>Distortion Is Unavoidable</h2>
+          <div class="content">
+            <div class="content-pads">
+              <img data-src="src/img/1ev1X.png">
+            </div>
+          </div>
+          <p><a target="about:blank" href="https://xkcd.com/977/">https://xkcd.com/977/</a></p>
+        </section>
+        <section>
+          <h2>Sleepwalk</h2>
+          <div class="content">
+            <div class="content-pads">
+              <pre><code data-trim data-noescape class="language-r">sleepwalk(Embeddings(Reductions(seu, "umap")), Embeddings(Reductions(seu, "pca")))</code></pre>
+              <div class="aspect-ratio" style="padding-top: 45%; width: 75%; margin-left: 10%;">
+                <iframe data-src="src/Fig_B.html"></iframe>
+              </div>
+            </div>
+          </div>
+          <div class="wrapper" style="z-index: -1;">
+            <div class="bottom-cell">
+              <p class="footnote">data from 
+                <a target="about:blank" href="https://doi.org/10.1038/nmeth.4380">Stoeckius et al., Simultaneous epitope and transcriptome measurement in single cells, Nature Methods, 14:865, 2017</a>
+              </p>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2>Compare Samples</h2>
+          <div class="content">
+            <div class="content-pads">
+              <pre><code data-trim data-noescape class="language-r">sleepwalk(list(um13_A, um13_B, um14), 
+      list(comFeatures13_A, comFeatures13_B, comFeatures14), same = "features",
+      titles = c("e13.5_A", "e13.5_B", "e14.5"), nrow = 1)</code></pre>
+            <div class="aspect-ratio" style="padding-top: 42%; width: 95%;">
+              <iframe data-src="src/Fig_D.html"></iframe>
+            </div>
+          </div>
+            </div>
+            <div class="wrapper">
+              <div class="bottom-cell">
+                <p class="footnote">data from 
+                  <a target="about:blank" href="https://doi.org/10.1016/j.cub.2018.07.062">Carter et al., A Single-Cell Transcriptional Atlas of the Developing Murine Cerebellum, Current Biology, 28:18, 2018</a>
+                </p>
+              </div>
+          </div>
+        </section>
+        <section>
+          <h2>Packages</h2>
+          <div class="content">
+            <div class="content-pads">
+              <h3>Available on CRAN</h3>
+              <ul>
+                <li>rlc (LinkedCharts)</li>
+                <p class="note">Interactive plotting library</p>
+                <p class="note" style="background-color: #000;  padding-right: 50px;"><a href="https://cran.r-project.org/package=rlc">https://cran.r-project.org/package=rlc</a></p>
+                <li>sleepwalk</li>
+                <p class="note">Explore distortions in a 2D embeddings</p>
+                <p class="note" style="background-color: #000; padding-right: 50px;"><a href="https://cran.r-project.org/package=sleepwalk">https://cran.r-project.org/package=sleepwalk</a></p>                
+                <li>jrc</li>
+                <p class="note">R-JavaScript bridge for package developers</p>
+                <p class="note" style="background-color: #000;  padding-right: 50px;"><a href="https://cran.r-project.org/package=jrc">https://cran.r-project.org/package=jrc</a></p>                
+              </ul>              
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2>Single Cell DCM Methilation</h2>
+          <div class="content">
+            <div class="content-pads">
+              <p><span class="highlight">Retrospective analysis of enhancer activity and transcriptome history</span></p>
+              <p class="note">by Ruben Boers, Joachim Boers, <...>, Joost Gribnau on 
+                <a href="https://www.biorxiv.org/content/10.1101/2021.09.07.459233v1.full" style="color: black;">bioRxiv</a></p>
+              <img src="src/img/F1.large.jpg" width="600px" />
+            </div>
+          </div>
+            <div class="wrapper">
+              <div class="bottom-cell">
+                <p class="footnote">in collaboration with Prof. Dr. Ana Martin-Villalba's Lab, DKFZ</p>
+              </div>
+          </div>          
+			</div>
+		</div>
+		<script type="text/javascript" src="src/js/prism.js"></script>
+		<script src="../revealjs/dist/reveal.js"></script>
+		<script src='../revealjs/plugin/notes/notes.js'></script>
+		<script src="../revealjs/plugin/animate/plugin.js"></script>
+		<script src="../revealjs/plugin/animate/svg.min.js"></script>
+
+		<script>
+		  // More info about config & dependencies:
+		  // - https://github.com/hakimel/reveal.js#configuration
+		  // - https://github.com/hakimel/reveal.js#dependencies
+		  Reveal.initialize({
+		    center: false,
+		    hash: true,
+		    slideNumber: 'c/t',
+		    math: {
+		      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+		      config: 'TeX-AMS_HTML-full',
+		      // pass other options into `MathJax.Hub.Config()`
+		      TeX: { Macros: { RR: "{\\bf R}" } }
+		    },
+
+		    plugins: [ RevealNotes, RevealAnimate ]
+		  });
+		</script>		  	    	
+  </body>
+</html>

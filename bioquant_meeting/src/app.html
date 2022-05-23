@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="css/linked-charts.css">
+	<script type="text/javascript" src = "js/linked-charts.min.js"></script>
+	<script type="text/javascript" src = "js/inputData.js"></script>
+	<script type="text/javascript" src="js/jstat.min.js"></script>
+	<script type="text/javascript" src="js/science.v1.min.js"></script>
+</head>
+<body>
+<table>
+	<tr>
+		<td id="A1"></td>
+		<td id="A2"></td>
+	</tr>	
+</table>
+<script type="text/javascript">
+	width = window.innerWidth/2;
+	var gene = 0,
+		cell = 0, shifts = [];
+
+	for(let i = 0; i < data.expr.length; i++) {
+		//shifts.push(getShift(i));
+	}
+
+	function getMeansAndSds(idx) {
+		var means = jStat(data.expr).col(idx).sumrow();
+		means = jStat.divide(means, idx.length);
+		var sds = jStat(data.expr).col(idx).transpose().stdev();
+		return {means: means, sds: sds}
+	}
+
+	function getTopGenes(cells) {
+		var nns_ms = getMeansAndSds(cells);
+		var idx = jStat.arange(data.expr.length);
+		var scores = idx.map(i => (nns_ms.means[i] - all_ms.means[i])/d3.max([0.1, nns_ms.sds[i] + all_ms.sds[i]]));
+		idx.sort((a,b) => scores[b] - scores[a])
+		for(let i = 0; i < 5; i++) {
+			if(!shifts[idx[i]]) shifts[idx[i]] = getShift(idx[i]);
+		}
+		return idx.slice(0, 5);
+	}
+
+	function getShift(gene) {
+		var density = science.stats.kde().sample(data.expr[gene]).bandwidth(0.1)(data.expr[gene]).map(el => el[1]);
+		var range = d3.extent(density);
+		return density.map(el => ((el - range[0])/(range[1] - range[0])) * (Math.random() - 0.5) * 0.4)
+	}
+
+	var all_ms = getMeansAndSds(jStat.arange(data.um[0].length));
+	var topGenes = getTopGenes(data.nns[cell]);
+
+	var emb = lc.scatter()
+		.x(i => data.um[0][i])
+		.y(i => data.um[1][i])
+    .width(width * 0.93 - 75)
+    .height(width * 0.9)
+    .set_paddings({bottom: 20})
+		.size(1.5)
+		.mode("canvas")
+		.colourValue(i => data.expr[gene][i])
+		.colourLegendTitle(() => data.genes[gene])
+		.on_click(function(d) {
+			cell = d;
+			topGenes = getTopGenes(data.nns[cell]);
+			genePlot.update();
+		})
+		.place("#A1");
+
+	var genePlot = lc.scatter()
+		.width(width * 0.93 )
+    .height(width * 0.9)
+    .set_paddings({bottom: 20})
+		.nelements(data.um[0].length * topGenes.length)
+	 	.x(i => data.genes[topGenes[i % topGenes.length]])
+	 	.y(i => data.expr[topGenes[i % topGenes.length]][Math.floor(i / topGenes.length)])
+	 	.mode("canvas")
+	 	.shiftX(i => shifts[topGenes[i % topGenes.length]][Math.floor(i / topGenes.length)])
+	 	.on_click(function(d) {
+	 		gene = topGenes[d % topGenes.length];
+	 		emb.updateElementStyle();
+	 	})
+	 	.size(1);
+	lc.scatter("currentCells", genePlot)
+		.nelements(topGenes.length * data.nns[0].length)
+		.x(i => data.genes[topGenes[i % topGenes.length]])
+		.y(i => data.expr[topGenes[i % topGenes.length]][data.nns[cell][Math.floor(i / topGenes.length)]])
+		.colour("red")
+	 	.on_click(function(d) {
+	 		gene = topGenes[d % topGenes.length];
+	 		emb.updateElementStyle();
+	 	})		
+		.place("#A2");
+</script>
+</body>
+</html>

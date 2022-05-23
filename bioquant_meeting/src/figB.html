@@ -1,0 +1,41 @@
+<head>
+	<link rel="stylesheet" type="text/css" href="css/linked-charts.css">
+	<script type="text/javascript" src = "js/linked-charts.min.js"></script>
+  <script type="text/javascript" src = "js/iris.js"></script>
+  <style>
+    .header {
+      text-align: center;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 16pt;
+    }
+  </style>
+</head>
+<body>
+  <table>
+    <tr>
+      <td>
+        <img src="img/ggplot.png" width="400px">
+      </td>
+      <td id = "lcCell"></td>
+    </tr>
+  </table>
+  <script>
+    width = window.innerWidth/2;
+    d3.select("img")
+      .attr("width", (width * 0.85) + "px");
+
+    var sc = lc.scatter()
+      .nelements(iris.length)
+      .width(width * 0.95 - 100)
+      .height(width * 0.74)
+		  .x(i => +iris[i].sepal_length)
+      .y(i => +iris[i].petal_length)
+      .size(i => +iris[i].sepal_width * 2)
+      .colourValue(i => +iris[i].petal_width)
+      .symbolValue(i => iris[i].species)
+      .colourLegendTitle("")
+      .symbolLegendTitle("")
+      .place("#lcCell");
+    sc.legend.width(100).update();
+  </script>
+</body>

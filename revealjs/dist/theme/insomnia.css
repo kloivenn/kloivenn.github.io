@@ -97,7 +97,7 @@ section > .wrapper > .bottom-cell {
   color: #d2dae7; 
 }
 
-.reveal h3 {
+.reveal h3, .reveal .h3 {
   font-family: 'Covington SC';
   font-size: 37px;
   letter-spacing: 1px;
@@ -365,6 +365,12 @@ section > .wrapper > .bottom-cell {
   stroke-dasharray: 5 5;
   stroke-width: 2;
   fill: none;
+}
+
+.reveal .filled_container {
+  stroke: #000;
+  stroke-width: 3;
+  fill: #d4c78c;
 }
 
 .reveal svg .text_block {
