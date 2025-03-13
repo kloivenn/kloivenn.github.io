@@ -86,6 +86,23 @@ export const transformElement = ( element, transform ) => {
 }
 
 /**
+ * Element.matches with IE support.
+ *
+ * @param {HTMLElement} target The element to match
+ * @param {String} selector The CSS selector to match
+ * the element against
+ *
+ * @return {Boolean}
+ */
+export const matches = ( target, selector ) => {
+
+	let matchesMethod = target.matches || target.matchesSelector || target.msMatchesSelector;
+
+	return !!( matchesMethod && matchesMethod.call( target, selector ) );
+
+}
+
+/**
  * Find the closest parent that matches the given
  * selector.
  *
@@ -96,25 +113,21 @@ export const transformElement = ( element, transform ) => {
  * @return {HTMLElement} The matched parent or null
  * if no matching parent was found
  */
-export const closestParent = ( target, selector ) => {
+export const closest = ( target, selector ) => {
 
-	let parent = target.parentNode;
+	// Native Element.closest
+	if( typeof target.closest === 'function' ) {
+		return target.closest( selector );
+	}
 
-	while( parent ) {
-
-		// There's some overhead doing this each time, we don't
-		// want to rewrite the element prototype but should still
-		// be enough to feature detect once at startup...
-		let matchesMethod = parent.matches || parent.matchesSelector || parent.msMatchesSelector;
-
-		// If we find a match, we're all set
-		if( matchesMethod && matchesMethod.call( parent, selector ) ) {
-			return parent;
+	// Polyfill
+	while( target ) {
+		if( matches( target, selector ) ) {
+			return target;
 		}
 
 		// Keep searching
-		parent = parent.parentNode;
-
+		target = target.parentNode;
 	}
 
 	return null;
@@ -266,4 +279,35 @@ export const getRemainingHeight = ( element, height = 0 ) => {
 
 	return height;
 
+}
+
+const fileExtensionToMimeMap = {
+	'mp4': 'video/mp4',
+	'm4a': 'video/mp4',
+	'ogv': 'video/ogg',
+	'mpeg': 'video/mpeg',
+	'webm': 'video/webm'
+}
+
+/**
+ * Guess the MIME type for common file formats.
+ */
+export const getMimeTypeFromFile = ( filename='' ) => {
+	return fileExtensionToMimeMap[filename.split('.').pop()]
+}
+
+/**
+ * Encodes a string for RFC3986-compliant URL format.
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURI#encoding_for_rfc3986
+ *
+ * @param {string} url
+ */
+export const encodeRFC3986URI = ( url='' ) => {
+	return encodeURI(url)
+	  .replace(/%5B/g, "[")
+	  .replace(/%5D/g, "]")
+	  .replace(
+		/[!'()*]/g,
+		(c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`
+	  );
 }

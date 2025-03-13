@@ -1,0 +1,200 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Group meeting</title>
+    <link rel="stylesheet" href="../revealjs/dist/reset.css">
+    <link rel="stylesheet" href="../revealjs/dist/reveal.css">
+    <link rel="stylesheet" href="../revealjs/dist/theme/mdzs.css">
+  </head>
+  <body background-size="cover">
+    <div class="reveal">
+      <div class="slides">
+        <section>
+          <h1 style="font-size: 130%; margin-top: 130px; margin-bottom: 10px;">Some pseudotime stuff</h1>
+          <h3 style="width: 50%; font-size: 200%; margin-left: auto; margin-right: auto;">Group meeting</h3>  
+          <img class="plain" src="img/rabbits.png"/>
+        </section>
+        <section>
+          <h2>How does pseudotime look like?</h2>
+          <div style="display: grid;">
+            <div style="grid-column: 1; margin-top: 30px;" class="fragment">
+              <div class="cloud">
+                <img class="plain" src="img/slingshot.png" width="400px"/>
+              </div>
+              <p class="highlight" style="font-size: 150%;">Like this?</p>
+            </div>
+            <div style="grid-column: 2; grid-row: 1; margin-top: 250px;" class="fragment">
+              <p class="highlight" style="font-size: 150%;">Or like this?</p>
+              <div class="cloud">
+                <img class="plain" src="img/pt_ex.png" width="600px"/>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2>Other options?</h2>
+          <ul style="width: 100%; margin-top: 50px;">
+            <li class="leftHeader highlight cloud fragment" data-fragment-index="1">UMAP, tSNE, etc.</li>
+            <li class="fragment" data-fragment-index="2" style="z-index: 100; position: relative; margin-bottom: 40px;">Too much relies on the neighbours.</li>
+            <li class="leftHeader highlight cloud fragment" data-fragment-index="3">PCA</li>
+            <li class="fragment" data-fragment-index="4" style="z-index: 100; position: relative; margin-bottom: 40px;">Linear, based on the set of correlated features.</li>
+            <li class="leftHeader highlight cloud fragment" data-fragment-index="5">principal curves</li>
+            <li class="fragment" data-fragment-index="6" style="z-index: 100; position: relative; margin-bottom: 40px;">Too greedy.</li>
+          </ul>
+          <div class="r-stack">
+            <img src="img/pt_ex.png" class="plain fragment fade-in-then-out" data-fragment-index="2"/>
+            <img src="img/gene_timeline.png" class="plain fragment fade-in-then-out" data-fragment-index="4" width="400px"/>
+            <img src="img/princurve.png" class="plain fragment fade-in-then-out" data-fragment-index="6" width="600px"/>
+            <div class="fragment" data-fragment-index="7">
+              <h3>Hypothetic solution:</h3>
+              <p>A set of principal curves, each limited with a specific set of features.</p>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2>Data to play with</h2>
+          <img class="plain" src="img/data.png"/>
+          <p>19080 cells, 48h post ischemia, GFP+ and GFP-</p>
+        </section>
+        <section>
+          <h2 style="color: brown; margin-top: 200px;">Option 1:</h2>
+          <h1 style="font-size: 130%;">Without neural networks</h1>
+        </section>
+        <section>
+          <h2>Define gene clusters</h2>
+          <div style="display: grid; margin-top: 100px;" class="cloud">
+            <div style="grid-column: 1;">
+              <img src="img/umap_clusters.png" class="plain"/>
+            </div>
+            <div style="grid-column: 2;">
+              <img src="img/gene_umap_rowsums.png" class="plain"/>
+            </div>
+          </div>
+          <p><span class="highlight">GLM-PCA</span> embedding applied to genes</p>
+        </section>
+        <section>
+          <h2>Embeddings based on a single gene cluster</h2>
+          <div class="r-stack cloud">
+            <img class="plain fragment" src="img/um_blob.png"/>
+            <img class="plain fragment" src="img/um_clusters.png"/>
+            <img class="plain fragment" src="img/um_funny.png"/>
+            <img class="plain fragment" src="img/um_funny2.png"/>
+            <img class="plain fragment" src="img/um_cellcycle.png"/>
+          </div>
+        </section>
+        <section>
+          <h2>Principal curves correlation</h2>
+          <img class="plain" src="img/princurve_cor.png"/>
+        </section>
+        <section>
+          <h2>Genes and pseudotimes</h2>
+          <div class="r-stack cloud" style="margin-top: 150px;">
+            <img class="plain fragment" src="img/Mki67_pt.png"/>
+            <img class="plain fragment" src="img/Slc1a3.png"/>
+          </div>        
+        </section>
+        <section>
+          <h2>Spline fitting</h2>
+          <div class="r-stack cloud" style="margin-top: 150px;">
+            <img class="plain fragment" src="img/Mki67_spline.png"/>
+            <img class="plain fragment" src="img/Slc1a3_spline.png"/>
+          </div>        
+        </section>
+        <section>
+          <h2>The goodness of fit?</h2>
+          <div class="r-stack cloud" style="margin-top: 150px;">
+            <img class="plain fragment" src="img/Mki67_r2.png"/>
+            <img class="plain fragment" src="img/pts_r2_sim.png"/>
+            <img class="plain fragment" src="img/pts_r2_orth.png"/>
+          </div>        
+        </section>
+        <section>
+          <h2>Gene overlaps</h2>
+          <img class="plain" src="img/overlaps.png"/>
+        </section>
+        <section>
+          <h2 style="color: brown; margin-top: 200px;">Option 2:</h2>
+          <h1 style="font-size: 130%;">Autoencoder magic</h1>
+        </section>
+        <section>
+          <h2>Parameters to fit</h2>
+          <div style="display: grid; grid-template-columns: 600px auto; margin-top: 100px;">
+            <div style="grid-column: 1;" class="cloud">
+              <img class="plain" src="img/sim_pt.png"/>
+            </div>
+            <div style="grid-column: 2;" class="cloud">
+              <p class="fragment">
+                $$cell_i = (p_{i1}, p_{i2}, ..., p_{iT})$$
+              </p>
+              <p class="fragment">For each pseudotime $p_t$ gene $j$ is described by:</p>
+              <ul>
+                <li class="fragment"><span class="highlight">mode position</span> $m_{jt}$</li>
+                <li class="fragment"><span class="highlight">peak width</span> $w_{jt}$ (or $w_j$)</li>
+                <li class="fragment"><span class="highlight">expression strength</span> $a_{jt}$</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2>(V)AE structure</h2>
+          <div class="cloud" style="margin-top: 100px;">
+            $$K_{[M \times N]} = F(P_{[N \times T]}, M_{[M \times T]}, W_{[1 \times M]}, A_{[T \times M]})$$
+            <img src="img/NN.png" class="plain"/>
+            <p class="fragment">
+              $$\hat{K_{ij}} = i_j + \sum_{t=1}^T a_{jt}^2 \cdot \exp{(\frac{-(p_{it} - m_{jt})^2}{w_j^2})}$$
+            </p>
+          </div>
+        </section>
+        <section>
+          <h2>Penalties</h2>
+          <ul style="width: 75%; margin-top: 50px;" class="cloud">
+            <li class="leftHeader highlight fragment" data-fragment-index="1">reconstruction penalty</li>
+            <li class="fragment" data-fragment-index="1">negative binomial loss</li>
+            <li class="leftHeader highlight fragment" data-fragment-index="2">"single peak penalty</li>
+            <li class="fragment" data-fragment-index="2">$$\sum_{i = 1}^N \left( \sum_{t = 1}^T \left| {a_{it}} \right| - \max_{t}{\left| a_{it} \right|} \right)$$</li>
+            <li class="leftHeader highlight fragment" data-fragment-index="3">"use intercept" penalty</li>
+            <li class="fragment" data-fragment-index="3">$$\sum_{i = 1}^N \sum_{t = 1}^T \left| {a_{it}} \right|$$</li>
+            <li class="leftHeader highlight fragment" data-fragment-index="4">"variational AE" penalty</li>
+            <li class="fragment" data-fragment-index="4">KL-divergence, uniform prior</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Does it work?</h2>
+          <div class="r-stack cloud" style="margin-top: 150px;">
+            <img class="plain fragment" src="img/nn_pts_1.png"/>
+            <img class="plain fragment" src="img/nn_pts_2.png"/>
+            <img class="plain fragment" src="img/nn_pts_3.png"/>
+          </div>
+          <p class="fragment">Not really... Suggestions?</p>
+        </section>
+      </div>
+    </div>
+
+    <script src="../revealjs/dist/reveal.js"></script>
+    <script src="../revealjs/plugin/math/math.js"></script>
+
+    <script>
+      // More info about config & dependencies:
+      // - https://github.com/hakimel/reveal.js#configuration
+      // - https://github.com/hakimel/reveal.js#dependencies
+      Reveal.initialize({
+        width: 1280,
+        height: 935,
+        center: false,
+        hash: true,
+        slideNumber: 'c/t',
+        mathjax3: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js',
+          tex: {
+            inlineMath: [ [ '$', '$' ], [ '\\(', '\\)' ]  ]
+          },
+          options: {
+            skipHtmlTags: [ 'script', 'noscript', 'style', 'textarea', 'pre' ]
+          },
+        },
+        plugins: [ RevealMath.MathJax3 ]
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,328 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>DCM</title>
+    <link rel="stylesheet" href="../revealjs/dist/reset.css">
+    <link rel="stylesheet" href="../revealjs/dist/reveal.css">
+    <link rel="stylesheet" href="../revealjs/dist/theme/insomnia.css">
+  </head>
+  <body background-size="cover">
+    <div class="reveal">
+      <div class="slides">
+        <section style="background-color: #000;">
+          <div>
+            <h1> Single Cell Center Heidelberg</h1>
+            <h2>Using DCM methylation marks to infer past transcriptional states</h2>
+          </div>
+          <img src="img/insomnia.png" class="plain" width="15%" style="margin: 80px;">
+          <table>
+            <tr width="100%">
+              <th width="50%" style="text-align: center;">Experiments by:</th>
+              <th width="50%" style="text-align: center;">Analysis by:</th>
+            </tr>
+            <tr>
+              <td style="color: #d2dae7; text-align: center;">
+                Zeynep Aydin<br><br>
+                Prof. Dr. Ana Martin-Villalba Lab<br>
+                DKFZ
+            </td>
+              <td style="color: #d2dae7; text-align: center;">
+                Svetlana Ovchinnikova<br><br>
+                Prof. Dr. Simon Anders Lab<br>
+                BioQuant
+              </td>
+            </tr>
+          </table>
+          <div class="twosided">
+            <small style="color: #d4c78c; text-align: center;">
+              March 13th, 2025
+            </small>
+            <small style="color: #d4c78c; text-align: center;">
+              Heidelberg
+            </small>  
+          </div>
+        </section>
+        <section>
+          <section>
+            <h2>DCM Mehtylation</h2>
+            <div class="content">
+              <table style="margin-top: 80px;">
+                <tr>
+                  <td style="vertical-align: top;">
+                    <table class="borders" style="margin-top: 40px; border: 2px solid #000;">
+                      <tr>
+                        <th colspan="3">E.Coli methylases</th>
+                      </tr>
+                      <tr>
+                        <td style="border-right: none;">Dam</td>
+                        <td style="border-right: none; border-left: none;">→</td>
+                        <td style="border-left: none;">G<span style="font-weight: bold; color: #e7ad52; font-size: 120%; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">A</span>TC</td>
+                      </tr>
+                      <tr>
+                        <td style="border-right: none;">Dcm</td>
+                        <td style="border-right: none; border-left: none;">→</td>
+                        <td style="border-left: none;">C<span style="font-weight: bold; color: #e7ad52; font-size: 120%; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">C</span>(A/T)GG</td>              
+                      </tr>
+                      <tr>
+                        <td style="border-right: none; vertical-align:middle;">EcoKI</td>
+                        <td style="border-right: none; border-left: none; vertical-align:middle;">→</td>
+                        <td style="border-left: none;">
+                          <span style="font-weight: bold; color: #e7ad52; font-size: 120%; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">AA</span>C(N6)GTGC, 
+                          GC<span style="font-weight: bold; color: #e7ad52; font-size: 120%; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">A</span>C(N6)GTT
+                        </td>
+                      </tr>            
+                    </table>
+                  </td>
+                  <td>
+                    <img src="img/methylation.png" class="plain">
+                  </td>
+                </tr>
+              </table>
+              <hr>
+              <h3 style="margin-top: 40px">DCM methylation</h3>
+              <ul style="margin-bottom: 30px;">
+                <li>Occurs once in 512 bp (if random)</li>
+                <span style="font-size: 80%; margin-left: 40px;">(in reality, once in ~300 bp, occurs more often in gene-rich areas)</span>
+                <li>Copied during cell division (~80% of DCM marks)</li>
+                <li>Does not affect biological processes in mammalian cells.</li>
+              </ul>
+            </div>
+            <div class="wrapper">
+              <div class="bottom-cell">
+                <p class="footnote">image from 
+                  <a target="about:blank" href="https://doi.org/10.1101/2021.09.07.459233">Boers et al., Retrospective analysis of enhancer activity and transcriptome history, bioRxiv, 2021</a>
+                </p>
+              </div>
+            </div>          
+          </section>
+          <section>
+            <h2>Experimental Settings</h2>
+            <div class="content" style="background-color: #000; background-image: none;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr;">
+                <div style="grid-column: 1; grid-row: 1;" class="fragment" data-fragment-index="0">
+                  <p class="highlight" style="font-size: 120%;">1. Introducing doxy</p>
+                  <table>
+                    <tr>
+                      <td>
+                        <img src="img/invitro.png" class="plain"/>
+                      </td>
+                      <td>
+                        <img src="img/explants.png" class="plain"/>
+                      </td>
+                      <td>
+                        <img src="img/water.png" class="plain"/>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="text-align: center;">
+                        <p style="color: #d2dae7;">In Vitro</p>
+                      </td>
+                      <td style="text-align: center;">
+                        <p style="color: #d2dae7;">Explants</p>
+                      </td>
+                      <td style="text-align: center;">
+                        <p style="color: #d2dae7;">Drinking Water</p>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                <div style="grid-column: 1; grid-row: 2;" class="fragment" data-fragment-index="1">
+                  <p class="highlight" style="font-size: 120%;">2. Waiting</p>
+                </div>
+                <div style="grid-column: 1; grid-row: 3;" class="fragment" data-fragment-index="2">
+                  <p class="highlight" style="font-size: 120%;">3. Sorting for GFP+</p>
+                  <img src="img/gfp.png" class="plain" width="400px"/>
+                </div>
+                <div style="grid-column: 2; grid-row: 1/4;" class="fragment" data-fragment-index="3">
+                  <p class="highlight" style="font-size: 120%;">4. Sequencing</p>
+                  <img src="img/scnt.png" class="plain" width="500px"/>
+                </div>
+              </div>
+            </div>
+            <div class="wrapper">
+              <div class="bottom-cell">
+                <p class="footnote">slide from Zeynep Aydin</p>
+              </div>
+            </div>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Signal-to-Noise Ratio</h2>
+            <div class="content">
+              <p><span class="highlight">Methylation fraction:</span> $m = \frac{\text{methylated motifs}}{\text{observed motifs}}$</p>
+              <table><tr>
+                <td><img src="img/gene_vs_other-1.png" class="plain fragment" width = "400px"></td>
+                <td style="vertical-align: top;">
+                  <ul style="margin-top: 25px;">
+                    <li class="fragment">Gene bodies are methylated more than other regions</li>
+                    <li class="fragment">DCM methylase activity varies <span class="highlight">a lot</span> between cells.</li>
+                    <li class="fragment">DCM works not in all cells</li>
+                    <li class="fragment">There is off-target methylation</li>
+                    <img src="img/stn-1.png" class="plain fragment" width = "650px"/>
+                  </ul>
+                </td>
+              </tr></table>
+            </div>
+          </section>
+          <section>
+            <h2>But what about GFP?</h2>
+            <div class="content" style="background-color: #000; background-image: none;">
+              <img src="img/gfp_doxy.png" class="plain" width="1200px"/>
+            </div>
+          </section>
+          <section>
+            <h2>If you wait long enough...</h2>
+            <div class="content">
+              <img src="img/stn_vs_pulse-1.png" class="plain" width="1000px"/>
+            </div>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Single cell WGBS is sparse</h2>
+            <div class="content">
+              <table><tr>
+                <td>
+                  <img src="img/dcm_sites-1.png" class="plain"/>
+                </td>
+                <td>
+                  <img src="img/observed_sites-1.png" class="plain"/>
+                </td>
+              </tr></table>
+            </div>
+          </section>
+          <section>
+            <h2>And what about expression?</h2>
+            <div class="content" style="background-color: #000; background-image: none;">
+              <table class="fragment" style="margin-bottom: 0px;">
+                <tr>
+                  <td><img src="img/AS-982795-LR-68602.png" class="plain" width="500px"/></td>
+                  <td><img src="img/AS-982125-LR-68602.png" class="plain" width="500px"/></td>
+                </tr>
+              </table>
+              <table class="fragment" style="margin-top: 0px;">
+                <tr>
+                  <td><img src="img/AS-982795-LR-68602_pert.png" class="plain" width="500px"/></td>
+                  <td><img src="img/AS-982125-LR-68602_pert.png" class="plain" width="500px"/></td>
+                </tr>
+              </table>
+            </div>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Binomial?</h2>
+            <div class="content">
+              <ul>
+                <li class="fragment">Assume that in cell $i$ any DCM site can always get methylated with the probability $p_{i}$.</li>
+                <li class="fragment">
+                  If there is no signal in gene $j$:
+                  $$
+                  M_{ij} \sim \text{Binomial}(N_{ij}, p_{i})
+                  $$    
+                </li>
+                <li class="fragment">Any extra methylation is due to past transcription.</li>
+              </ul>
+              <p class="fragment">
+                $$D_{ij} = \text{sign}(\frac{M_{ij}}{N_{ij}} - p_{i}) \sqrt{2 \left( \log L(M_{ij} | N_{ij}, \frac{M_{ij}}{N_{ij}}) - \log L(M_{ij} | N_{ij}, p_{i}) \right)}$$
+              </p>
+              <img src="img/dcm_cell-1.png" class="plain fragment" width="400px"/>
+            </div>
+          </section>
+          <section>
+            <h2>Cell types</h2>
+            <div class="content">
+              <table style="margin: 5px;">
+                <tr>
+                  <th style="text-align: center;">Expression</th>
+                  <th style="text-align: center;">DCM methylation</th>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="r-stack">
+                      <img src="img/seu-1.png" class="plain"/>
+                      <img src="img/binom_umap_stn-1.png" class="plain fragment" data-fragment-index="2"/>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="r-stack">
+                      <img src="img/binom_umap-1.png" class="plain fragment" data-fragment-index="1"/>
+                    </div>
+                  </td>
+                </tr>
+              </table>  
+              
+              </div>
+          </section>
+          <section>
+            <h2>Gene markers</h2>
+            <div class="content" style="background-color: #000; background-image: none;">
+              <img src="img/08_dcm_markers_heatmap.png" class="plain" width="1200px"/>
+            </div>
+          </section>
+          <section>
+            <h2>Identifying cell type</h2>
+            <div class="content" style="background-color: #000; background-image: none;">
+              <img src="img/cor_heatmap.png" class="plain" width="1200px"/>
+            </div>
+          </section>          
+        </section>
+        <section>
+            <h1 style="border: none; margin-top: 50px; font-size: 500%;">Thank you for your attention!</h1>
+            <div class="highlight" style="font-size: 120%;">
+              <p style="font-size: 150%; margin-top: 50px;">In collaboration with Ana Martin-Villalba's Lab</p>
+              <p style="margin-top: 50px;">Special thanks to:</p>
+              <ul>
+                <li>Zeynep Aydin</li>
+                <li>Santiago Cerrizuela</li>
+                <li>Andrea Sarvari</li>
+                <li>... and everyone else...</li>
+              </ul>
+            </div>   
+        </section>
+        <section>
+          <section>
+            <h2>Mehylome classification</h2>
+            <div class="content">
+              <img src="img/sortofroc-1.png" class="plain" width="1000px"/>
+            </div>
+          </section>
+          <section>
+            <h2>Not expressed genes</h2>
+            <div class="content" style="background-color: #000; background-image: none;">
+              <img src="img/region_methylation-1.png" class="plain" width="1000px"/>
+            </div>
+          </section>  
+        </section>
+      </div>
+    </div>
+
+    <script src="../revealjs/dist/reveal.js"></script>
+    <script src="../revealjs/plugin/math/math.js"></script>
+
+    <script>
+      // More info about config & dependencies:
+      // - https://github.com/hakimel/reveal.js#configuration
+      // - https://github.com/hakimel/reveal.js#dependencies
+      Reveal.initialize({
+        width: 1280,
+        height: 935,
+        center: false,
+        hash: true,
+        slideNumber: 'c/t',
+        mathjax3: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js',
+          tex: {
+            inlineMath: [ [ '$', '$' ], [ '\\(', '\\)' ]  ]
+          },
+          options: {
+            skipHtmlTags: [ 'script', 'noscript', 'style', 'textarea', 'pre' ]
+          },
+        },
+        plugins: [ RevealMath.MathJax3 ]
+      });
+    </script>
+  </body>
+</html>

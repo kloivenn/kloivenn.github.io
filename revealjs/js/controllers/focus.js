@@ -1,3 +1,5 @@
+import { closest } from '../utils/util.js'
+
 /**
  * Manages focus when a presentation is embedded. This
  * helps us only capture keyboard from the presentation
@@ -77,6 +79,12 @@ export default class Focus {
 
 	}
 
+	destroy() {
+
+		this.Reveal.getRevealElement().classList.remove( 'focused' );
+
+	}
+
 	onRevealPointerDown( event ) {
 
 		this.focus();
@@ -85,7 +93,7 @@ export default class Focus {
 
 	onDocumentPointerDown( event ) {
 
-		let revealElement = event.target.closest( '.reveal' );
+		let revealElement = closest( event.target, '.reveal' );
 		if( !revealElement || revealElement !== this.Reveal.getRevealElement() ) {
 			this.blur();
 		}

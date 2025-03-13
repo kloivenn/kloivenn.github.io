@@ -11,9 +11,6 @@
 @import url(fonts/kaneiwa/font.css);
 @import url(fonts/yozakura/font.css);
 
-section.has-dark-background, section.has-dark-background h1, section.has-dark-background h2, section.has-dark-background h3, section.has-dark-background h4, section.has-dark-background h5, section.has-dark-background h6 {
-  color: #fff; }
-
 section {
   height: inherit; }
 
@@ -138,7 +135,8 @@ body {
 }
 
 .reveal span.highlight,
-.reveal p.highlight {
+.reveal p.highlight,
+.reveal li.highlight {
   color: #c8012f;
 }
 
@@ -172,7 +170,7 @@ body {
   list-style-type: decimal; }
 
 .reveal ul ul {
-  list-style-type: square; }
+  list-style-type: none; }
 
 .reveal ul ul ul {
   list-style-type: circle; }

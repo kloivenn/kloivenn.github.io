@@ -238,12 +238,13 @@ section > .wrapper > .bottom-cell {
 .reveal table {
   margin: auto;
   border-collapse: collapse;
-  border-spacing: 0; }
+  border-spacing: 0;
+}
 
 .reveal table th {
+  background-color: #111;
   font-size: 120%;
   color: #d4c78c;
-  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
 
 .reveal table th,

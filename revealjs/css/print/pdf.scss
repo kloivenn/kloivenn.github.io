@@ -2,10 +2,10 @@
  * This stylesheet is used to print reveal.js
  * presentations to PDF.
  *
- * https://revealjs.revealjs.com/pdf-export/
+ * https://revealjs.com/pdf-export/
  */
 
-html.print-pdf {
+html.reveal-print {
 	* {
 		-webkit-print-color-adjust: exact;
 	}
@@ -30,30 +30,14 @@ html.print-pdf {
 	.reveal .progress,
 	.reveal .playback,
 	.reveal.overview,
-	.fork-reveal,
-	.share-reveal,
 	.state-background {
 		display: none !important;
 	}
 
-	h1, h2, h3, h4, h5, h6 {
-		text-shadow: 0 0 0 #000 !important;
-	}
-
 	.reveal pre code {
 		overflow: hidden !important;
-		font-family: Courier, 'Courier New', monospace !important;
 	}
 
-	ul, ol, div, p {
-		visibility: visible;
-		position: static;
-		width: auto;
-		height: auto;
-		display: block;
-		overflow: visible;
-		margin: auto;
-	}
 	.reveal {
 		width: auto !important;
 		height: auto !important;
@@ -86,6 +70,10 @@ html.print-pdf {
 		page-break-after: always;
 	}
 
+	.reveal .slides .pdf-page:last-of-type {
+		page-break-after: avoid;
+	}
+
 	.reveal .slides section {
 		visibility: visible !important;
 		display: block !important;
@@ -115,12 +103,10 @@ html.print-pdf {
 		box-shadow: none;
 	}
 
-	.reveal .roll {
-		overflow: visible;
-		line-height: 1em;
-	}
-
 	/* Slide backgrounds are placed inside of their slide when exporting to PDF */
+	.reveal .backgrounds {
+		display: none;
+	}
 	.reveal .slide-background {
 		display: block !important;
 		position: absolute;
@@ -163,6 +149,7 @@ html.print-pdf {
 		display: block;
 		position: absolute;
 		font-size: 14px;
+		visibility: visible;
 	}
 
 	/* This accessibility tool is not useful in PDF and breaks it visually */
